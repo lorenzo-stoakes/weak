@@ -144,4 +144,7 @@ Positions BoardPositions(BitBoard);
 Position  BitScanForward(BitBoard);
 Position  BitScanBackward(BitBoard bitBoard);
 
+// stringer.c
+char* StringPosition(Position);
+
 #endif
