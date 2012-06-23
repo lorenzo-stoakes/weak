@@ -161,22 +161,23 @@ static const BitBoard
   InitBlackKing                  = C64(0x1000000000000000);
 
 // bitboard.c
-int       PopCount(BitBoard);
-BitBoard  SoutOne(BitBoard);
-BitBoard  NortOne(BitBoard);
-BitBoard  WestOne(BitBoard);
+Position  BitScanBackward(BitBoard);
+Position  BitScanForward(BitBoard);
+Positions BoardPositions(BitBoard);
 BitBoard  EastOne(BitBoard);
-BitBoard  NoEaOne(BitBoard);
-BitBoard  SoEaOne(BitBoard);
-BitBoard  SoWeOne(BitBoard);
-BitBoard  NoWeOne(BitBoard);
-BitBoard  FlipVertical(BitBoard);
 BitBoard  FlipDiagA1H8(BitBoard);
+BitBoard  FlipVertical(BitBoard);
+BitBoard  NoEaOne(BitBoard);
+BitBoard  NortOne(BitBoard);
+BitBoard  NoWeOne(BitBoard);
+int       PopCount(BitBoard);
+bool      PositionOccupied(BitBoard, Position);
 BitBoard  Rotate90AntiClockwise(BitBoard);
 BitBoard  Rotate90Clockwise(BitBoard);
-Positions BoardPositions(BitBoard);
-Position  BitScanForward(BitBoard);
-Position  BitScanBackward(BitBoard);
+BitBoard  SoEaOne(BitBoard);
+BitBoard  SoutOne(BitBoard);
+BitBoard  SoWeOne(BitBoard);
+BitBoard  WestOne(BitBoard);
 
 // pawn.c
 BitBoard AllPawnPushSources(Side, ChessSet*);
