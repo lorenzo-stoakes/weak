@@ -12,14 +12,6 @@
 #define FILE(pos) ((File)(pos%8))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 
-enum Piece {
-  Pawn,
-  Knight,
-  Bishop,
-  Rook,
-  Queen,
-  King
-};
 
 enum MoveType {
   Normal,
@@ -30,6 +22,15 @@ enum MoveType {
   PromoteRook,
   PromoteQueen,
   EnPassant
+};
+
+enum Piece {
+  Pawn,
+  Knight,
+  Bishop,
+  Rook,
+  Queen,
+  King
 };
 
 enum Position {
