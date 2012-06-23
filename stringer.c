@@ -21,3 +21,34 @@ StringPosition(Position pos)
   return ret;
 }
 
+char*
+StringBitBoard(BitBoard bitBoard)
+{
+  Rank rank;
+  File file;
+  Position pos;
+  int newline, index;
+
+  char *ret = (char*)allocate(64+8);
+
+  for(pos = A1; pos <= H8; pos++) {
+
+
+    rank = Rank8 - RANK(pos);
+    file = FILE(pos);
+    newline = rank;
+    index = 8*rank + file + newline;
+
+    if(file == 7) {
+        ret[index+1] = '\n';
+    }
+
+    if((POSBOARD(pos)&bitBoard) == 0) {
+      ret[index] = '.';
+    } else {
+      ret[index] = '1';
+    }
+  }
+
+  return ret;
+}
