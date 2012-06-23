@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <strings.h>
+#include <ctype.h>
 #include "weak.h"
 
 char
@@ -50,6 +51,88 @@ StringBitBoard(BitBoard bitBoard)
     }
   }
   ret[64+8] = '\0';
+
+  return ret;
+}
+
+// ASCII-art representation of chessboard.
+char*
+StringChessSet(ChessSet *chessSet)
+{
+  // Include space for newlines.
+  char *ret = (char*)allocate(64+8+1);
+  char pieceChr;
+  int index, newline;
+  File file;
+  Piece piece;
+  Position pos;
+  Rank rank;
+  Side side;
+
+  // Outputs chess set as ascii-art.
+  // pieces are upper-case if white, lower-case if black.
+  // P=pawn, R=rook, N=knight, B=bishop, Q=queen, K=king, .=empty square.
+
+  // e.g., the initial position is output as follows:-
+
+  // rnbqkbnr
+  // pppppppp
+  // ........
+  // ........
+  // ........
+  // ........
+  // PPPPPPPP
+  // RNBQKBNR
+
+  for(pos = A1; pos <= H8; pos++) {
+    // Vertical flip.
+    rank = Rank8 - RANK(pos);
+    file = FILE(pos);
+
+	// We need to leave space for a newline after each rank. This is equal to the
+	// number of ranks which will appear before this one in the ASCII board,
+	// e.g. the vertically flipped rank.
+    newline = rank;
+    index = 8*rank + file + newline;
+
+    if(file == 7) {
+      ret[index+1] = '\n';
+    }
+
+    piece = SetPieceAt(&chessSet->White, pos);
+
+    if(piece != MissingPiece) {
+      side = White;
+    } else {
+      side = Black;
+      piece = SetPieceAt(&chessSet->Black, pos);
+    }
+
+    if(piece == MissingPiece) {
+      ret[index] = '.';
+    } else {
+      pieceChr = CharPiece(piece);
+
+      switch(side) {
+      case White:
+        ret[index] = pieceChr;
+        break;
+      case Black:
+        ret[index] = tolower(pieceChr);
+        break;
+      default:
+        panic("Impossible.");
+      }
+    }
+  }
+
+  ret[64+8] = '\0';
+
+  for(pos = A1; pos <= H8; pos++) {
+    if(ret[pos] == '\0') {
+        ret[pos] = '?';
+    }
+  }
 
   return ret;
 }
