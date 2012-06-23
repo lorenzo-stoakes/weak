@@ -146,7 +146,7 @@ static const BitBoard
 // util.c
 void* allocate(size_t);
 void  release(void*);
-void  panic(char*);
+void  panic(char*, ...);
 
 // bitboard.c
 int       PopCount(BitBoard);
