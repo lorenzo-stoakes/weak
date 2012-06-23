@@ -4,7 +4,7 @@
 int
 main(int argc, char **argv)
 {
-  puts("WeakC v0.0.dev.");
+  puts("WeakC v0.0.dev.\n");
 
   return 0;
 }
