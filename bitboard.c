@@ -23,4 +23,62 @@ PopCount(BitBoard x)
 
   return (int)x;
 }
+
+// northwest    north   northeast
+//  NoWe         Nort         NoEa
+//          +7    +8    +9
+//              \  |  /
+//  West    -1 <-  0 -> +1    East
+//              /  |  \
+//          -9    -8    -7
+//  SoWe         Sout         SoEa
+//  southwest    south   southeast
+
+BitBoard
+SoutOne(BitBoard bitBoard)
+{
+  return bitBoard >> 8;
+}
+
+BitBoard
+NortOne(BitBoard bitBoard)
+{
+  return bitBoard << 8;
+}
+
+BitBoard
+WestOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileAMask) >> 1;
+}
+
+BitBoard
+EastOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileHMask) << 1;
+}
+
+BitBoard
+NoEaOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileHMask) << 9;
+}
+
+BitBoard
+SoEaOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileHMask) >> 7;
+}
+
+BitBoard
+SoWeOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileAMask) >> 9;
+}
+
+BitBoard
+NoWeOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileAMask) << 7;
+}
 }

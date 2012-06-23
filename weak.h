@@ -76,5 +76,13 @@ BitBoard SoutOne(BitBoard);
 BitBoard NortOne(BitBoard);
 BitBoard WestOne(BitBoard);
 BitBoard 
+BitBoard  SoutOne(BitBoard);
+BitBoard  NortOne(BitBoard);
+BitBoard  WestOne(BitBoard);
+BitBoard  EastOne(BitBoard);
+BitBoard  NoEaOne(BitBoard);
+BitBoard  SoEaOne(BitBoard);
+BitBoard  SoWeOne(BitBoard);
+BitBoard  NoWeOne(BitBoard);
 
 #endif
