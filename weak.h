@@ -65,6 +65,11 @@ enum Rank {
   Rank8 = 7
 };
 
+enum Side {
+  White,
+  Black
+};
+
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
 // We use little-endian rank-file (LERF) mapping [1].
 typedef uint64_t         BitBoard;
@@ -75,6 +80,7 @@ typedef enum Position    Position;
 typedef struct Positions Positions;
 typedef enum Rank        Rank;
 typedef enum File        File;
+typedef enum Side        Side;
 
 struct Move {
   Piece    Piece;
