@@ -8,9 +8,9 @@
 
 // See http://chessprogramming.wikispaces.com/Bitboards.
 #define C64(constantU64) constantU64##ULL
-#define RANK(pos) (pos/8)
-#define FILE(pos) (pos%8)
 #define POSBOARD(pos) ((BitBoard)(1<<pos))
+#define RANK(pos) ((Rank)(pos/8))
+#define FILE(pos) ((File)(pos%8))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 
 enum Piece {
@@ -44,6 +44,28 @@ enum Position {
   A8, B8, C8, D8, E8, F8, G8, H8
 };
 
+enum Rank {
+  Rank1 = 0,
+  Rank2 = 1,
+  Rank3 = 2,
+  Rank4 = 3,
+  Rank5 = 4,
+  Rank6 = 5,
+  Rank7 = 6,
+  Rank8 = 7
+};
+
+enum File {
+  FileA = 0,
+  FileB = 1,
+  FileC = 2,
+  FileD = 3,
+  FileE = 4,
+  FileF = 5,
+  FileG = 6,
+  FileH = 7
+};
+
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
 // We use little-endian rank-file (LERF) mapping [1].
 typedef uint64_t         BitBoard;
@@ -52,6 +74,8 @@ typedef enum MoveType    MoveType;
 typedef enum Piece       Piece;
 typedef enum Position    Position;
 typedef struct Positions Positions;
+typedef enum Rank        Rank;
+typedef enum File        File;
 
 struct Move {
   Piece    Piece;
