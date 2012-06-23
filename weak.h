@@ -71,11 +71,7 @@ void* mal(size_t);
 void free(void*);
 
 // bitboard.c
-int      PopCount(BitBoard);
-BitBoard SoutOne(BitBoard);
-BitBoard NortOne(BitBoard);
-BitBoard WestOne(BitBoard);
-BitBoard 
+int       PopCount(BitBoard);
 BitBoard  SoutOne(BitBoard);
 BitBoard  NortOne(BitBoard);
 BitBoard  WestOne(BitBoard);
@@ -84,5 +80,10 @@ BitBoard  NoEaOne(BitBoard);
 BitBoard  SoEaOne(BitBoard);
 BitBoard  SoWeOne(BitBoard);
 BitBoard  NoWeOne(BitBoard);
+BitBoard  FlipVertical(BitBoard bitBoard);
+BitBoard  FlipDiagA1H8(BitBoard bitBoard);
+BitBoard  Rotate90AntiClockwise(BitBoard bitBoard);
+BitBoard  Rotate90Clockwise(BitBoard bitBoard);
+Positions BoardPositions(BitBoard);
 
 #endif
