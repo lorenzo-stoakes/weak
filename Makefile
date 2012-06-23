@@ -4,7 +4,8 @@ all: weak
 
 weak: bitboard.c\
       main.c\
+      pawn.c\
       stringer.c\
       util.c\
       weak.h
-	clang $(CFLAGS) main.c bitboard.c stringer.c util.c -o weak
+	clang $(CFLAGS) main.c bitboard.c pawn.c stringer.c util.c -o weak

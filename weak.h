@@ -167,6 +167,10 @@ Positions BoardPositions(BitBoard);
 Position  BitScanForward(BitBoard);
 Position  BitScanBackward(BitBoard);
 
+// pawn.c
+BitBoard AllPawnPushSources(Side, ChessSet*);
+BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
+
 // stringer.c
 char* StringBitBoard(BitBoard bitBoard);
 char* StringPosition(Position);
