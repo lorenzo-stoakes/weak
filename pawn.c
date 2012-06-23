@@ -1,14 +1,32 @@
 #include "weak.h"
 
 static BitBoard
-pawnSinglePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
+singlePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
 {
+  switch(side) {
+  case White:
+    return SoutOne(EmptySquares(chessSet)) & pawns;
+  case Black:
+    return NortOne(EmptySquares(chessSet)) & pawns;
+  }
+
+  panic("Invalid side %d.", side);
   return EmptyBoard;  
 }
 
 static BitBoard
-pawnDoublePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
+doublePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
 {
+  BitBoard singlePushes = singlePushSources(side, chessSet, pawns);
+
+  switch(side) {
+  case White:
+    return NortOne(singlePushes) & EmptySquares(chessSet) & Rank4Mask;
+  case Black:
+    return SoutOne(singlePushes) & EmptySquares(chessSet) & Rank5Mask;
+  }
+
+  panic("Invalid side %d.", side);
   return EmptyBoard;
 }
 
@@ -28,7 +46,7 @@ AllPawnPushSources(Side side, ChessSet *chessSet)
 BitBoard
 PawnPushSources(Side side, ChessSet *chessSet, BitBoard pawns)
 {
-  return pawnSinglePushSources(side, chessSet, pawns) |
-    pawnDoublePushSources(side, chessSet, pawns);
+  return singlePushSources(side, chessSet, pawns) |
+    doublePushSources(side, chessSet, pawns);
 }
 
