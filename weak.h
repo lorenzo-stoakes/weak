@@ -184,7 +184,10 @@ BitBoard AllPawnPushSources(Side, ChessSet*);
 BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
 
 // stringer.c
-char* StringBitBoard(BitBoard bitBoard);
+char  CharPiece(Piece);
+char* StringBitBoard(BitBoard);
+char* StringChessSet(ChessSet*);
+char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
 
