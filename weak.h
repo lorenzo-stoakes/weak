@@ -174,6 +174,7 @@ BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
 // stringer.c
 char* StringBitBoard(BitBoard bitBoard);
 char* StringPosition(Position);
+char* StringSide(Side);
 
 // util.c
 void* allocate(size_t);

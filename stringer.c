@@ -52,3 +52,16 @@ StringPosition(Position pos)
 
   return ret;
 }
+
+char*
+StringSide(Side side)
+{
+  switch(side) {
+  case White:
+    return strdup("white");
+  case Black:
+    return strdup("black");
+  }
+
+  return strdup("#invalid side");
+}
