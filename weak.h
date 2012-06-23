@@ -159,13 +159,13 @@ BitBoard  NoEaOne(BitBoard);
 BitBoard  SoEaOne(BitBoard);
 BitBoard  SoWeOne(BitBoard);
 BitBoard  NoWeOne(BitBoard);
-BitBoard  FlipVertical(BitBoard bitBoard);
-BitBoard  FlipDiagA1H8(BitBoard bitBoard);
-BitBoard  Rotate90AntiClockwise(BitBoard bitBoard);
-BitBoard  Rotate90Clockwise(BitBoard bitBoard);
+BitBoard  FlipVertical(BitBoard);
+BitBoard  FlipDiagA1H8(BitBoard);
+BitBoard  Rotate90AntiClockwise(BitBoard);
+BitBoard  Rotate90Clockwise(BitBoard);
 Positions BoardPositions(BitBoard);
 Position  BitScanForward(BitBoard);
-Position  BitScanBackward(BitBoard bitBoard);
+Position  BitScanBackward(BitBoard);
 
 // stringer.c
 char* StringBitBoard(BitBoard bitBoard);
