@@ -11,6 +11,7 @@
 #define RANK(pos) (pos/8)
 #define FILE(pos) (pos%8)
 #define POSBOARD(pos) ((BitBoard)(1<<pos))
+#define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 
 enum Piece {
   Pawn,
