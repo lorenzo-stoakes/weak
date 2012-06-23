@@ -40,7 +40,8 @@ enum Piece {
   Bishop,
   Rook,
   Queen,
-  King
+  King,
+  MissingPiece
 };
 
 enum Position {
