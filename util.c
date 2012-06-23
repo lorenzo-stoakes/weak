@@ -3,12 +3,14 @@
 
 // Wrapper for malloc. We might change the implementation later.
 void*
-mal(size_t size) {
+allocate(size_t size)
+{
   return malloc(size);
 }
 
 // Wrapper for free. We might change the implementation later.
 void
-free(void *ptr) {
+release(void *ptr)
+{
   free(ptr);
 }

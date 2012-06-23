@@ -67,8 +67,8 @@ static const BitBoard
   InitBlackKing                  = C64(0x1000000000000000);
 
 // util.c
-void* mal(size_t);
-void free(void*);
+void* allocate(size_t);
+void  release(void*);
 
 // bitboard.c
 int       PopCount(BitBoard);
