@@ -167,7 +167,7 @@ Position  BitScanForward(BitBoard);
 Position  BitScanBackward(BitBoard bitBoard);
 
 // stringer.c
-char* StringPosition(Position);
 char* StringBitBoard(BitBoard bitBoard);
+char* StringPosition(Position);
 
 #endif
