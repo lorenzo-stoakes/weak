@@ -1,4 +1,4 @@
-CFLAGS=-pedantic -Wall -g -std=c99
+CFLAGS=-pedantic -Wall -g -std=c99 -m64
 
 all: weak
 
