@@ -1,6 +1,17 @@
 #include <strings.h>
 #include "weak.h"
 
+// Used in BitScanForward.
+const Position deBruijnLookup[64] = {
+  63, 0, 58, 1, 59, 47, 53, 2,
+  60, 39, 48, 27, 54, 33, 42, 3,
+  61, 51, 37, 40, 49, 18, 28, 20,
+  55, 30, 34, 11, 43, 14, 22, 4,
+  62, 57, 46, 52, 38, 26, 32, 41,
+  50, 36, 17, 19, 29, 10, 13, 21,
+  56, 45, 25, 31, 35, 16, 9, 12,
+  44, 24, 15, 8, 23, 7, 6, 5,
+};
 // Count the number of bits in the specified BitBoard.
 int
 PopCount(BitBoard x)
@@ -166,4 +177,25 @@ BoardPositions(BitBoard bitBoard)
   }
 
   return ret;
+}
+
+// Determine the position of the first non-zero least significant bit.
+Position
+BitScanForward(BitBoard bitBoard)
+{
+  const BitBoard debruijn64 = 0x07EDD5E59A4E28C2;
+  BitBoard isolated, multiple;
+  int index;
+
+	// Uses De Bruijn multiplication. See [9].
+
+  if(bitBoard == EmptyBoard) {
+    panic("BitScanForward attempted on empty BitBoard.");
+  }
+
+  isolated = bitBoard & -bitBoard;
+  multiple = isolated * debruijn64;
+  index = multiple >> 58;
+
+  return deBruijnLookup[index];
 }
