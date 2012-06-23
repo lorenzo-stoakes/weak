@@ -12,6 +12,28 @@ const Position deBruijnLookup[64] = {
   56, 45, 25, 31, 35, 16, 9, 12,
   44, 24, 15, 8, 23, 7, 6, 5,
 };
+
+// Used in BackScanBackward.
+const int bitBackward8[256] = {
+  -1, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+};
+
+
 // Count the number of bits in the specified BitBoard.
 int
 PopCount(BitBoard x)
@@ -198,4 +220,31 @@ BitScanForward(BitBoard bitBoard)
   index = multiple >> 58;
 
   return deBruijnLookup[index];
+}
+
+// Determine the index of the first non-zero most significant bit.
+Position
+BitScanBackward(BitBoard bitBoard)
+{
+  // See [10].
+  int offset = 0;
+  
+  if(bitBoard == EmptyBoard){
+    panic("BitScanBackward attempted on empty BitBoard.");
+  }
+
+  if(bitBoard > 0xffffffff) {
+    bitBoard >>= 32;
+    offset = 32;
+  }
+  if(bitBoard > 0xffff) {
+    bitBoard >>= 16;
+    offset += 16;
+  }
+  if(bitBoard > 0xff) {
+    bitBoard >>= 8;
+    offset += 8;
+  }
+
+  return offset + bitBackward8[bitBoard];
 }
