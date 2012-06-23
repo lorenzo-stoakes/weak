@@ -2,6 +2,27 @@
 #include <strings.h>
 #include "weak.h"
 
+char
+CharPiece(Piece piece)
+{
+  switch(piece) {
+  case Pawn:
+    return 'P';
+  case Rook:
+    return 'R';
+  case Knight:
+    return 'N';
+  case Bishop:
+    return 'B';
+  case Queen:
+    return 'Q';
+  case King:
+    return 'K';
+  default:
+    return '?';
+  }
+}
+
 char*
 StringBitBoard(BitBoard bitBoard)
 {
@@ -13,8 +34,6 @@ StringBitBoard(BitBoard bitBoard)
   char *ret = (char*)allocate(64+8+1);
 
   for(pos = A1; pos <= H8; pos++) {
-
-
     rank = Rank8 - RANK(pos);
     file = FILE(pos);
     newline = rank;
@@ -33,6 +52,38 @@ StringBitBoard(BitBoard bitBoard)
   ret[64+8] = '\0';
 
   return ret;
+}
+
+char*
+StringPiece(Piece piece)
+{
+  char *ret;
+
+  switch(piece) {
+    case Pawn:
+      ret = "pawn";
+      break;
+    case Rook:
+      ret = "rook";
+      break;
+    case Knight:
+      ret = "knight";
+      break;
+    case Bishop:
+      ret = "bishop";
+      break;
+    case Queen:
+      ret = "queen";
+      break;
+    case King:
+      ret = "king";
+      break;
+    default:
+      ret = "#invalid piece";
+      break;
+  }
+
+  return strdup(ret);
 }
 
 char*
