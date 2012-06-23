@@ -189,6 +189,12 @@ ChessSet NewChessSet(void);
 BitBoard AllPawnPushSources(Side, ChessSet*);
 BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
 
+// set.c
+Set      NewBlackSet(void);
+Set      NewWhiteSet(void);
+BitBoard SetOccupancy(Set);
+Piece    SetPieceAt(Set*, Position);
+
 // stringer.c
 char  CharPiece(Piece);
 char* StringBitBoard(BitBoard);
