@@ -10,7 +10,7 @@ StringBitBoard(BitBoard bitBoard)
   Position pos;
   int newline, index;
 
-  char *ret = (char*)allocate(64+8);
+  char *ret = (char*)allocate(64+8+1);
 
   for(pos = A1; pos <= H8; pos++) {
 
@@ -30,6 +30,7 @@ StringBitBoard(BitBoard bitBoard)
       ret[index] = '1';
     }
   }
+  ret[64+8] = '\0';
 
   return ret;
 }
@@ -44,11 +45,13 @@ StringPosition(Position pos)
     return strdup("#invalid position");
   }
 
-  ret = (char*)allocate(2);
+  ret = (char*)allocate(2+1);
 
   if(sprintf(ret, "%c%d", 'a'+FILE(pos), RANK(pos)) != 2) {
     panic("Couldn't string position");
   }
+
+  ret[2] = '\0';
 
   return ret;
 }
