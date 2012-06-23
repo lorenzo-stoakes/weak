@@ -33,6 +33,119 @@ const int bitBackward8[256] = {
   7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 };
 
+Position
+BitScanBackward(BitBoard bitBoard)
+{
+  // See [10].
+
+  int offset = 0;
+
+  if(bitBoard == EmptyBoard) {
+    panic("BitScanBackward attempted on empty BitBoard.");
+  }
+
+  if(bitBoard > C64(0xffffffff)) {
+    bitBoard >>= 32;
+    offset = 32;
+  }
+  if(bitBoard > C64(0xffff)) {
+    bitBoard >>= 16;
+    offset += 16;
+  }
+  if(bitBoard > C64(0xff)) {
+    bitBoard >>= 8;
+    offset += 8;
+  }
+
+  return offset + bitBackward8[bitBoard];
+}
+
+// Determine the position of the first non-zero least significant bit.
+Position
+BitScanForward(BitBoard bitBoard)
+{
+  const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
+  BitBoard isolated, multiple;
+  int index;
+
+	// Uses De Bruijn multiplication. See [9].
+
+  if(bitBoard == EmptyBoard) {
+    panic("BitScanForward attempted on empty BitBoard.");
+  }
+
+  isolated = bitBoard & -bitBoard;
+  multiple = isolated * debruijn64;
+  index = multiple >> 58;
+
+  return deBruijnLookup[index];
+}
+
+
+Positions
+BoardPositions(BitBoard bitBoard)
+{
+  int i, n;
+  Position pos;
+  Positions ret;
+
+  if(bitBoard == EmptyBoard) {
+    ret.Vals = NULL;
+    ret.Length = 0;
+    return ret;
+  }
+
+  n = PopCount(bitBoard);
+  ret.Length = n;
+  ret.Vals = (Position*)allocate(n*sizeof(Position));
+
+  for(pos = A1; pos <= H8; pos++) {
+    if(PositionOccupied(bitBoard, pos)) {
+        ret.Vals[i] = pos;
+        i++;
+    }
+  }
+
+  return ret;
+}
+
+// Flip bitboard vertically (about the horizontal axis).
+BitBoard
+FlipVertical(BitBoard bitBoard)
+{
+  // Flipping about the horizontal rank [4].
+
+  return (bitBoard << 56) |
+    ((bitBoard << 40) & Rank7Mask) |
+    ((bitBoard << 24) & Rank6Mask) |
+    ((bitBoard << 8) & Rank5Mask) |
+    ((bitBoard >> 8) & Rank4Mask) |
+    ((bitBoard >> 24) & Rank3Mask) |
+    ((bitBoard >> 40) & Rank2Mask) |
+    (bitBoard >> 56);
+}
+
+// Flip bitboard diagonally about the A1-H8 diagonal.
+BitBoard
+FlipDiagA1H8(BitBoard bitBoard)
+{
+  // Flipping across A1-H8 [5].
+
+  BitBoard temp;
+  const BitBoard
+    k1 = C64(0x5500550055005500),
+    k2 = C64(0x3333000033330000),
+    k4 = C64(0x0f0f0f0f00000000);
+
+  temp = k4 & (bitBoard ^ (bitBoard << 28));
+  bitBoard ^= temp ^ (temp >> 28);
+  temp = k2 & (bitBoard ^ (bitBoard << 14));
+  bitBoard ^= temp ^ (temp >> 14);
+  temp = k1 & (bitBoard ^ (bitBoard << 7));
+  bitBoard ^= temp ^ (temp >> 7);
+  return bitBoard;
+}
+
 
 // Count the number of bits in the specified BitBoard.
 int
@@ -56,6 +169,35 @@ PopCount(BitBoard x)
   x = (x * kf) >> 56;
 
   return (int)x;
+}
+
+// Is the specified position occupied in the specified BitBoard?
+bool
+PositionOccupied(BitBoard bitBoard, Position pos)
+{
+  return (bitBoard & POSBOARD(pos)) != 0;
+}
+
+
+// Rotate bitboard 90 degrees anticlockwise.
+BitBoard
+Rotate90AntiClockwise(BitBoard bitBoard)
+{
+  // Flip vertically, then across A1-H8 diagonal [6].
+
+  bitBoard = FlipVertical(bitBoard);
+  return FlipDiagA1H8(bitBoard);
+}
+
+// Rotate bitboard 90 degrees clockwise.
+BitBoard
+Rotate90Clockwise(BitBoard bitBoard)
+{
+  // Rotate 90 degrees clockwise [7].
+
+  // Flip across A1-H8 diagonal, flip vertical.
+  bitBoard = FlipDiagA1H8(bitBoard);
+  return FlipVertical(bitBoard);
 }
 
 // northwest    north   northeast
@@ -114,137 +256,4 @@ BitBoard
 NoWeOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileAMask) << 7;
-}
-
-// Flip bitboard vertically (about the horizontal axis).
-BitBoard
-FlipVertical(BitBoard bitBoard)
-{
-  // Flipping about the horizontal rank [4].
-
-  return (bitBoard << 56) |
-    ((bitBoard << 40) & Rank7Mask) |
-    ((bitBoard << 24) & Rank6Mask) |
-    ((bitBoard << 8) & Rank5Mask) |
-    ((bitBoard >> 8) & Rank4Mask) |
-    ((bitBoard >> 24) & Rank3Mask) |
-    ((bitBoard >> 40) & Rank2Mask) |
-    (bitBoard >> 56);
-}
-
-// Flip bitboard diagonally about the A1-H8 diagonal.
-BitBoard
-FlipDiagA1H8(BitBoard bitBoard)
-{
-  // Flipping across A1-H8 [5].
-
-  BitBoard temp;
-  const BitBoard
-    k1 = C64(0x5500550055005500),
-    k2 = C64(0x3333000033330000),
-    k4 = C64(0x0f0f0f0f00000000);
-
-  temp = k4 & (bitBoard ^ (bitBoard << 28));
-  bitBoard ^= temp ^ (temp >> 28);
-  temp = k2 & (bitBoard ^ (bitBoard << 14));
-  bitBoard ^= temp ^ (temp >> 14);
-  temp = k1 & (bitBoard ^ (bitBoard << 7));
-  bitBoard ^= temp ^ (temp >> 7);
-  return bitBoard;
-}
-
-// Rotate bitboard 90 degrees anticlockwise.
-BitBoard
-Rotate90AntiClockwise(BitBoard bitBoard)
-{
-  // Flip vertically, then across A1-H8 diagonal [6].
-
-  bitBoard = FlipVertical(bitBoard);
-  return FlipDiagA1H8(bitBoard);
-}
-
-// Rotate bitboard 90 degrees clockwise.
-BitBoard
-Rotate90Clockwise(BitBoard bitBoard)
-{
-  // Rotate 90 degrees clockwise [7].
-
-  // Flip across A1-H8 diagonal, flip vertical.
-  bitBoard = FlipDiagA1H8(bitBoard);
-  return FlipVertical(bitBoard);
-}
-
-Positions
-BoardPositions(BitBoard bitBoard)
-{
-  int i, n;
-  Position pos;
-  Positions ret;
-
-  if(bitBoard == EmptyBoard) {
-    ret.Vals = NULL;
-    ret.Length = 0;
-    return ret;
-  }
-
-  n = PopCount(bitBoard);
-  ret.Length = n;
-  ret.Vals = (Position*)allocate(n*sizeof(Position));
-
-  for(pos = A1; pos <= H8; pos++) {
-    if((bitBoard&POSBOARD(pos)) != 0) {
-        ret.Vals[i] = pos;
-        i++;
-    }
-  }
-
-  return ret;
-}
-
-// Determine the position of the first non-zero least significant bit.
-Position
-BitScanForward(BitBoard bitBoard)
-{
-  const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
-  BitBoard isolated, multiple;
-  int index;
-
-	// Uses De Bruijn multiplication. See [9].
-
-  if(bitBoard == EmptyBoard) {
-    panic("BitScanForward attempted on empty BitBoard.");
-  }
-
-  isolated = bitBoard & -bitBoard;
-  multiple = isolated * debruijn64;
-  index = multiple >> 58;
-
-  return deBruijnLookup[index];
-}
-
-// Determine the index of the first non-zero most significant bit.
-Position
-BitScanBackward(BitBoard bitBoard)
-{
-  // See [10].
-  int offset = 0;
-  
-  if(bitBoard == EmptyBoard){
-    panic("BitScanBackward attempted on empty BitBoard.");
-  }
-
-  if(bitBoard > 0xffffffff) {
-    bitBoard >>= 32;
-    offset = 32;
-  }
-  if(bitBoard > 0xffff) {
-    bitBoard >>= 16;
-    offset += 16;
-  }
-  if(bitBoard > 0xff) {
-    bitBoard >>= 8;
-    offset += 8;
-  }
-
-  return offset + bitBackward8[bitBoard];
 }
