@@ -205,7 +205,7 @@ BoardPositions(BitBoard bitBoard)
 Position
 BitScanForward(BitBoard bitBoard)
 {
-  const BitBoard debruijn64 = 0x07EDD5E59A4E28C2;
+  const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
   BitBoard isolated, multiple;
   int index;
 
