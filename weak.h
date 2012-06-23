@@ -141,5 +141,7 @@ BitBoard  FlipDiagA1H8(BitBoard bitBoard);
 BitBoard  Rotate90AntiClockwise(BitBoard bitBoard);
 BitBoard  Rotate90Clockwise(BitBoard bitBoard);
 Positions BoardPositions(BitBoard);
+Position  BitScanForward(BitBoard);
+Position  BitScanBackward(BitBoard bitBoard);
 
 #endif
