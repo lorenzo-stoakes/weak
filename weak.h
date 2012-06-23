@@ -149,11 +149,6 @@ static const BitBoard
   InitBlackQueens                = C64(0x0800000000000000),
   InitBlackKing                  = C64(0x1000000000000000);
 
-// util.c
-void* allocate(size_t);
-void  release(void*);
-void  panic(char*, ...);
-
 // bitboard.c
 int       PopCount(BitBoard);
 BitBoard  SoutOne(BitBoard);
@@ -175,5 +170,10 @@ Position  BitScanBackward(BitBoard bitBoard);
 // stringer.c
 char* StringBitBoard(BitBoard bitBoard);
 char* StringPosition(Position);
+
+// util.c
+void* allocate(size_t);
+void  release(void*);
+void  panic(char*, ...);
 
 #endif
