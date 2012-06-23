@@ -12,6 +12,16 @@
 #define FILE(pos) ((File)(pos%8))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 
+enum File {
+  FileA = 0,
+  FileB = 1,
+  FileC = 2,
+  FileD = 3,
+  FileE = 4,
+  FileF = 5,
+  FileG = 6,
+  FileH = 7
+};
 
 enum MoveType {
   Normal,
@@ -53,17 +63,6 @@ enum Rank {
   Rank6 = 5,
   Rank7 = 6,
   Rank8 = 7
-};
-
-enum File {
-  FileA = 0,
-  FileB = 1,
-  FileC = 2,
-  FileD = 3,
-  FileE = 4,
-  FileF = 5,
-  FileG = 6,
-  FileH = 7
 };
 
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
