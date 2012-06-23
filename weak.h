@@ -8,7 +8,6 @@
 
 // See http://chessprogramming.wikispaces.com/Bitboards.
 #define C64(constantU64) constantU64##ULL
-#define POSBOARD(pos) ((BitBoard)(1<<pos))
 #define RANK(pos) ((Rank)(pos/8))
 #define FILE(pos) ((File)(pos%8))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
