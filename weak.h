@@ -179,6 +179,12 @@ BitBoard  SoutOne(BitBoard);
 BitBoard  SoWeOne(BitBoard);
 BitBoard  WestOne(BitBoard);
 
+
+// chessset.c
+BitBoard ChessSetOccupancy(ChessSet*);
+BitBoard EmptySquares(ChessSet*);
+ChessSet NewChessSet(void);
+
 // pawn.c
 BitBoard AllPawnPushSources(Side, ChessSet*);
 BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
