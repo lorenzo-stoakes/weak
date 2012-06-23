@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef WEAK_HEADER
 #define WEAK_HEADER
 
