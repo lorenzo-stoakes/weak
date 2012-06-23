@@ -13,7 +13,7 @@ const Position deBruijnLookup[64] = {
   44, 24, 15, 8, 23, 7, 6, 5,
 };
 
-// Used in BackScanBackward.
+// Used in BitScanBackward.
 const int bitBackward8[256] = {
   -1, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
