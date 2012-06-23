@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "weak.h"
 
@@ -13,4 +14,11 @@ void
 release(void *ptr)
 {
   free(ptr);
+}
+
+void
+panic(char *msg)
+{
+  fprintf(stderr, "%s\n", msg);
+  abort();
 }
