@@ -194,6 +194,25 @@ StringMove(Move *move)
 }
 
 char*
+StringPerft(PerftStats *s)
+{
+  char ret[1000];
+
+  sprintf(ret, ""
+          "Count:       %llu\n"
+          "Captures:    %llu\n"
+          "En Passants: %llu\n"
+          "Castles:     %llu\n"
+          "Promotions:  %llu\n"
+          "Checks:      %llu\n"
+          "Checkmates:  %llu\n",
+          s->Count, s->Captures, s->EnPassants, s->Castles, s->Promotions, s->Checks,
+          s->Checkmates);
+
+  return strdup(ret);
+}
+
+char*
 StringPiece(Piece piece)
 {
   char *ret;
