@@ -311,6 +311,13 @@ BitBoard NoWeRay(Position);
 BitBoard SoEaRay(Position);
 BitBoard SoWeRay(Position);
 
+// queen.c
+BitBoard AllQueenCaptureTargets(ChessSet*, Side);
+BitBoard AllQueenMoveTargets(ChessSet*, Side);
+BitBoard AllQueenThreats(ChessSet*, Side);
+BitBoard QueenCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard QueenMoveTargets(ChessSet*, Side, BitBoard);
+
 // rook.c
 BitBoard AllRookCaptureTargets(ChessSet*, Side);
 BitBoard AllRookMoveTargets(ChessSet*, Side);

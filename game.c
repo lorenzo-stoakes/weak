@@ -16,8 +16,9 @@ AllMoves(Game *game)
   // TODO: Clean up the duplication, for God's sake :-)
 
   int i, j, k;
-  BitBoard bishops, captureTargets, enPassantPawns, fromBoard, knights, moveTargets,
-    pawnCaptureSources, pawnPushSources, pawnCaptureTargets, pawnPushTargets, rooks, toBoard;
+  BitBoard bishops, captureTargets, enPassantPawns, fromBoard, kings, knights, moveTargets,
+    pawnCaptureSources, pawnPushSources, pawnCaptureTargets, pawnPushTargets, queens, rooks,
+    toBoard;
   Move move;
   Position from, to;
   Positions sourcePositions, targetPositions;
@@ -289,6 +290,57 @@ AllMoves(Game *game)
     }
   }
   
+  // Queens.
+
+  switch(game->WhosTurn) {
+  case White:
+    queens = game->ChessSet.White.Queens;
+    break;
+  case Black:
+    queens = game->ChessSet.Black.Queens;
+    break;
+  default:
+    panic("Invalid side %d.", game->WhosTurn);
+  }
+
+  sourcePositions = BoardPositions(queens);
+  for(i = 0; i < sourcePositions.Len; i++) {
+    from = sourcePositions.Vals[i];
+
+    moveTargets = QueenMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    captureTargets = QueenCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+
+    // Moves.
+    targetPositions = BoardPositions(moveTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Queen;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+
+    // Captures.
+    targetPositions = BoardPositions(captureTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Queen;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+  }
+
 
   return ret;
 }
@@ -792,7 +844,16 @@ static bool bishopLegal(Game *game, Move *move)
 
 static bool queenLegal(Game *game, Move *move)
 {
-  return false;
+  BitBoard from, to;
+
+  from = POSBOARD(move->From);
+  to = POSBOARD(move->To);
+
+  if(move->Capture) {
+    return (to&QueenCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
+  }
+
+  return (to&QueenMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;  
 }
 
 static bool kingLegal(Game *game, Move *move)
