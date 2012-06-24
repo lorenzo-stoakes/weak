@@ -264,7 +264,7 @@ MoveSlice NewMoveSlice(void);
 Move      PopMove(MoveSlice*);
 
 // movehistory.c
-MoveHistory      NewMoveHistory(void);
+MoveHistory NewMoveHistory(void);
 
 // pawn.c
 BitBoard AllPawnCaptureSources(ChessSet*, Side);
