@@ -26,8 +26,10 @@ ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   switch(side) {
   case White:
     SetPlacePiece(&chessSet->White, piece, pos);
+    break;
   case Black:
     SetPlacePiece(&chessSet->Black, piece, pos);
+    break;
   default:
     panic("Invalid side %d.", side);
   }
@@ -39,8 +41,10 @@ ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   switch(side) {
   case White:
     SetRemovePiece(&chessSet->White, piece, pos);
+    break;
   case Black:
     SetRemovePiece(&chessSet->Black, piece, pos);
+    break;
   default:
     panic("Invalid side %d.", side);
   }  
