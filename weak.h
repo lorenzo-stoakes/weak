@@ -250,10 +250,10 @@ void      ToggleTurn(Game *game);
 void      Unmove(Game*);
 
 // move.c
+MoveSlice AppendMove(MoveSlice, Move);
 MoveSlice NewMoveSlice(void);
 
 // movehistory.c
-CastleEventSlice NewCastleEventSlice(void);
 MoveHistory      NewMoveHistory(void);
 
 // pawn.c
