@@ -231,6 +231,7 @@ BitBoard  WestOne(BitBoard);
 
 // chessset.c
 BitBoard ChessSetOccupancy(ChessSet*);
+Piece    ChessSetPieceAt(ChessSet*, Side, Position);
 BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
