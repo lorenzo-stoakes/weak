@@ -6,6 +6,7 @@ static void
 init()
 {
   InitKnight();
+  InitRays();
 }
 
 int
