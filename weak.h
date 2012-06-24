@@ -238,6 +238,7 @@ CastleEvent      PopCastleEvent(CastleEventSlice*);
 
 // chessset.c
 BitBoard AllThreats(ChessSet*, Side);
+bool     Checked(ChessSet*, Side);
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
 BitBoard ChessSetOccupancy(ChessSet*);

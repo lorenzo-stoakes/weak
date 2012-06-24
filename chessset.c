@@ -9,6 +9,25 @@ AllThreats(ChessSet *chessSet, Side side)
 
   return AllPawnThreats(chessSet, side);
 }
+
+bool
+Checked(ChessSet *chessSet, Side side)
+{
+  BitBoard king;
+  switch(side) {
+  case White:
+    king = chessSet->White.King;
+    break;
+  case Black:
+    king = chessSet->Black.King;
+    break;
+  default:
+    panic("Invalid side %d.", side);
+  }
+
+  return (AllThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
+}
+
 BitBoard
 ChessSetOccupancy(ChessSet *chessSet)
 {
