@@ -267,6 +267,8 @@ Set      NewBlackSet(void);
 Set      NewWhiteSet(void);
 BitBoard SetOccupancy(Set*);
 Piece    SetPieceAt(Set*, Position);
+void     SetPlacePiece(Set*, Piece, Position);
+void     SetRemovePiece(Set*, Piece, Position);
 
 // stringer.c
 char  CharPiece(Piece);

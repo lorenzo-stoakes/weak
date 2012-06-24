@@ -62,3 +62,74 @@ SetPieceAt(Set *set, Position pos)
 
   return MissingPiece;
 }
+
+// Place piece on set.
+void
+SetPlacePiece(Set *set, Piece piece, Position pos)
+{
+  BitBoard bitBoard;
+
+  if(pos > 63) {
+    panic("Invaild position %d.", pos);
+  }
+
+  bitBoard = POSBOARD(pos);
+
+  switch(piece) {
+  case Pawn:
+    set->Pawns |= bitBoard;
+    break;
+  case Rook:
+    set->Rooks |= bitBoard;
+    break;    
+  case Knight:
+    set->Knights |= bitBoard;
+    break;    
+  case Bishop:
+    set->Bishops |= bitBoard;
+    break;    
+  case Queen:
+    set->Queens |= bitBoard;
+    break;    
+  case King:
+    set->King |= bitBoard;
+    break;    
+  default:
+    panic("Invalid piece %d.", piece);
+  }
+}
+
+// Remove piece on set.
+void
+SetRemovePiece(Set *set, Piece piece, Position pos)
+{
+  BitBoard complement;
+
+  if(pos > 63) {
+    panic("Invaild position %d.", pos);
+  }
+
+  complement = ~POSBOARD(pos);
+
+  switch(piece) {
+  case Pawn:
+    set->Pawns &= complement;
+    break;
+  case Rook:
+    set->Rooks &= complement;
+    break;
+  case Knight:
+    set->Knights &= complement;
+    break;
+  case Bishop:
+    set->Bishops &= complement;
+    break;
+  case Queen:
+    set->Queens &= complement;
+    break;
+  case King:
+    set->King &= complement;
+  default:
+    panic("Invalid piece %d.", piece);
+  }
+}
