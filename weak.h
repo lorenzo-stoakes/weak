@@ -90,6 +90,7 @@ typedef struct Move             Move;
 typedef struct MoveHistory      MoveHistory;
 typedef struct MoveSlice        MoveSlice;
 typedef enum MoveType           MoveType;
+typedef struct PerftStats       PerftStats;
 typedef enum Piece              Piece;
 typedef struct PieceSlice       PieceSlice;
 typedef enum Position           Position;
@@ -143,6 +144,10 @@ struct Move {
   Position From, To;
   bool     Capture;
   MoveType Type;
+};
+
+struct PerftStats {
+  uint64_t Count, Captures, EnPassants, Castles, Promotions, Checks, CheckMates;
 };
 
 struct Positions {
