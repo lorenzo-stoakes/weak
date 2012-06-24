@@ -137,57 +137,6 @@ AllMoves(Game *game)
     release(sourcePositions.Vals);
   }
 
-  // Knights.
-
-  switch(game->WhosTurn) {
-  case White:
-    knights = game->ChessSet.White.Knights;
-    break;
-  case Black:
-    knights = game->ChessSet.Black.Knights;
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
-  sourcePositions = BoardPositions(knights);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
-
-    moveTargets = KnightMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = KnightCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-
-    // Moves.
-    targetPositions = BoardPositions(moveTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
-
-      move.Piece = Knight;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-
-    // Captures.
-    targetPositions = BoardPositions(captureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
-
-      move.Piece = Knight;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
   // Rooks.
 
   switch(game->WhosTurn) {
@@ -229,6 +178,57 @@ AllMoves(Game *game)
       to = targetPositions.Vals[j];
 
       move.Piece = Rook;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+  }
+
+  // Knights.
+
+  switch(game->WhosTurn) {
+  case White:
+    knights = game->ChessSet.White.Knights;
+    break;
+  case Black:
+    knights = game->ChessSet.Black.Knights;
+    break;
+  default:
+    panic("Invalid side %d.", game->WhosTurn);
+  }
+
+  sourcePositions = BoardPositions(knights);
+  for(i = 0; i < sourcePositions.Len; i++) {
+    from = sourcePositions.Vals[i];
+
+    moveTargets = KnightMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    captureTargets = KnightCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+
+    // Moves.
+    targetPositions = BoardPositions(moveTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Knight;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+
+    // Captures.
+    targetPositions = BoardPositions(captureTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Knight;
       move.From = from;
       move.To = to;
       move.Capture = true;
