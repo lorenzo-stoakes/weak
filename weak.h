@@ -231,6 +231,10 @@ BitBoard  SoutOne(BitBoard);
 BitBoard  SoWeOne(BitBoard);
 BitBoard  WestOne(BitBoard);
 
+// castleevent.c
+CastleEventSlice AppendCastleEvent(CastleEventSlice, CastleEvent);
+CastleEventSlice NewCastleEventSlice(void);
+
 // chessset.c
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
