@@ -149,7 +149,7 @@ struct Move {
 };
 
 struct PerftStats {
-  uint64_t Count, Captures, EnPassants, Castles, Promotions, Checks, CheckMates;
+  uint64_t Count, Captures, EnPassants, Castles, Promotions, Checks, Checkmates;
 };
 
 struct Positions {
