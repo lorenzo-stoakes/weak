@@ -205,7 +205,7 @@ Rotate90Clockwise(BitBoard bitBoard)
 //          +7    +8    +9
 //              \  |  /
 //  West    -1 <-  0 -> +1    East
-//              /  |  \
+//              /  |  \.
 //          -9    -8    -7
 //  SoWe         Sout         SoEa
 //  southwest    south   southeast
