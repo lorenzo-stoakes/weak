@@ -293,6 +293,16 @@ PieceSlice AppendPiece(PieceSlice, Piece);
 PieceSlice NewPieceSlice(void);
 Piece      PopPiece(PieceSlice*);
 
+// position.c
+void     InitRays(void);
+BitBoard NortRay(Position);
+BitBoard EastRay(Position);
+BitBoard SoutRay(Position);
+BitBoard WestRay(Position);
+BitBoard NoEaRay(Position);
+BitBoard NoWeRay(Position);
+BitBoard SoEaRay(Position);
+BitBoard SoWeRay(Position);
 // set.c
 Set      NewBlackSet(void);
 Set      NewWhiteSet(void);
