@@ -124,7 +124,7 @@ struct Set {
 
 struct MoveHistory {
   CastleEventSlice CastleEvents;
-  MoveSlice        Moves;  
+  MoveSlice        Moves;
   PieceSlice       CapturedPieces;
 };
 
@@ -137,7 +137,7 @@ struct Game {
   bool        CastleKingSideBlack, CastleQueenSideBlack;
   ChessSet    ChessSet;
   bool        Debug;
-  MoveHistory History;  
+  MoveHistory History;
   Side        WhosTurn, HumanSide;
 };
 
