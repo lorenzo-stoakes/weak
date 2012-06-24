@@ -247,7 +247,7 @@ BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
 // game.c
-MoveSlice AllMoves(Game *);
+MoveSlice AllMoves(Game*);
 bool      Checkmated(Game*);
 void      DoCastleKingSide(Game*);
 void      DoCastleQueenSide(Game*);
