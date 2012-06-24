@@ -613,5 +613,67 @@ static bool kingLegal(Game *game, Move *move)
 
 static CastleEvent updateCastlingRights(Game *game, Move *move)
 {
-  return NoCastleEvent;
+  CastleEvent ret = NoCastleEvent;
+
+  switch(move->Type) {
+  default:
+    return NoCastleEvent;
+  case Normal:
+    if(move->Piece != King && move->Piece != Rook) {
+      return NoCastleEvent;
+    }
+    break;
+  case CastleKingSide:
+  case CastleQueenSide:
+    if(game->WhosTurn == White) {
+        return LostKingSideWhite | LostQueenSideWhite;
+    } else if(game->WhosTurn == Black) {
+        return LostKingSideBlack | LostQueenSideBlack;
+    } else {
+      panic("Unrecognised side %d.", game->WhosTurn);
+    }
+  }
+
+  switch(game->WhosTurn) {
+  case White:
+    if(move->Piece == King && move->From == E1) {
+      if(game->CastleQueenSideWhite) {
+        ret = LostQueenSideWhite;
+        game->CastleQueenSideWhite = false;
+      }
+      if(game->CastleKingSideWhite) {
+        ret |= LostKingSideWhite;
+        game->CastleKingSideWhite = false;
+      }
+    } else if(game->CastleQueenSideWhite && move->Piece == Rook && move->From == A1) {
+      ret = LostQueenSideWhite;
+      game->CastleQueenSideWhite = false;
+    } else if(game->CastleKingSideWhite && move->Piece == Rook && move->From == H1) {
+      ret = LostKingSideWhite;
+      game->CastleKingSideWhite = false;
+    }
+    break;
+  case Black:
+    if(move->Piece == King && move->From == E8) {
+      if(game->CastleQueenSideBlack) {
+        ret = LostQueenSideBlack;
+        game->CastleQueenSideBlack = false;
+      }
+      if(game->CastleKingSideBlack) {
+        ret |= LostKingSideBlack;
+        game->CastleKingSideBlack = false;
+      }
+    } else if(game->CastleQueenSideBlack && move->Piece == Rook && move->From == A8) {
+      ret = LostQueenSideBlack;
+      game->CastleQueenSideBlack = false;
+    } else if(game->CastleKingSideBlack && move->Piece == Rook && move->From == H8) {
+      ret = LostKingSideBlack;
+      game->CastleKingSideBlack = false;
+    }
+    break;
+  default:
+    panic("Invalid side %d.", game->WhosTurn);
+  }
+
+  return ret;
 }
