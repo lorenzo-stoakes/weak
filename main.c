@@ -4,20 +4,15 @@
 int
 main(int argc, char **argv)
 {
-  int i;
   Game game;
-  Move move;
-  MoveSlice moves;
+  PerftStats stats;
 
   puts("WeakC v0.0.dev.\n");
 
   game = NewGame(true, White);
-  moves = AllMoves(&game);
 
-  for(i = 0; i < moves.Len; i++) {
-    move = moves.Vals[i];
-    puts(StringMove(&move));
-  }
-
+  stats = Perft(&game, 4);
+  puts(StringPerft(&stats));
+  
   return 0;
 }
