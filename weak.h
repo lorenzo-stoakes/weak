@@ -235,6 +235,10 @@ Piece    ChessSetPieceAt(ChessSet*, Side, Position);
 BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
+// game.c
+bool Legal(Game*, Move*);
+Game NewGame(bool, Side);
+
 // move.c
 MoveSlice NewMoveSlice(void);
 
