@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-pedantic -Wall -Werror -g -std=c99 -m64
+CFLAGS=-pedantic -Wall -Werror -g -std=c99 -m64 -O2
 
 all: weak
 
