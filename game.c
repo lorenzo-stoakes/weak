@@ -218,6 +218,100 @@ Legal(Game *game, Move *move)
   return pieceLegal && !ExposesCheck(game, move);
 }
 
+// Attempt to move piece.
+void
+DoMove(Game *game, Move *move)
+{
+  Piece piece;
+  Position enPassant;
+  Rank offset;
+  Side opposite = OPPOSITE(game->WhosTurn);
+
+  switch(move->Type) {
+  default:
+    panic("Move type %d not recognised.", move->Type);
+  case CastleKingSide:
+    DoCastleKingSide(game);
+    break;
+  case CastleQueenSide:
+    DoCastleQueenSide(game);
+    break;
+  case EnPassant:
+    // Panic, because in the usual course of the game .Legal() would have picked
+    // these up, and the move makes no sense without these conditions being true.
+    if(move->Piece != Pawn) {
+      panic("Expected pawn, en passant performed on piece %s.", move->Piece);
+    }
+    if(!move->Capture) {
+      panic("En passant move, but not capture.");
+    }
+
+    switch(game->WhosTurn) {
+    case White:
+      offset = -1;
+      break;
+    case Black:
+      offset = 1;
+      break;
+    default:
+      panic("Unrecognised side %d.", game->WhosTurn);
+    }
+
+    enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
+
+    piece = ChessSetPieceAt(&game->ChessSet, opposite, enPassant);
+    if(piece == MissingPiece) {
+      panic("No piece at %s when attempting en passant.", StringPosition(enPassant));
+    } else {
+      if(piece != Pawn) {
+        panic("Piece taken via en passant is %s, not pawn.", piece);
+      }
+      ChessSetRemovePiece(&game->ChessSet, opposite, piece, enPassant);
+      game->History.CapturedPieces = AppendPiece(game->History.CapturedPieces, piece);
+    }
+
+    break;
+  case PromoteKnight:
+  case PromoteBishop:
+  case PromoteRook:
+  case PromoteQueen:
+  case Normal:
+    if(move->Capture) {
+      piece = ChessSetPieceAt(&game->ChessSet, opposite, move->To);
+      if(piece == MissingPiece) {
+        panic("No piece at %s when attempting capture %s.", StringPosition(move->To),
+              StringMove(move));
+      } else {
+        ChessSetRemovePiece(&game->ChessSet, opposite, piece, move->To);
+        game->History.CapturedPieces = AppendPiece(game->History.CapturedPieces, piece);
+      }
+    }
+
+    if(move->Type == Normal) {
+      piece = move->Piece;
+    } else if(move->Type == PromoteKnight) {
+      piece = Knight;
+    } else if(move->Type == PromoteBishop) {
+      piece = Bishop;
+    } else if(move->Type == PromoteRook) {
+      piece = Rook;
+    } else if(move->Type == PromoteQueen) {
+      piece = Queen;
+    } else {
+      panic("Impossible.");
+    }
+
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
+  }
+
+  game->History.CastleEvents = AppendCastleEvent(game->History.CastleEvents,
+                                                 updateCastlingRights(game, *move));
+  ToggleTurn(game);
+}
+
+// Create new game with specified human side and white + black's pieces in standard initial
+// positions.
 Game
 NewGame(bool debug, Side humanSide)
 {

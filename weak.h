@@ -240,11 +240,12 @@ BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
 // game.c
-void DoCastleKingSide(Game*);
-void DoCastleQueenSide(Game*);
-bool Legal(Game*, Move*);
-Game NewGame(bool, Side);
 MoveSlice AllMoves(Game *);
+void      DoCastleKingSide(Game*);
+void      DoCastleQueenSide(Game*);
+bool      Legal(Game*, Move*);
+void      DoMove(Game*, Move*);
+Game      NewGame(bool, Side);
 void      ToggleTurn(Game *game);
 void      Unmove(Game*);
 
