@@ -244,6 +244,7 @@ void DoCastleKingSide(Game*);
 void DoCastleQueenSide(Game*);
 bool Legal(Game*, Move*);
 Game NewGame(bool, Side);
+void      ToggleTurn(Game *game);
 
 // move.c
 MoveSlice NewMoveSlice(void);

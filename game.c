@@ -107,6 +107,11 @@ NewGame(bool debug, Side humanSide)
   return ret;
 }
 
+// Toggle whose turn it is.
+void
+ToggleTurn(Game *game) {
+  game->WhosTurn = OPPOSITE(game->WhosTurn);
+}
 static bool
 castleLegal(Game *game, bool queenSide)
 {
