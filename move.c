@@ -43,3 +43,18 @@ NewMoveSlice()
 
   return ret;
 }
+
+Move
+PopMove(MoveSlice *slice)
+{
+  Move ret;
+
+  if(slice->Len <= 0) {
+    panic("Invaild slice length %d on PopMove().", slice->Len);
+  }
+
+  ret = slice->Vals[slice->Len-1];
+  slice->Len--;
+
+  return ret;
+}
