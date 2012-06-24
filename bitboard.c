@@ -85,7 +85,7 @@ BitScanForward(BitBoard bitBoard)
 Positions
 BoardPositions(BitBoard bitBoard)
 {
-  int i, n;
+  int i = 0, n;
   Position pos;
   Positions ret;
 
@@ -101,8 +101,8 @@ BoardPositions(BitBoard bitBoard)
 
   for(pos = A1; pos <= H8; pos++) {
     if(PositionOccupied(bitBoard, pos)) {
-        ret.Vals[i] = pos;
-        i++;
+      ret.Vals[i] = pos;
+      i++;
     }
   }
 
