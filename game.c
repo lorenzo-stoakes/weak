@@ -352,10 +352,131 @@ ToggleTurn(Game *game) {
   game->WhosTurn = OPPOSITE(game->WhosTurn);
 }
 
+// Attempt to undo move.
 void
 Unmove(Game *game)
 {
-  panic("Not implemented.");
+  CastleEvent castleEvent;
+  Move move;
+  Piece captured, piece;
+  Position to;
+  Rank offset;
+  Side opposite;
+
+  // Rollback to previous turn.
+  move = PopMove(&game->History.Moves);
+  ToggleTurn(game);
+
+  switch(move.Type) {
+  case EnPassant:
+  case Normal:
+    piece = move.Piece;
+    break;
+  case PromoteKnight:
+    piece = Knight;
+    break;
+  case PromoteBishop:
+    piece = Bishop;
+    break;
+  case PromoteRook:
+    piece = Rook;
+    break;
+  case PromoteQueen:
+    piece = Queen;
+    break;
+  case CastleQueenSide:
+  case CastleKingSide:
+    ;
+  }
+
+  switch(move.Type) {
+  case EnPassant:
+  case PromoteKnight:
+  case PromoteBishop:
+  case PromoteRook:
+  case PromoteQueen:
+  case Normal:
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, piece, move.To);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.From);
+
+    if(move.Capture) {
+        captured = PopPiece(&game->History.CapturedPieces);
+
+        opposite = OPPOSITE(game->WhosTurn);
+        if(move.Type == EnPassant) {
+          switch(game->WhosTurn) {
+          case White:
+            offset = -1;
+            break;
+          case Black:
+            offset = 1;
+            break;
+          default:
+            panic("Unrecognised side %d.", game->WhosTurn);
+          }
+          to = POSITION(RANK(move.To)+offset, FILE(move.To));
+          ChessSetPlacePiece(&game->ChessSet, opposite, captured, to);
+        } else {
+          ChessSetPlacePiece(&game->ChessSet, opposite, captured, move.To);
+        }
+    }
+    break;
+  case CastleQueenSide:
+    if(game->WhosTurn == White) {
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, D1);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, A1);
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, C1);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1);
+    } else if(game->WhosTurn == Black) {
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, D8);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, A8);
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, C8);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E8);
+    } else {
+      panic("Invalid side %d.", game->WhosTurn);
+    }
+    break;
+  case CastleKingSide:
+    if(game->WhosTurn == White) {
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, F1);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, H1);
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, G1);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1);
+    } else if(game->WhosTurn == Black) {
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, F8);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, H8);
+      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, G8);
+      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E8);
+    } else {
+      panic("Invalid side %d.", game->WhosTurn);
+    }
+    break;
+  default:
+    panic("Unrecognised move type %d.", move.Type);
+  }
+
+  castleEvent = PopCastleEvent(&game->History.CastleEvents);
+
+  switch(game->WhosTurn) {
+  case White:
+    if((castleEvent&LostQueenSideWhite) == LostQueenSideWhite) {
+      game->CastleQueenSideWhite = true;
+    }
+    if((castleEvent&LostKingSideWhite) == LostKingSideWhite) {
+      game->CastleKingSideWhite = true;
+    }
+    break;
+  case Black:
+    if((castleEvent&LostQueenSideBlack) == LostQueenSideBlack) {
+      game->CastleQueenSideBlack = true;
+    }
+    if((castleEvent&LostKingSideBlack) == LostKingSideBlack) {
+      game->CastleKingSideBlack = true;
+    }
+    break;
+  default:
+    panic("Invalid side %d.", game->WhosTurn);
+  }
 }
 
 static bool
