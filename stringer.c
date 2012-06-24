@@ -136,6 +136,61 @@ StringChessSet(ChessSet *chessSet)
 
   return strdup(ret);
 }
+
+// String move in long algebraic form.
+char*
+StringMove(Move move)
+{
+  char actionChr, pieceChr;
+  char *suffix, *from, *to;
+  char ret[1+2+1+2+2+1];
+
+  from = StringPosition(move.From);
+  to = StringPosition(move.To);
+
+  switch(move.Type) {
+  default:
+    suffix = "??";
+    break;
+  case CastleQueenSide:
+    return strdup("O-O-O");
+  case CastleKingSide:
+    return strdup("O-O");    
+  case EnPassant:
+    suffix = "ep";
+    break;
+  case PromoteKnight:
+    suffix = "=N";
+    break;
+  case PromoteBishop:
+    suffix = "=B";
+    break;
+  case PromoteRook:
+    suffix = "=R";
+    break;
+  case PromoteQueen:
+    suffix = "=Q";
+    break;
+  case Normal:
+    suffix = "";
+    break;
+  }
+  
+  if(move.Capture) {
+    actionChr = 'x';
+  } else {
+    actionChr = '-';
+  }
+
+  pieceChr = CharPiece(move.Piece);
+
+  if(pieceChr == 'P' || pieceChr == 'p') {
+    sprintf(ret, "%s%c%s%s", from, actionChr, to, suffix);
+  } else {
+    sprintf(ret, "%c%s%c%s%s", pieceChr, from, actionChr, to, suffix);
+  }
+
+  return strdup(ret);
 }
 
 char*

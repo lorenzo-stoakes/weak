@@ -199,6 +199,7 @@ Piece    SetPieceAt(Set*, Position);
 char  CharPiece(Piece);
 char* StringBitBoard(BitBoard);
 char* StringChessSet(ChessSet*);
+char* StringMove(Move);
 char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
