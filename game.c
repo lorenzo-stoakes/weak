@@ -289,7 +289,7 @@ AllMoves(Game *game)
       }
     }
   }
-  
+
   // Queens.
 
   switch(game->WhosTurn) {
@@ -341,6 +341,64 @@ AllMoves(Game *game)
     }
   }
 
+    // Kings.
+
+  switch(game->WhosTurn) {
+  case White:
+    kings = game->ChessSet.White.King;
+    break;
+  case Black:
+    kings = game->ChessSet.Black.King;
+    break;
+  default:
+    panic("Invalid side %d.", game->WhosTurn);
+  }
+
+  // We allow 0 kings for the purposes of testing.
+  // TODO: Review.
+
+  sourcePositions = BoardPositions(kings);
+  if(sourcePositions.Len > 1) {
+    panic("%s has %d kings, expected 0 or 1.", StringSide(game->WhosTurn),
+          sourcePositions.Len);
+  }
+
+  if(sourcePositions.Len == 1) {
+    from = sourcePositions.Vals[0];
+
+    moveTargets = KingMoveTargets(&game->ChessSet, game->WhosTurn);
+    captureTargets = KingCaptureTargets(&game->ChessSet, game->WhosTurn);
+
+    // Moves.
+    targetPositions = BoardPositions(moveTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Queen;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+
+    // Captures.
+    targetPositions = BoardPositions(captureTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Queen;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }    
+  }
 
   return ret;
 }
@@ -858,7 +916,16 @@ static bool queenLegal(Game *game, Move *move)
 
 static bool kingLegal(Game *game, Move *move)
 {
-  return false;
+  BitBoard from, to;
+
+  from = POSBOARD(move->From);
+  to = POSBOARD(move->To);
+
+  if(move->Capture) {
+    return (to&KingCaptureTargets(&game->ChessSet, game->WhosTurn)) != EmptyBoard;
+  }
+
+  return (to&KingMoveTargets(&game->ChessSet, game->WhosTurn)) != EmptyBoard;  
 }
 
 static CastleEvent updateCastlingRights(Game *game, Move *move)

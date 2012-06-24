@@ -265,6 +265,11 @@ bool      Stalemated(Game*);
 void      ToggleTurn(Game *game);
 void      Unmove(Game*);
 
+// king.c
+BitBoard AllKingThreats(ChessSet*, Side);
+BitBoard KingCaptureTargets(ChessSet*, Side);
+BitBoard KingMoveTargets(ChessSet*, Side);
+
 // knight.c
 void      InitKnight(void);
 BitBoard  AllKnightCaptureTargets(ChessSet*, Side);

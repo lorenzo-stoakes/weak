@@ -5,10 +5,9 @@
 BitBoard
 AllThreats(ChessSet *chessSet, Side side)
 {
-  // TODO: Do for more than pawns, knights, rooks, bishops.
-
   return AllPawnThreats(chessSet, side) | AllKnightThreats(chessSet, side) |
-    AllRookThreats(chessSet, side) | AllBishopThreats(chessSet, side);
+    AllRookThreats(chessSet, side) | AllBishopThreats(chessSet, side) |
+    AllQueenThreats(chessSet, side) | AllKingThreats(chessSet, side);
 }
 
 bool
