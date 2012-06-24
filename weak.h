@@ -279,7 +279,7 @@ void     SetRemovePiece(Set*, Piece, Position);
 char  CharPiece(Piece);
 char* StringBitBoard(BitBoard);
 char* StringChessSet(ChessSet*);
-char* StringMove(Move);
+char* StringMove(Move*);
 char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
