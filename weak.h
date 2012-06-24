@@ -85,6 +85,7 @@ typedef uint64_t                BitBoard;
 typedef enum CastleEvent        CastleEvent;
 typedef struct CastleEventSlice CastleEventSlice;
 typedef struct ChessSet         ChessSet;
+typedef struct Game             Game;
 typedef struct Move             Move;
 typedef struct MoveHistory      MoveHistory;
 typedef struct MoveSlice        MoveSlice;
@@ -125,6 +126,15 @@ struct Set {
 
 struct ChessSet {
   Set White, Black;
+};
+
+struct Game {
+  bool        CastleKingSideWhite, CastleQueenSideWhite;
+  bool        CastleKingSideBlack, CastleQueenSideBlack;
+  ChessSet    ChessSet;
+  bool        Debug;
+  MoveHistory History;  
+  Side        WhosTurn, HumanSide;
 };
 
 struct Move {
