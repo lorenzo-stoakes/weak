@@ -81,17 +81,43 @@ enum Side {
 
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
 // We use little-endian rank-file (LERF) mapping [1].
-typedef uint64_t         BitBoard;
-typedef struct ChessSet  ChessSet;
-typedef struct Move      Move;
-typedef enum MoveType    MoveType;
-typedef enum Piece       Piece;
-typedef enum Position    Position;
-typedef struct Positions Positions;
-typedef enum Rank        Rank;
-typedef enum File        File;
-typedef struct Set       Set;
-typedef enum Side        Side;
+typedef uint64_t                BitBoard;
+typedef enum CastleEvent        CastleEvent;
+typedef struct CastleEventSlice CastleEventSlice;
+typedef struct ChessSet         ChessSet;
+typedef struct Move             Move;
+typedef struct MoveHistory      MoveHistory;
+typedef struct MoveSlice        MoveSlice;
+typedef enum MoveType           MoveType;
+typedef enum Piece              Piece;
+typedef struct PieceSlice       PieceSlice;
+typedef enum Position           Position;
+typedef struct Positions        Positions;
+typedef enum Rank               Rank;
+typedef enum File               File;
+typedef struct Set              Set;
+typedef enum Side               Side;
+
+struct CastleEventSlice {
+  int Len, Cap;
+  CastleEvent *Vals;
+};
+
+struct MoveSlice {
+  int Len, Cap;
+  Move *Vals;
+};
+
+struct PieceSlice {
+  int Len, Cap;
+  Piece *Vals;
+};
+
+struct MoveHistory {
+  CastleEventSlice CastleEvents;
+  MoveSlice        Moves;  
+  PieceSlice       CapturedPieces;
+};
 
 struct Set {
   BitBoard Pawns, Rooks, Knights, Bishops, Queens, King;
@@ -187,15 +213,24 @@ BitBoard  SoutOne(BitBoard);
 BitBoard  SoWeOne(BitBoard);
 BitBoard  WestOne(BitBoard);
 
-
 // chessset.c
 BitBoard ChessSetOccupancy(ChessSet*);
 BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
+// move.c
+MoveSlice NewMoveSlice(void);
+
+// movehistory.c
+CastleEventSlice NewCastleEventSlice(void);
+MoveHistory      NewMoveHistory(void);
+
 // pawn.c
 BitBoard AllPawnPushSources(Side, ChessSet*);
 BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
+
+// piece.c
+PieceSlice NewPieceSlice(void);
 
 // set.c
 Set      NewBlackSet(void);
