@@ -235,7 +235,7 @@ StringPosition(Position pos)
     return strdup("#invalid position");
   }
 
-  if(sprintf(ret, "%c%d", 'a'+FILE(pos), RANK(pos)) != 2) {
+  if(sprintf(ret, "%c%d", 'a'+FILE(pos), RANK(pos)+1) != 2) {
     panic("Couldn't string position");
   }
 
