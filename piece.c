@@ -2,6 +2,7 @@
 
 static const int INIT_PIECE_COUNT = 32;
 
+// Append Piece to specified Piece slice.
 PieceSlice
 AppendPiece(PieceSlice slice, Piece piece)
 {
