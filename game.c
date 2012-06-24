@@ -7,7 +7,7 @@ static bool knightLegal(Game*, Move*);
 static bool bishopLegal(Game*, Move*);
 static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
-static CastleEvent updateCastlingRights(Game*, Move);
+static CastleEvent updateCastlingRights(Game*, Move*);
 
 // Get all valid moves for the current player.
 MoveSlice
