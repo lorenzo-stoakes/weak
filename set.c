@@ -1,9 +1,9 @@
 #include "weak.h"
 
 BitBoard
-SetOccupancy(Set set)
+SetOccupancy(Set *set)
 {
-  return set.Pawns | set.Rooks | set.Knights | set.Bishops | set.Queens | set.King;
+  return set->Pawns | set->Rooks | set->Knights | set->Bishops | set->Queens | set->King;
 }
 
 Set

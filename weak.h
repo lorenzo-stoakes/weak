@@ -192,7 +192,7 @@ BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
 // set.c
 Set      NewBlackSet(void);
 Set      NewWhiteSet(void);
-BitBoard SetOccupancy(Set);
+BitBoard SetOccupancy(Set*);
 Piece    SetPieceAt(Set*, Position);
 
 // stringer.c
