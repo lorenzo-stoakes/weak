@@ -12,6 +12,14 @@
 #define FILE(pos) ((File)(pos%8))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 
+enum CastleEvent {
+  NoCastleEvent = 1 << 0,
+  LostKingSideWhite = 1 << 1,
+  LostQueenSideWhite = 1 << 2,
+  LostKingSideBlack = 1 << 3,
+  LostQueenSideBlack = 1 << 4
+};
+
 enum File {
   FileA = 0,
   FileB = 1,
