@@ -298,6 +298,7 @@ char  CharPiece(Piece);
 char* StringBitBoard(BitBoard);
 char* StringChessSet(ChessSet*);
 char* StringMove(Move*);
+char* StringPerft(PerftStats*);
 char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
