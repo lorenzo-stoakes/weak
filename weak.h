@@ -247,8 +247,15 @@ CastleEventSlice NewCastleEventSlice(void);
 MoveHistory      NewMoveHistory(void);
 
 // pawn.c
+BitBoard AllPawnCaptureSources(Side, ChessSet*);
+BitBoard AllPawnCaptureTargets(Side, ChessSet*);
 BitBoard AllPawnPushSources(Side, ChessSet*);
+BitBoard AllPawnPushTargets(Side, ChessSet*);
+BitBoard AllPawnThreats(Side, ChessSet*);
+BitBoard PawnCaptureSources(Side, ChessSet*, BitBoard);
+BitBoard PawnCaptureTargets(Side, ChessSet*, BitBoard);
 BitBoard PawnPushSources(Side, ChessSet*, BitBoard);
+BitBoard PawnPushTargets(Side, ChessSet*, BitBoard);
 
 // piece.c
 PieceSlice NewPieceSlice(void);
