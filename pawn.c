@@ -41,6 +41,7 @@ AllPawnPushSources(Side side, ChessSet *chessSet)
   }
 
   panic("Invalid side %s.", StringSide(side));
+  return EmptyBoard;
 }
 
 BitBoard
