@@ -20,6 +20,32 @@ ChessSetPieceAt(ChessSet *chessSet, Side side, Position pos)
   return MissingPiece;
 }
 
+void
+ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
+{
+  switch(side) {
+  case White:
+    SetPlacePiece(&chessSet->White, piece, pos);
+  case Black:
+    SetPlacePiece(&chessSet->Black, piece, pos);
+  default:
+    panic("Invalid side %d.", side);
+  }
+}
+
+void
+ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
+{
+  switch(side) {
+  case White:
+    SetRemovePiece(&chessSet->White, piece, pos);
+  case Black:
+    SetRemovePiece(&chessSet->Black, piece, pos);
+  default:
+    panic("Invalid side %d.", side);
+  }  
+}
+
 BitBoard
 EmptySquares(ChessSet *chessSet)
 {

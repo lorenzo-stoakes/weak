@@ -232,6 +232,8 @@ BitBoard  SoWeOne(BitBoard);
 BitBoard  WestOne(BitBoard);
 
 // chessset.c
+void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
+void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
 BitBoard ChessSetOccupancy(ChessSet*);
 Piece    ChessSetPieceAt(ChessSet*, Side, Position);
 BitBoard EmptySquares(ChessSet*);
