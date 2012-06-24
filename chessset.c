@@ -3,7 +3,7 @@
 BitBoard
 ChessSetOccupancy(ChessSet *chessSet)
 {
-  return SetOccupancy(chessSet->White) + SetOccupancy(chessSet->Black);
+  return SetOccupancy(&chessSet->White) + SetOccupancy(&chessSet->Black);
 }
 
 BitBoard
