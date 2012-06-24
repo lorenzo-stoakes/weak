@@ -3,6 +3,24 @@
 static const int INIT_PIECE_COUNT = 32;
 
 PieceSlice
+AppendPiece(PieceSlice slice, Piece piece)
+{
+  PieceSlice ret;
+
+  // Never need to expand slice, as there can never be more than 32 pieces on the board.
+  if(slice.Len >= slice.Cap) {
+    panic("Impossible condition, have %d pieces.", slice.Len);
+  }
+
+  ret.Vals = slice.Vals;    
+  ret.Vals[slice.Len] = piece;
+  ret.Len = slice.Len+1;
+  ret.Cap = slice.Cap;  
+
+  return ret;
+}
+
+PieceSlice
 NewPieceSlice()
 {
   PieceSlice ret;

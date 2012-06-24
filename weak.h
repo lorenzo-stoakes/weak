@@ -264,6 +264,7 @@ BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
 BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 
 // piece.c
+PieceSlice AppendPiece(PieceSlice, Piece);
 PieceSlice NewPieceSlice(void);
 
 // set.c
