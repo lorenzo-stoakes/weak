@@ -321,7 +321,7 @@ DoMove(Game *game, Move *move)
   }
 
   game->History.CastleEvents = AppendCastleEvent(game->History.CastleEvents,
-                                                 updateCastlingRights(game, *move));
+                                                 updateCastlingRights(game, move));
   ToggleTurn(game);
 }
 
