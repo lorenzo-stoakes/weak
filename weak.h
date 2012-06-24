@@ -10,6 +10,7 @@
 #define C64(constantU64) constantU64##ULL
 #define RANK(pos) ((Rank)(pos/8))
 #define FILE(pos) ((File)(pos%8))
+#define OPPOSITE(side) ((Side)(1-side))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 #define POSITION(rank, file) ((Position)(rank*8 + file))
 
