@@ -248,11 +248,13 @@ ChessSet NewChessSet(void);
 
 // game.c
 MoveSlice AllMoves(Game *);
+bool      Checkmated(Game*);
 void      DoCastleKingSide(Game*);
 void      DoCastleQueenSide(Game*);
 bool      Legal(Game*, Move*);
 void      DoMove(Game*, Move*);
 Game      NewGame(bool, Side);
+bool      Stalemated(Game*);
 void      ToggleTurn(Game *game);
 void      Unmove(Game*);
 

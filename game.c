@@ -137,6 +137,21 @@ AllMoves(Game *game)
   return ret;
 }
 
+// Determine whether the current player is checkmated.
+bool
+Checkmated(Game *game)
+{
+  return Checked(&game->ChessSet, game->WhosTurn) && AllMoves(game).Len == 0;
+}
+
+// Determine whether the game is in a state of stalemate, i.e. the current player cannot make a
+// move.
+bool
+Stalemated(Game *game)
+{
+  return !Checked(&game->ChessSet, game->WhosTurn) && AllMoves(game).Len == 0;
+}
+
 void
 DoCastleKingSide(Game *game)
 {
