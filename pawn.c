@@ -1,19 +1,19 @@
 #include "weak.h"
 
-static BitBoard singlePushSources(Side, ChessSet*, BitBoard);
-static BitBoard doublePushSources(Side, ChessSet*, BitBoard);
-static BitBoard singlePushTargets(Side, ChessSet*, BitBoard);
-static BitBoard doublePushTargets(Side, ChessSet*, BitBoard);
+static BitBoard singlePushSources(ChessSet*, Side, BitBoard);
+static BitBoard doublePushSources(ChessSet*, Side, BitBoard);
+static BitBoard singlePushTargets(ChessSet*, Side, BitBoard);
+static BitBoard doublePushTargets(ChessSet*, Side, BitBoard);
 
 // Get BitBoard encoding capture sources for *all* pawns on specified side.
 BitBoard
-AllPawnCaptureSources(Side side, ChessSet *chessSet)
+AllPawnCaptureSources(ChessSet *chessSet, Side side)
 {
   switch(side) {
   case White:
-    return PawnCaptureSources(side, chessSet, chessSet->White.Pawns);
+    return PawnCaptureSources(chessSet, side, chessSet->White.Pawns);
   case Black:
-    return PawnCaptureSources(side, chessSet, chessSet->Black.Pawns);
+    return PawnCaptureSources(chessSet, side, chessSet->Black.Pawns);
   }
 
   panic("Invalid side %s.", StringSide(side));
@@ -22,13 +22,13 @@ AllPawnCaptureSources(Side side, ChessSet *chessSet)
 
 // Get BitBoard encoding capture targets for *all* pawns on specified side.
 BitBoard
-AllPawnCaptureTargets(Side side, ChessSet *chessSet)
+AllPawnCaptureTargets(ChessSet *chessSet, Side side)
 {
   switch(side) {
   case White:
-    return PawnCaptureTargets(side, chessSet, chessSet->White.Pawns);
+    return PawnCaptureTargets(chessSet, side, chessSet->White.Pawns);
   case Black:
-    return PawnCaptureTargets(side, chessSet, chessSet->Black.Pawns);
+    return PawnCaptureTargets(chessSet, side, chessSet->Black.Pawns);
   }
 
   panic("Invalid side %s.", StringSide(side));
@@ -37,13 +37,13 @@ AllPawnCaptureTargets(Side side, ChessSet *chessSet)
 
 // Get BitBoard encoding push sources for *all* pawns on specified side.
 BitBoard
-AllPawnPushSources(Side side, ChessSet *chessSet)
+AllPawnPushSources(ChessSet *chessSet, Side side)
 {
   switch(side) {
   case White:
-    return PawnPushSources(side, chessSet, chessSet->White.Pawns);
+    return PawnPushSources(chessSet, side, chessSet->White.Pawns);
   case Black:
-    return PawnPushSources(side, chessSet, chessSet->Black.Pawns);
+    return PawnPushSources(chessSet, side, chessSet->Black.Pawns);
   }
 
   panic("Invalid side %s.", StringSide(side));
@@ -52,13 +52,13 @@ AllPawnPushSources(Side side, ChessSet *chessSet)
 
 // Get BitBoard encoding push targets for *all* pawns on specified side.
 BitBoard
-AllPawnPushTargets(Side side, ChessSet *chessSet)
+AllPawnPushTargets(ChessSet *chessSet, Side side)
 {
   switch(side) {
   case White:
-    return PawnPushTargets(side, chessSet, chessSet->White.Pawns);
+    return PawnPushTargets(chessSet, side, chessSet->White.Pawns);
   case Black:
-    return PawnPushTargets(side, chessSet, chessSet->Black.Pawns);
+    return PawnPushTargets(chessSet, side, chessSet->Black.Pawns);
   }
 
   panic("Invalid side %s.", StringSide(side));
@@ -67,7 +67,7 @@ AllPawnPushTargets(Side side, ChessSet *chessSet)
 
 // Get BitBoard encoding all squares threatened by pawns.
 BitBoard
-AllPawnThreats(Side side, ChessSet *chessSet)
+AllPawnThreats(ChessSet *chessSet, Side side)
 {
   BitBoard pawns;
 
@@ -88,7 +88,7 @@ AllPawnThreats(Side side, ChessSet *chessSet)
 
 // Get BitBoard encoding specified pawns which are able to capture.
 BitBoard
-PawnCaptureSources(Side side, ChessSet *chessSet, BitBoard pawns)
+PawnCaptureSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   BitBoard whiteOccupancy, blackOccupancy;
 
@@ -109,7 +109,7 @@ PawnCaptureSources(Side side, ChessSet *chessSet, BitBoard pawns)
 
 // Get BitBoard encoding squares able to be captured by specified pawns.
 BitBoard
-PawnCaptureTargets(Side side, ChessSet *chessSet, BitBoard pawns)
+PawnCaptureTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   BitBoard whiteOccupancy, blackOccupancy;
 
@@ -130,23 +130,23 @@ PawnCaptureTargets(Side side, ChessSet *chessSet, BitBoard pawns)
 
 // Get BitBoard encoding push sources for specified pawns.
 BitBoard
-PawnPushSources(Side side, ChessSet *chessSet, BitBoard pawns)
+PawnPushSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
-  return singlePushSources(side, chessSet, pawns) |
-    doublePushSources(side, chessSet, pawns);
+  return singlePushSources(chessSet, side, pawns) |
+    doublePushSources(chessSet, side, pawns);
 }
 
 // Get BitBoard encoding push targets for specified pawns.
 BitBoard
-PawnPushTargets(Side side, ChessSet *chessSet, BitBoard pawns)
+PawnPushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 {
-  return singlePushTargets(side, chessSet, pawns) |
-    doublePushTargets(side, chessSet, pawns);
+  return singlePushTargets(chessSet, side, pawns) |
+    doublePushTargets(chessSet, side, pawns);
 }
 
 // Get BitBoard encoding which of specified pawns are able to single push.
 static BitBoard
-singlePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
+singlePushSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   // Any pawn which is able to move forward one place must have an empty square
   // immediately in front of it. If we move all empty squares south one place, we end up
@@ -166,7 +166,7 @@ singlePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
 
 // Get BitBoard encoding which of specified pawns are able to double push.
 static BitBoard
-doublePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
+doublePushSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   BitBoard emptyRank4, emptyRank3And4, emptyRank5, emptyRank5And6;
 
@@ -193,7 +193,7 @@ doublePushSources(Side side, ChessSet *chessSet, BitBoard pawns)
 
 // Get BitBoard encoding single push targets for specified pawns.
 static BitBoard
-singlePushTargets(Side side, ChessSet *chessSet, BitBoard pawns)
+singlePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   // Take advantage of the fact that shifting off the end of the uint64 simply pushes the
   // bits into oblivion, so we need not worry about pawns on the last rank (assuming this
@@ -211,9 +211,9 @@ singlePushTargets(Side side, ChessSet *chessSet, BitBoard pawns)
 
 // Get BitBoard encoding double push targets for specified pawns.
 static BitBoard
-doublePushTargets(Side side, ChessSet *chessSet, BitBoard pawns)
+doublePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 {
-  BitBoard singlePushes = singlePushTargets(side, chessSet, pawns);
+  BitBoard singlePushes = singlePushTargets(chessSet, side, pawns);
 
   // We can only double-push pawns if they are on the 2nd rank and thus end up on the 4th
   // rank (5th for black).

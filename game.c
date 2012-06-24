@@ -187,11 +187,11 @@ pawnLegal(Game *game, Move *move)
   }
 
   if(move->Capture) {
-    sources = PawnCaptureSources(game->WhosTurn, &game->ChessSet, fromBoard);
-    targets = PawnCaptureTargets(game->WhosTurn, &game->ChessSet, fromBoard);
+    sources = PawnCaptureSources(&game->ChessSet, game->WhosTurn, fromBoard);
+    targets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, fromBoard);
   } else {
-    sources = PawnPushSources(game->WhosTurn, &game->ChessSet, fromBoard);
-    targets = PawnPushTargets(game->WhosTurn, &game->ChessSet, fromBoard);
+    sources = PawnPushSources(&game->ChessSet, game->WhosTurn, fromBoard);
+    targets = PawnPushTargets(&game->ChessSet, game->WhosTurn, fromBoard);
   }
 
   // Since sources are referenced against our single candidate pawn, their being non-empty
