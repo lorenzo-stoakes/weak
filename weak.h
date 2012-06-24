@@ -237,6 +237,7 @@ CastleEventSlice NewCastleEventSlice(void);
 CastleEvent      PopCastleEvent(CastleEventSlice*);
 
 // chessset.c
+BitBoard AllThreats(ChessSet*, Side);
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
 BitBoard ChessSetOccupancy(ChessSet*);

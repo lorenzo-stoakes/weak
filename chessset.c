@@ -1,5 +1,14 @@
 #include "weak.h"
 
+// Get the bitboard which encodes a mask of all squares threatened by the specified side in the
+// chess set.
+BitBoard
+AllThreats(ChessSet *chessSet, Side side)
+{
+  // TODO: Do for more than pawns.
+
+  return AllPawnThreats(chessSet, side);
+}
 BitBoard
 ChessSetOccupancy(ChessSet *chessSet)
 {
