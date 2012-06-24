@@ -7,6 +7,7 @@ static bool knightLegal(Game*, Move*);
 static bool bishopLegal(Game*, Move*);
 static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
+static CastleEvent updateCastlingRights(Game*, Move);
 
 void
 DoCastleKingSide(Game *game)
@@ -112,6 +113,13 @@ void
 ToggleTurn(Game *game) {
   game->WhosTurn = OPPOSITE(game->WhosTurn);
 }
+
+void
+Unmove(Game *game)
+{
+  panic("Not implemented.");
+}
+
 static bool
 castleLegal(Game *game, bool queenSide)
 {
@@ -242,4 +250,9 @@ static bool queenLegal(Game *game, Move *move)
 static bool kingLegal(Game *game, Move *move)
 {
   return false;
+}
+
+static CastleEvent updateCastlingRights(Game *game, Move move)
+{
+  return NoCastleEvent;
 }
