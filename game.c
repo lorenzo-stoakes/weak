@@ -374,7 +374,7 @@ AllMoves(Game *game)
     for(j = 0; j < targetPositions.Len; j++) {
       to = targetPositions.Vals[j];
 
-      move.Piece = Queen;
+      move.Piece = King;
       move.From = from;
       move.To = to;
       move.Capture = false;
@@ -389,7 +389,7 @@ AllMoves(Game *game)
     for(j = 0; j < targetPositions.Len; j++) {
       to = targetPositions.Vals[j];
 
-      move.Piece = Queen;
+      move.Piece = King;
       move.From = from;
       move.To = to;
       move.Capture = true;
