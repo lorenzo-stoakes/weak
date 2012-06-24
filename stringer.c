@@ -32,7 +32,7 @@ StringBitBoard(BitBoard bitBoard)
   Position pos;
   int newline, index;
 
-  char *ret = (char*)allocate(64+8+1);
+  char ret[64+8+1];
 
   for(pos = A1; pos <= H8; pos++) {
     rank = Rank8 - RANK(pos);
@@ -52,7 +52,7 @@ StringBitBoard(BitBoard bitBoard)
   }
   ret[64+8] = '\0';
 
-  return ret;
+  return strdup(ret);
 }
 
 // ASCII-art representation of chessboard.
@@ -60,7 +60,7 @@ char*
 StringChessSet(ChessSet *chessSet)
 {
   // Include space for newlines.
-  char *ret = (char*)allocate(64+8+1);
+  char ret[64+8+1];
   char pieceChr;
   int index, newline;
   File file;
@@ -172,14 +172,12 @@ StringPiece(Piece piece)
 char*
 StringPosition(Position pos)
 {
-  char *ret;
+  char ret[2+1];
 
   // Unsigned so we don't need to check < 0.
   if(pos > 63) {
     return strdup("#invalid position");
   }
-
-  ret = (char*)allocate(2+1);
 
   if(sprintf(ret, "%c%d", 'a'+FILE(pos), RANK(pos)) != 2) {
     panic("Couldn't string position");
@@ -187,18 +185,25 @@ StringPosition(Position pos)
 
   ret[2] = '\0';
 
-  return ret;
+  return strdup(ret);
 }
 
 char*
 StringSide(Side side)
 {
+  char *ret;
+
   switch(side) {
   case White:
-    return strdup("white");
+    ret = "white";
+    break;
   case Black:
-    return strdup("black");
+    ret = "black";
+    break;
+  default:
+    ret = "#invalid side";
+    break;
   }
 
-  return strdup("#invalid side");
+  return strdup(ret);
 }
