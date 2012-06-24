@@ -611,7 +611,7 @@ static bool kingLegal(Game *game, Move *move)
   return false;
 }
 
-static CastleEvent updateCastlingRights(Game *game, Move move)
+static CastleEvent updateCastlingRights(Game *game, Move *move)
 {
   return NoCastleEvent;
 }
