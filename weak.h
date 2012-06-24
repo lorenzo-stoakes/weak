@@ -212,6 +212,13 @@ static const BitBoard
   InitBlackQueens                = C64(0x0800000000000000),
   InitBlackKing                  = C64(0x1000000000000000);
 
+// bishop.c
+BitBoard AllBishopCaptureTargets(ChessSet*, Side);
+BitBoard AllBishopMoveTargets(ChessSet*, Side);
+BitBoard AllBishopThreats(ChessSet*, Side);
+BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
+
 // bitboard.c
 Position  BitScanBackward(BitBoard);
 Position  BitScanForward(BitBoard);
