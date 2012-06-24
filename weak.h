@@ -99,6 +99,7 @@ typedef enum File               File;
 typedef struct Set              Set;
 typedef enum Side               Side;
 
+
 struct CastleEventSlice {
   int Len, Cap;
   CastleEvent *Vals;
@@ -114,14 +115,14 @@ struct PieceSlice {
   Piece *Vals;
 };
 
+struct Set {
+  BitBoard Pawns, Rooks, Knights, Bishops, Queens, King;
+};
+
 struct MoveHistory {
   CastleEventSlice CastleEvents;
   MoveSlice        Moves;  
   PieceSlice       CapturedPieces;
-};
-
-struct Set {
-  BitBoard Pawns, Rooks, Knights, Bishops, Queens, King;
 };
 
 struct ChessSet {
