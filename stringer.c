@@ -134,7 +134,8 @@ StringChessSet(ChessSet *chessSet)
     }
   }
 
-  return ret;
+  return strdup(ret);
+}
 }
 
 char*
