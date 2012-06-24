@@ -11,6 +11,7 @@
 #define RANK(pos) ((Rank)(pos/8))
 #define FILE(pos) ((File)(pos%8))
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
+#define POSITION(rank, file) ((Position)(rank*8 + file))
 
 enum CastleEvent {
   NoCastleEvent = 1 << 0,
