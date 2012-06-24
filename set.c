@@ -129,6 +129,7 @@ SetRemovePiece(Set *set, Piece piece, Position pos)
     break;
   case King:
     set->King &= complement;
+    break;
   default:
     panic("Invalid piece %d.", piece);
   }
