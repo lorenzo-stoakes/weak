@@ -45,3 +45,17 @@ NewCastleEventSlice()
   return ret;
 }
 
+CastleEvent
+PopCastleEvent(CastleEventSlice *slice)
+{
+  CastleEvent ret;
+
+  if(slice->Len <= 0) {
+    panic("Invaild slice length %d on PopCastleEvent().", slice->Len);    
+  }
+
+  ret = slice->Vals[slice->Len-1];
+  slice->Len--;
+
+  return ret;
+}

@@ -234,6 +234,7 @@ BitBoard  WestOne(BitBoard);
 // castleevent.c
 CastleEventSlice AppendCastleEvent(CastleEventSlice, CastleEvent);
 CastleEventSlice NewCastleEventSlice(void);
+CastleEvent      PopCastleEvent(CastleEventSlice*);
 
 // chessset.c
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
