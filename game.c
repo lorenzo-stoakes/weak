@@ -43,12 +43,12 @@ Legal(Game *game, Move *move)
   }
 
   // Have to move from an occupied square, and it has to be the piece the move purports
-  // it to be.  
+  // it to be.
   piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, move->From);
   if(piece == MissingPiece || piece != move->Piece) {
     return false;
   }
-  
+
   switch(move->Piece) {
   case Pawn:
     pieceLegal = pawnLegal(game, move);
