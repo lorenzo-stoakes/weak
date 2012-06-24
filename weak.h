@@ -261,6 +261,7 @@ void      Unmove(Game*);
 // move.c
 MoveSlice AppendMove(MoveSlice, Move);
 MoveSlice NewMoveSlice(void);
+Move      PopMove(MoveSlice*);
 
 // movehistory.c
 MoveHistory      NewMoveHistory(void);
@@ -282,6 +283,7 @@ PerftStats Perft(Game*, int);
 // piece.c
 PieceSlice AppendPiece(PieceSlice, Piece);
 PieceSlice NewPieceSlice(void);
+Piece      PopPiece(PieceSlice*);
 
 // set.c
 Set      NewBlackSet(void);
