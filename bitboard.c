@@ -91,12 +91,12 @@ BoardPositions(BitBoard bitBoard)
 
   if(bitBoard == EmptyBoard) {
     ret.Vals = NULL;
-    ret.Length = 0;
+    ret.Len = 0;
     return ret;
   }
 
   n = PopCount(bitBoard);
-  ret.Length = n;
+  ret.Len = n;
   ret.Vals = (Position*)allocate(n*sizeof(Position));
 
   for(pos = A1; pos <= H8; pos++) {

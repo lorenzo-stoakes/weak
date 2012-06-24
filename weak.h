@@ -154,7 +154,7 @@ struct PerftStats {
 
 struct Positions {
   Position *Vals;
-  int      Length;
+  int      Len;
 };
 
 static const BitBoard
