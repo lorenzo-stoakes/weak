@@ -341,7 +341,7 @@ AllMoves(Game *game)
     }
   }
 
-    // Kings.
+  // Kings.
 
   switch(game->WhosTurn) {
   case White:
