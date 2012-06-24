@@ -240,6 +240,8 @@ BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
 // game.c
+void DoCastleKingSide(Game*);
+void DoCastleQueenSide(Game*);
 bool Legal(Game*, Move*);
 Game NewGame(bool, Side);
 

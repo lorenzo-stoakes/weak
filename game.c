@@ -8,6 +8,18 @@ static bool bishopLegal(Game*, Move*);
 static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
 
+void
+DoCastleKingSide(Game *game)
+{
+  panic("Not implemented.");
+}
+
+void
+DoCastleQueenSide(Game *game)
+{
+  panic("Not implemented.");
+}
+
 // Determine whether the specified move places the current player into check.
 bool
 ExposesCheck(Game *game, Move *move)
