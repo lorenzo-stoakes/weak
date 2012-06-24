@@ -9,6 +9,134 @@ static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move);
 
+// Get all valid moves for the current player.
+MoveSlice
+AllMoves(Game *game)
+{
+  int i, j, k;
+  BitBoard enPassantPawns, pawnPushSources, pawnCaptureSources, pawnPushTargets,
+    pawnCaptureTargets, fromBoard, toBoard;
+  Move move;
+  Position from, to;
+  Positions sourcePositions, targetPositions;
+  Rank promotionRank;
+  MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
+  MoveSlice ret = NewMoveSlice();
+
+  // Pawns.
+
+  pawnPushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
+  pawnCaptureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
+
+  switch(game->WhosTurn) {
+  case White:
+    enPassantPawns = game->ChessSet.White.Pawns & Rank5Mask;
+    promotionRank = Rank8;
+    break;
+  case Black:
+    enPassantPawns = game->ChessSet.Black.Pawns & Rank4Mask;
+    promotionRank = Rank1;
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
+  }
+
+  // Pushes.
+  sourcePositions = BoardPositions(pawnPushSources);
+  for(i = 0; i < sourcePositions.Len; i++) {
+    from = sourcePositions.Vals[i];
+    pawnPushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    targetPositions = BoardPositions(pawnPushTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+      move.Piece = Pawn;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+
+      if(RANK(to) == promotionRank) {
+        for(k = 0; k < 4; k++) {
+          move.Type = promotions[k];
+          if(Legal(game, &move)) {
+            ret = AppendMove(ret, move);
+          }
+        }
+      } else if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+    release(targetPositions.Vals);
+  }
+  release(sourcePositions.Vals);
+
+  // Captures.
+  sourcePositions = BoardPositions(pawnCaptureSources);
+  for(i = 0; i < sourcePositions.Len; i++) {
+    from = sourcePositions.Vals[i];
+    pawnCaptureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    targetPositions = BoardPositions(pawnCaptureTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+      move.Piece = Pawn;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+
+      if(RANK(to) == promotionRank) {
+        for(k = 0; k < 4; k++) {
+          move.Type = promotions[k];
+          if(Legal(game, &move)) {
+            ret = AppendMove(ret, move);
+          }
+        }
+      } else if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+    release(targetPositions.Vals);
+  }
+  release(sourcePositions.Vals);
+
+  // En passant.
+  if(enPassantPawns != EmptyBoard) {
+    sourcePositions = BoardPositions(enPassantPawns);
+    for(i = 0; i < sourcePositions.Len; i++) {
+      from = sourcePositions.Vals[i];
+      fromBoard = POSBOARD(from);
+      switch(game->WhosTurn) {
+      case White:
+        toBoard = NoWeOne(fromBoard) | NoEaOne(fromBoard);
+        break;
+      case Black:
+        toBoard = SoWeOne(fromBoard) | SoEaOne(fromBoard);
+        break;
+      default:
+        panic("Unrecognised side %d.", game->WhosTurn);
+        break;
+      }
+
+      targetPositions = BoardPositions(toBoard);
+      for(j = 0; j < targetPositions.Len; j++) {
+        to = targetPositions.Vals[j];
+        move.Piece = Pawn;
+        move.From = from;
+        move.To = to;
+        move.Capture = true;
+        move.Type = EnPassant;
+        if(Legal(game, &move)) {
+          ret = AppendMove(ret, move);
+        }
+      }
+      release(targetPositions.Vals);
+    }
+    release(sourcePositions.Vals);
+  }
+
+  return ret;
+}
+
 void
 DoCastleKingSide(Game *game)
 {
