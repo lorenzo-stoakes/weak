@@ -146,7 +146,6 @@ FlipDiagA1H8(BitBoard bitBoard)
   return bitBoard;
 }
 
-
 // Count the number of bits in the specified BitBoard.
 int
 PopCount(BitBoard x)
@@ -177,7 +176,6 @@ PositionOccupied(BitBoard bitBoard, Position pos)
 {
   return (bitBoard & POSBOARD(pos)) != 0;
 }
-
 
 // Rotate bitboard 90 degrees anticlockwise.
 BitBoard
