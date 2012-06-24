@@ -276,6 +276,9 @@ BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
 BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 
+// perft.c
+PerftStats Perft(Game*, int);
+
 // piece.c
 PieceSlice AppendPiece(PieceSlice, Piece);
 PieceSlice NewPieceSlice(void);
