@@ -168,7 +168,13 @@ DoCastleQueenSide(Game *game)
 bool
 ExposesCheck(Game *game, Move *move)
 {
-  return false;
+  bool ret;
+
+  DoMove(game, move);
+  ret = Checked(&game->ChessSet, OPPOSITE(game->WhosTurn));
+  Unmove(game);
+
+  return ret;
 }
 
 // Is the proposed move legal in this game?
