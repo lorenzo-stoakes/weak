@@ -36,6 +36,8 @@ NewWhiteSet()
   return ret;
 }
 
+// Determine whether the set has a piece at the specified position, and if so what that piece
+// is.
 Piece
 SetPieceAt(Set *set, Position pos)
 {
