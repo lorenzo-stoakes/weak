@@ -8,12 +8,14 @@ static bool bishopLegal(Game*, Move*);
 static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
 
+// Determine whether the specified move places the current player into check.
 bool
 ExposesCheck(Game *game, Move *move)
 {
   return false;
 }
 
+// Is the proposed move legal in this game?
 bool
 Legal(Game *game, Move *move)
 {
