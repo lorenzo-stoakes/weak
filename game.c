@@ -13,9 +13,11 @@ static CastleEvent updateCastlingRights(Game*, Move*);
 MoveSlice
 AllMoves(Game *game)
 {
+  // TODO: Clean up the duplication, for God's sake :-)
+
   int i, j, k;
-  BitBoard enPassantPawns, knights, pawnPushSources, pawnCaptureSources, pawnPushTargets,
-    pawnCaptureTargets, fromBoard, moveTargets, captureTargets, toBoard;
+  BitBoard captureTargets, enPassantPawns, fromBoard, knights, moveTargets, pawnCaptureSources,
+    pawnPushSources, pawnCaptureTargets, pawnPushTargets, rooks, toBoard;
   Move move;
   Position from, to;
   Positions sourcePositions, targetPositions;
@@ -175,6 +177,57 @@ AllMoves(Game *game)
       to = targetPositions.Vals[j];
 
       move.Piece = Knight;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+  }
+
+  // Rooks.
+
+  switch(game->WhosTurn) {
+  case White:
+    rooks = game->ChessSet.White.Rooks;
+    break;
+  case Black:
+    rooks = game->ChessSet.Black.Rooks;
+    break;
+  default:
+    panic("Invalid side %d.", game->WhosTurn);
+  }
+
+  sourcePositions = BoardPositions(rooks);
+  for(i = 0; i < sourcePositions.Len; i++) {
+    from = sourcePositions.Vals[i];
+
+    moveTargets = RookMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    captureTargets = RookCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+
+    // Moves.
+    targetPositions = BoardPositions(moveTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Rook;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        ret = AppendMove(ret, move);
+      }
+    }
+
+    // Captures.
+    targetPositions = BoardPositions(captureTargets);
+    for(j = 0; j < targetPositions.Len; j++) {
+      to = targetPositions.Vals[j];
+
+      move.Piece = Rook;
       move.From = from;
       move.To = to;
       move.Capture = true;
@@ -645,7 +698,16 @@ pawnLegal(Game *game, Move *move)
 
 static bool rookLegal(Game *game, Move *move)
 {
-  return false;
+  BitBoard from, to;
+
+  from = POSBOARD(move->From);
+  to = POSBOARD(move->To);
+
+  if(move->Capture) {
+    return (to&RookCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
+  }
+
+  return (to&RookMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
 static bool knightLegal(Game *game, Move *move)

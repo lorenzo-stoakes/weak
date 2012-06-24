@@ -303,6 +303,14 @@ BitBoard NoEaRay(Position);
 BitBoard NoWeRay(Position);
 BitBoard SoEaRay(Position);
 BitBoard SoWeRay(Position);
+
+// rook.c
+BitBoard AllRookCaptureTargets(ChessSet*, Side);
+BitBoard AllRookMoveTargets(ChessSet*, Side);
+BitBoard AllRookThreats(ChessSet*, Side);
+BitBoard RookCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
+
 // set.c
 Set      NewBlackSet(void);
 Set      NewWhiteSet(void);
