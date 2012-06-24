@@ -258,6 +258,14 @@ bool      Stalemated(Game*);
 void      ToggleTurn(Game *game);
 void      Unmove(Game*);
 
+// knight.c
+void      InitKnight(void);
+BitBoard  AllKnightCaptureTargets(ChessSet*, Side);
+BitBoard  AllKnightMoveTargets(ChessSet*, Side);
+BitBoard  AllKnightThreats(ChessSet*, Side);
+BitBoard  KnightCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard  KnightMoveTargets(ChessSet*, Side, BitBoard);
+
 // move.c
 MoveSlice AppendMove(MoveSlice, Move);
 MoveSlice NewMoveSlice(void);
