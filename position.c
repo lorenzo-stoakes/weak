@@ -61,7 +61,7 @@ InitRays(void)
   soweRay8 = C64(0x0040201008040201);
   for(file = FileH; file >= FileA; file--) {
     soweRay = soweRay8;
-    for(file = FileH; file >= FileA; file--) {
+    for(rank = Rank8; rank >= Rank1; rank--) {
       pos = POSITION(rank, file);
       soweRays[pos] = soweRay;
       soweRay >>= 8;
