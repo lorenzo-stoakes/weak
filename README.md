@@ -16,12 +16,12 @@ the engine has yet to be ported from go.
 
 0:  Not yet capable of playing a game.
 
-1: Capable of playing a game (badly), does not implement [50 move rule][1] or
-[threefold repetition][2].
+1: Capable of playing a game (badly), does not implement [50 move rule][2] or
+[threefold repetition][3].
 
 1.5: Improve code quality and unit tests.
 
-1.75: Add [xboard][0] support.
+1.75: Add [xboard][1] support.
 
 2:  Introduce the [50 move rule][2] and [threefold repetition][3].
 
