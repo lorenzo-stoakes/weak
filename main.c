@@ -5,7 +5,6 @@
 static void
 init()
 {
-  InitHash();
   InitKnight();
   InitRays();
 }

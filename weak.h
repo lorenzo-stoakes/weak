@@ -85,7 +85,6 @@ enum Side {
 // We use little-endian rank-file (LERF) mapping [1].
 typedef uint64_t                 BitBoard;
 typedef enum CastleEvent         CastleEvent;
-typedef struct BoardPositionPair BoardPositionPair;
 typedef struct CastleEventSlice  CastleEventSlice;
 typedef struct ChessSet          ChessSet;
 typedef struct Game              Game;
@@ -97,7 +96,6 @@ typedef struct PerftStats        PerftStats;
 typedef enum Piece               Piece;
 typedef struct PieceSlice        PieceSlice;
 typedef enum Position            Position;
-typedef struct Positions         Positions;
 typedef enum Rank                Rank;
 typedef enum File                File;
 typedef struct Set               Set;
@@ -150,16 +148,6 @@ struct Move {
 
 struct PerftStats {
   uint64_t Count, Captures, EnPassants, Castles, Promotions, Checks, Checkmates;
-};
-
-struct Positions {
-  Position *Vals;
-  int      Len;
-};
-
-struct BoardPositionPair {
-  BitBoard Board;
-  Positions Positions;
 };
 
 static const BitBoard
@@ -227,7 +215,6 @@ BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
 // bitboard.c
 Position  BitScanBackward(BitBoard);
 Position  BitScanForward(BitBoard);
-Positions BoardPositions(BitBoard);
 BitBoard  EastOne(BitBoard);
 BitBoard  FlipDiagA1H8(BitBoard);
 BitBoard  FlipVertical(BitBoard);
@@ -269,12 +256,6 @@ Game      NewGame(bool, Side);
 bool      Stalemated(Game*);
 void      ToggleTurn(Game *game);
 void      Unmove(Game*);
-
-// hash.c
-BitBoard          Hash(BitBoard);
-void              HashAdd(BitBoard, Positions);
-void              InitHash(void);
-BoardPositionPair HashGet(BitBoard);
 
 // king.c
 BitBoard AllKingThreats(ChessSet*, Side);

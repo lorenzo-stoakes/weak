@@ -127,41 +127,6 @@ BitScanForward(BitBoard bitBoard)
 #endif
 }
 
-Positions
-BoardPositions(BitBoard bitBoard)
-{
-  int i = 0, n;
-  Position pos;
-  Positions ret;
-  BoardPositionPair pair;
-
-  if(bitBoard == EmptyBoard) {
-    ret.Vals = NULL;
-    ret.Len = 0;
-    return ret;
-  }
-
-  pair = HashGet(bitBoard);
-  if(pair.Board == bitBoard) {
-    return pair.Positions;
-  }
-
-  n = PopCount(bitBoard);
-  ret.Len = n;
-  ret.Vals = (Position*)allocate(n*sizeof(Position));
-
-  for(pos = A1; pos <= H8; pos++) {
-    if(PositionOccupied(bitBoard, pos)) {
-      ret.Vals[i] = pos;
-      i++;
-    }
-  }
-
-  HashAdd(bitBoard, ret);
-
-  return ret;
-}
-
 // Flip bitboard vertically (about the horizontal axis).
 BitBoard
 FlipVertical(BitBoard bitBoard)

@@ -97,9 +97,7 @@ AllKnightThreats(ChessSet *chessSet, Side side)
 BitBoard
 KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {
-  int i;
   Position knight;
-  Positions positions;
   BitBoard opposition, ret;
 
   switch(side) {
@@ -114,9 +112,9 @@ KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
   }
 
   ret = EmptyBoard;
-  positions = BoardPositions(knights);
-  for(i = 0; i < positions.Len; i++) {
-    knight = positions.Vals[i];
+
+  for(knight = BitScanForward(knights); knights; knight = BitScanForward(knights)) {
+    knights ^= POSBOARD(knight);
     ret |= knightSquares[knight] & opposition;
   }
 
@@ -126,15 +124,12 @@ KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 BitBoard
 KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {
-  int i;
   BitBoard ret;
   Position knight;
-  Positions positions;
 
   ret = EmptyBoard;
-  positions = BoardPositions(knights);
-  for(i = 0; i < positions.Len; i++) {
-    knight = positions.Vals[i];
+  for(knight = BitScanForward(knights); knights; knight = BitScanForward(knights)) {
+    knights ^= POSBOARD(knight);
     ret |= knightSquares[knight];
   }
 

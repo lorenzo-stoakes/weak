@@ -15,13 +15,12 @@ AllMoves(Game *game)
 {
   // TODO: Clean up the duplication, for God's sake :-)
 
-  int i, j, k;
+  int k;
   BitBoard bishops, captureTargets, enPassantPawns, fromBoard, kings, knights, moveTargets,
     pawnCaptureSources, pawnPushSources, pawnCaptureTargets, pawnPushTargets, queens, rooks,
     toBoard;
   Move move;
   Position from, to;
-  Positions sourcePositions, targetPositions;
   Rank promotionRank;
   MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
   MoveSlice ret = NewMoveSlice();
@@ -45,13 +44,14 @@ AllMoves(Game *game)
   }
 
   // Pushes.
-  sourcePositions = BoardPositions(pawnPushSources);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
+  for(from = BitScanForward(pawnPushSources); pawnPushSources;
+      from = BitScanForward(pawnPushSources)) {
+    pawnPushSources ^= POSBOARD(from);
+
     pawnPushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    targetPositions = BoardPositions(pawnPushTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(pawnPushTargets); pawnPushTargets;
+        to = BitScanForward(pawnPushTargets)) {
+      pawnPushTargets ^= POSBOARD(to);
       move.Piece = Pawn;
       move.From = from;
       move.To = to;
@@ -69,18 +69,19 @@ AllMoves(Game *game)
         ret = AppendMove(ret, move);
       }
     }
-    release(targetPositions.Vals);
   }
-  release(sourcePositions.Vals);
 
   // Captures.
-  sourcePositions = BoardPositions(pawnCaptureSources);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
+
+  for(from = BitScanForward(pawnCaptureSources); pawnCaptureSources;
+      from = BitScanForward(pawnCaptureSources)) {
+    pawnCaptureSources ^= POSBOARD(from);
+
     pawnCaptureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    targetPositions = BoardPositions(pawnCaptureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(pawnCaptureTargets); pawnCaptureTargets;
+        to = BitScanForward(pawnCaptureTargets)) {
+      pawnCaptureTargets ^= POSBOARD(to);
+
       move.Piece = Pawn;
       move.From = from;
       move.To = to;
@@ -98,15 +99,14 @@ AllMoves(Game *game)
         ret = AppendMove(ret, move);
       }
     }
-    release(targetPositions.Vals);
   }
-  release(sourcePositions.Vals);
 
   // En passant.
   if(enPassantPawns != EmptyBoard) {
-    sourcePositions = BoardPositions(enPassantPawns);
-    for(i = 0; i < sourcePositions.Len; i++) {
-      from = sourcePositions.Vals[i];
+    for(from = BitScanForward(enPassantPawns); enPassantPawns;
+        from = BitScanForward(enPassantPawns)) {
+      enPassantPawns ^= POSBOARD(from);
+
       fromBoard = POSBOARD(from);
       switch(game->WhosTurn) {
       case White:
@@ -120,9 +120,9 @@ AllMoves(Game *game)
         break;
       }
 
-      targetPositions = BoardPositions(toBoard);
-      for(j = 0; j < targetPositions.Len; j++) {
-        to = targetPositions.Vals[j];
+      for(to = BitScanForward(toBoard); toBoard; to = BitScanForward(toBoard)) {
+        toBoard ^= POSBOARD(to);
+
         move.Piece = Pawn;
         move.From = from;
         move.To = to;
@@ -132,9 +132,7 @@ AllMoves(Game *game)
           ret = AppendMove(ret, move);
         }
       }
-      release(targetPositions.Vals);
     }
-    release(sourcePositions.Vals);
   }
 
   // Rooks.
@@ -150,17 +148,15 @@ AllMoves(Game *game)
     panic("Invalid side %d.", game->WhosTurn);
   }
 
-  sourcePositions = BoardPositions(rooks);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
+  for(from = BitScanForward(rooks); rooks; from = BitScanForward(rooks)) {
+    rooks ^= POSBOARD(from);
 
     moveTargets = RookMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = RookCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
-    targetPositions = BoardPositions(moveTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
+      moveTargets ^= POSBOARD(to);
 
       move.Piece = Rook;
       move.From = from;
@@ -173,9 +169,9 @@ AllMoves(Game *game)
     }
 
     // Captures.
-    targetPositions = BoardPositions(captureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);      
 
       move.Piece = Rook;
       move.From = from;
@@ -201,17 +197,15 @@ AllMoves(Game *game)
     panic("Invalid side %d.", game->WhosTurn);
   }
 
-  sourcePositions = BoardPositions(knights);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
+  for(from = BitScanForward(knights); knights; from = BitScanForward(knights)) {
+    knights ^= POSBOARD(from);
 
     moveTargets = KnightMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = KnightCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
-    targetPositions = BoardPositions(moveTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
+      moveTargets ^= POSBOARD(to);
 
       move.Piece = Knight;
       move.From = from;
@@ -224,9 +218,9 @@ AllMoves(Game *game)
     }
 
     // Captures.
-    targetPositions = BoardPositions(captureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);      
 
       move.Piece = Knight;
       move.From = from;
@@ -252,17 +246,15 @@ AllMoves(Game *game)
     panic("Invalid side %d.", game->WhosTurn);
   }
 
-  sourcePositions = BoardPositions(bishops);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
+  for(from = BitScanForward(bishops); bishops; from = BitScanForward(bishops)) {
+    bishops ^= POSBOARD(from);
 
     moveTargets = BishopMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = BishopCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
-    targetPositions = BoardPositions(moveTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
+      moveTargets ^= POSBOARD(to);
 
       move.Piece = Bishop;
       move.From = from;
@@ -275,9 +267,9 @@ AllMoves(Game *game)
     }
 
     // Captures.
-    targetPositions = BoardPositions(captureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);      
 
       move.Piece = Bishop;
       move.From = from;
@@ -303,17 +295,15 @@ AllMoves(Game *game)
     panic("Invalid side %d.", game->WhosTurn);
   }
 
-  sourcePositions = BoardPositions(queens);
-  for(i = 0; i < sourcePositions.Len; i++) {
-    from = sourcePositions.Vals[i];
+  for(from = BitScanForward(queens); queens; from = BitScanForward(queens)) {
+    queens ^= POSBOARD(from);
 
     moveTargets = QueenMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = QueenCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
-    targetPositions = BoardPositions(moveTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
+      moveTargets ^= POSBOARD(to);
 
       move.Piece = Queen;
       move.From = from;
@@ -326,9 +316,9 @@ AllMoves(Game *game)
     }
 
     // Captures.
-    targetPositions = BoardPositions(captureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);      
 
       move.Piece = Queen;
       move.From = from;
@@ -357,22 +347,20 @@ AllMoves(Game *game)
   // We allow 0 kings for the purposes of testing.
   // TODO: Review.
 
-  sourcePositions = BoardPositions(kings);
-  if(sourcePositions.Len > 1) {
-    panic("%s has %d kings, expected 0 or 1.", StringSide(game->WhosTurn),
-          sourcePositions.Len);
+  from = BitScanForward(kings);
+  kings ^= POSBOARD(from);
+
+  if(kings) {
+    panic("%s has >1 kings, expected 0 or 1.", StringSide(game->WhosTurn));
   }
 
-  if(sourcePositions.Len == 1) {
-    from = sourcePositions.Vals[0];
-
+  if(from) {
     moveTargets = KingMoveTargets(&game->ChessSet, game->WhosTurn);
     captureTargets = KingCaptureTargets(&game->ChessSet, game->WhosTurn);
 
     // Moves.
-    targetPositions = BoardPositions(moveTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
+      moveTargets ^= POSBOARD(to);
 
       move.Piece = King;
       move.From = from;
@@ -385,9 +373,9 @@ AllMoves(Game *game)
     }
 
     // Captures.
-    targetPositions = BoardPositions(captureTargets);
-    for(j = 0; j < targetPositions.Len; j++) {
-      to = targetPositions.Vals[j];
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);    
 
       move.Piece = King;
       move.From = from;

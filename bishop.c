@@ -24,7 +24,7 @@ AllBishopMoveTargets(ChessSet *chessSet, Side side)
     return BishopMoveTargets(chessSet, side, chessSet->Black.Bishops);
   }
 
-  panic("Invalid side %d.", side);  
+  panic("Invalid side %d.", side);
   return EmptyBoard;
 }
 
@@ -37,10 +37,8 @@ AllBishopThreats(ChessSet *chessSet, Side side)
 BitBoard
 BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 {
-  int i;
   BitBoard blockers, occupancy, opposition, noea, nowe, soea, sowe, ret;
   Position bishop, blocker;
-  Positions positions;
 
   occupancy = ChessSetOccupancy(chessSet);
 
@@ -56,10 +54,9 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   }
 
   ret = EmptyBoard;
-  positions = BoardPositions(bishops);
-  for(i = 0; i < positions.Len; i++) {
-    bishop = positions.Vals[i];
-    
+  for(bishop = BitScanForward(bishops); bishops; bishop = BitScanForward(bishops)) {
+    bishops ^= POSBOARD(bishop);
+
     noea = NoEaRay(bishop);
     blockers = noea & occupancy;
     if(blockers != EmptyBoard) {
@@ -95,17 +92,14 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 BitBoard
 BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 {
-  int i;
   BitBoard blockers, noea, nowe, occupancy, ret, soea, sowe;
   Position bishop, blocker;
-  Positions positions;
 
   occupancy = ChessSetOccupancy(chessSet);
 
   ret = EmptyBoard;
-  positions = BoardPositions(bishops);
-  for(i = 0; i < positions.Len; i++) {
-    bishop = positions.Vals[i];
+  for(bishop = BitScanForward(bishops); bishops; bishop = BitScanForward(bishops)) {
+    bishops ^= POSBOARD(bishop);
 
     noea = NoEaRay(bishop);
     blockers = noea & occupancy;
@@ -142,5 +136,3 @@ BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 
   return ret;
 }
-
-

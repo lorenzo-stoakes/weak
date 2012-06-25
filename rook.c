@@ -41,9 +41,7 @@ AllRookThreats(ChessSet *chessSet, Side side)
 BitBoard
 RookCaptureTargets(ChessSet *chessSet, Side side, BitBoard rooks)
 {
-  int i;
   BitBoard blockers, east, nort, sout, west, occupancy, opposition, ret;
-  Positions positions;
   Position blocker, rook;
 
   occupancy = ChessSetOccupancy(chessSet);
@@ -61,9 +59,9 @@ RookCaptureTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   }
 
   ret = EmptyBoard;
-  positions = BoardPositions(rooks);
-  for(i = 0; i < positions.Len; i++) {
-    rook = positions.Vals[i];
+  for(rook = BitScanForward(rooks); rooks; rook = BitScanForward(rooks)) {
+    rooks ^= POSBOARD(rook);
+
     nort = NortRay(rook);
     blockers = nort & occupancy;
     if(blockers != EmptyBoard) {
@@ -100,17 +98,16 @@ RookCaptureTargets(ChessSet *chessSet, Side side, BitBoard rooks)
 BitBoard
 RookMoveTargets(ChessSet *chessSet, Side side, BitBoard rooks)
 {
-  int i;
   BitBoard blockers, east, nort, sout, west, occupancy, ret;
-  Positions positions;
   Position blocker, rook;
 
   occupancy = ChessSetOccupancy(chessSet);
 
   ret = EmptyBoard;
-  positions = BoardPositions(rooks);
-  for(i = 0; i < positions.Len; i++) {
-    rook = positions.Vals[i];
+
+  for(rook = BitScanForward(rooks); rooks; rook = BitScanForward(rooks)) {
+    rooks ^= POSBOARD(rook);
+
     nort = NortRay(rook);
     blockers = nort & occupancy;
     if(blockers != EmptyBoard) {
@@ -146,4 +143,3 @@ RookMoveTargets(ChessSet *chessSet, Side side, BitBoard rooks)
 
   return ret;
 }
-
