@@ -5,13 +5,14 @@
 Weak is an open-source chess engine under active development, currently at a very early stage + thus
 not even capable of actually playing a game yet :-)
 
-Weak is written in C. Note it uses the latest development version of go, so it may not compile
-against release or weekly versions.
+Weak is written in C. This has been hastily ported from the [go version][0] so the code is
+somewhat messy. I'm working on it:-).
 
 ## The Plan ##
 
-The plan for development is to move in steps, starting with the absolute basics and slowly moving
-towards a fully-featured engine. We are currently at stage 1.
+The plan for development is to move in steps, starting with the absolute basics and slowly
+moving towards a fully-featured engine. We are currently at stage 1, though the front-end to
+the engine has yet to be ported from go.
 
 0:  Not yet capable of playing a game.
 
@@ -41,6 +42,7 @@ means of assessment of ability.
 
 * Performance - One of the primary aims of the weak project is to exhibit excellent performance.
 
-[0]:http://www.gnu.org/software/xboard/
-[1]:http://en.wikipedia.org/wiki/50_move_rule
-[2]:http://en.wikipedia.org/wiki/Three-fold_repetition
+[0]:https://github.com/lorenzo-stoakes/weak-go
+[1]:http://www.gnu.org/software/xboard/
+[2]:http://en.wikipedia.org/wiki/50_move_rule
+[3]:http://en.wikipedia.org/wiki/Three-fold_repetition
