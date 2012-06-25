@@ -9,7 +9,7 @@ InitRays(void)
   BitBoard nortRay, soutRay, eastRay, aEastRay, westRay, hWestRay, noeaRay1, noeaRay, soweRay8,
     soweRay, noweRay1, noweRay, soeaRay8, soeaRay;
 
-  // Define as ints so they are signed.
+  // Define as ints so they are signed, and we don't fall off the end when subtracting...!
   int file, pos, rank;
 
   nortRay = C64(0x0101010101010100);
