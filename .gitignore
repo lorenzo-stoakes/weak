@@ -1,4 +1,6 @@
 *.dSYM
 *.out
+*.out.*
+*.prof
 weak
 .#*
