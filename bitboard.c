@@ -81,7 +81,6 @@ BitScanForward(BitBoard bitBoard)
   return deBruijnLookup[index];
 }
 
-
 Positions
 BoardPositions(BitBoard bitBoard)
 {
