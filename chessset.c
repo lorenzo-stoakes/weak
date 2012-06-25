@@ -75,7 +75,7 @@ ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
     break;
   default:
     panic("Invalid side %d.", side);
-  }  
+  }
 }
 
 BitBoard
