@@ -1,6 +1,41 @@
 #include <strings.h>
 #include "weak.h"
 
+#ifdef _MSC_VER
+    #include <intrin.h>
+    #ifdef _WIN64
+        #pragma intrinsic(_BitScanForward64)
+        #pragma intrinsic(_BitScanReverse64)
+        #define USING_INTRINSICS
+    #endif
+#elif defined(__GNUC__) && defined(__LP64__)
+    static inline unsigned char _BitScanForward64(unsigned int* const Index, const BitBoard Mask)
+    {
+        BitBoard Ret;
+        __asm__
+        (
+            "bsfq %[Mask], %[Ret]"
+            :[Ret] "=r" (Ret)
+            :[Mask] "mr" (Mask)
+        );
+        *Index = (unsigned int)Ret;
+        return Mask?1:0;
+    }
+    static inline unsigned char _BitScanReverse64(unsigned int* const Index, const BitBoard Mask)
+    {
+        BitBoard Ret;
+        __asm__
+        (
+            "bsrq %[Mask], %[Ret]"
+            :[Ret] "=r" (Ret)
+            :[Mask] "mr" (Mask)
+        );
+        *Index = (unsigned int)Ret;
+        return Mask?1:0;
+    }
+    #define USING_INTRINSICS
+#endif
+
 // Used in BitScanForward.
 const Position deBruijnLookup[64] = {
   63, 0, 58, 1, 59, 47, 53, 2,
@@ -36,8 +71,12 @@ const int bitBackward8[256] = {
 Position
 BitScanBackward(BitBoard bitBoard)
 {
-  // See [10].
-
+#if defined(__LP64__)  
+  Position ret;
+  _BitScanReverse64(&ret, bitBoard);
+  return ret;
+#else
+  // See [10].  
   int offset = 0;
 
   if(bitBoard == EmptyBoard) {
@@ -58,12 +97,18 @@ BitScanBackward(BitBoard bitBoard)
   }
 
   return offset + bitBackward8[bitBoard];
+#endif
 }
 
 // Determine the position of the first non-zero least significant bit.
 Position
 BitScanForward(BitBoard bitBoard)
 {
+#if defined(__LP64__)  
+  Position ret;
+  _BitScanForward64(&ret, bitBoard);
+  return ret;  
+#else
   const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
   BitBoard isolated, multiple;
   int index;
@@ -79,6 +124,7 @@ BitScanForward(BitBoard bitBoard)
   index = multiple >> 58;
 
   return deBruijnLookup[index];
+#endif
 }
 
 Positions
@@ -87,11 +133,17 @@ BoardPositions(BitBoard bitBoard)
   int i = 0, n;
   Position pos;
   Positions ret;
+  BoardPositionPair pair;
 
   if(bitBoard == EmptyBoard) {
     ret.Vals = NULL;
     ret.Len = 0;
     return ret;
+  }
+
+  pair = HashGet(bitBoard);
+  if(pair.Board == bitBoard) {
+    return pair.Positions;
   }
 
   n = PopCount(bitBoard);
@@ -104,6 +156,8 @@ BoardPositions(BitBoard bitBoard)
       i++;
     }
   }
+
+  HashAdd(bitBoard, ret);
 
   return ret;
 }
