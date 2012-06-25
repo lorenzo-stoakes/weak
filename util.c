@@ -15,7 +15,8 @@ allocate(size_t size)
 void
 release(void *ptr)
 {
-  free(ptr);
+  // For now this doesn't want to work properly. TODO: Revisit.
+  //  free(ptr);
 }
 
 void
