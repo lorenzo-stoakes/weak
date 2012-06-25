@@ -31,7 +31,7 @@ Checked(ChessSet *chessSet, Side side)
 BitBoard
 ChessSetOccupancy(ChessSet *chessSet)
 {
-  return SetOccupancy(&chessSet->White) + SetOccupancy(&chessSet->Black);
+  return SetOccupancy(&chessSet->White) | SetOccupancy(&chessSet->Black);
 }
 
 Piece
