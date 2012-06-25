@@ -5,8 +5,8 @@
 BitBoard
 AllThreats(ChessSet *chessSet, Side side)
 {
-  return AllPawnThreats(chessSet, side) | AllKnightThreats(chessSet, side) |
-    AllRookThreats(chessSet, side) | AllBishopThreats(chessSet, side) |
+  return AllPawnThreats(chessSet, side) | AllRookThreats(chessSet, side) |
+    AllKnightThreats(chessSet, side) | AllBishopThreats(chessSet, side) |
     AllQueenThreats(chessSet, side) | AllKingThreats(chessSet, side);
 }
 
