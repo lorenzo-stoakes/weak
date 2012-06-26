@@ -259,8 +259,8 @@ void      Unmove(Game*);
 
 // king.c
 BitBoard AllKingThreats(ChessSet*, Side);
-BitBoard KingCaptureTargets(ChessSet*, Side);
-BitBoard KingMoveTargets(ChessSet*, Side);
+BitBoard KingCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard KingMoveTargets(ChessSet*, Side, BitBoard);
 
 // knight.c
 void      InitKnight(void);

@@ -10,270 +10,20 @@ static bool kingLegal(Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
 static void pawnMoves(Game*, MoveSlice*);
+static void pieceMoves(Piece, Game*, MoveSlice*);
 
 // Get all valid moves for the current player.
 MoveSlice
 AllMoves(Game *game)
 {
-  BitBoard bishops, captureTargets, kings, knights, moveTargets, queens, rooks;    
-  Move move;
-  Position from, to;
   MoveSlice ret = NewMoveSlice();
 
   pawnMoves(game, &ret);
-
-  // Rooks.
-
-  switch(game->WhosTurn) {
-  case White:
-    rooks = game->ChessSet.White.Rooks;
-    break;
-  case Black:
-    rooks = game->ChessSet.Black.Rooks;
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
-  for(from = BitScanForward(rooks); rooks; from = BitScanForward(rooks)) {
-    rooks ^= POSBOARD(from);
-
-    moveTargets = RookMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = RookCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-
-    // Moves.
-    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
-      moveTargets ^= POSBOARD(to);
-
-      move.Piece = Rook;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-
-    // Captures.
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);      
-
-      move.Piece = Rook;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
-  // Knights.
-
-  switch(game->WhosTurn) {
-  case White:
-    knights = game->ChessSet.White.Knights;
-    break;
-  case Black:
-    knights = game->ChessSet.Black.Knights;
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
-  for(from = BitScanForward(knights); knights; from = BitScanForward(knights)) {
-    knights ^= POSBOARD(from);
-
-    moveTargets = KnightMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = KnightCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-
-    // Moves.
-    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
-      moveTargets ^= POSBOARD(to);
-
-      move.Piece = Knight;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-
-    // Captures.
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);      
-
-      move.Piece = Knight;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
-  // Bishops.
-
-  switch(game->WhosTurn) {
-  case White:
-    bishops = game->ChessSet.White.Bishops;
-    break;
-  case Black:
-    bishops = game->ChessSet.Black.Bishops;
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
-  for(from = BitScanForward(bishops); bishops; from = BitScanForward(bishops)) {
-    bishops ^= POSBOARD(from);
-
-    moveTargets = BishopMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = BishopCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-
-    // Moves.
-    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
-      moveTargets ^= POSBOARD(to);
-
-      move.Piece = Bishop;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-
-    // Captures.
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);      
-
-      move.Piece = Bishop;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
-  // Queens.
-
-  switch(game->WhosTurn) {
-  case White:
-    queens = game->ChessSet.White.Queens;
-    break;
-  case Black:
-    queens = game->ChessSet.Black.Queens;
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
-  for(from = BitScanForward(queens); queens; from = BitScanForward(queens)) {
-    queens ^= POSBOARD(from);
-
-    moveTargets = QueenMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = QueenCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-
-    // Moves.
-    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
-      moveTargets ^= POSBOARD(to);
-
-      move.Piece = Queen;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-
-    // Captures.
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);      
-
-      move.Piece = Queen;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
-  // Kings.
-
-  switch(game->WhosTurn) {
-  case White:
-    kings = game->ChessSet.White.King;
-    break;
-  case Black:
-    kings = game->ChessSet.Black.King;
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
-  // We allow 0 kings for the purposes of testing.
-  // TODO: Review.
-
-  from = BitScanForward(kings);
-  kings ^= POSBOARD(from);
-
-  if(kings) {
-    panic("%s has >1 kings, expected 0 or 1.", StringSide(game->WhosTurn));
-  }
-
-  if(from) {
-    moveTargets = KingMoveTargets(&game->ChessSet, game->WhosTurn);
-    captureTargets = KingCaptureTargets(&game->ChessSet, game->WhosTurn);
-
-    // Moves.
-    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
-      moveTargets ^= POSBOARD(to);
-
-      move.Piece = King;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-
-    // Captures.
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);    
-
-      move.Piece = King;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-      if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }    
-  }
+  pieceMoves(Rook, game, &ret);
+  pieceMoves(Knight, game, &ret);
+  pieceMoves(Bishop, game, &ret);
+  pieceMoves(Queen, game, &ret);
+  pieceMoves(King, game, &ret);
 
   return ret;
 }
@@ -630,10 +380,10 @@ static void
 pawnMoves(Game *game, MoveSlice *ret)
 {
   int k;
-  BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassantPawns,
+  BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassants,
     fromBoard, toBoard;
   Move move;
-  MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};    
+  MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
   Position from, to;
   Rank promotionRank;
 
@@ -642,11 +392,11 @@ pawnMoves(Game *game, MoveSlice *ret)
 
   switch(game->WhosTurn) {
   case White:
-    enPassantPawns = game->ChessSet.White.Pawns & Rank5Mask;
+    enPassants = game->ChessSet.White.Pawns & Rank5Mask;
     promotionRank = Rank8;
     break;
   case Black:
-    enPassantPawns = game->ChessSet.Black.Pawns & Rank4Mask;
+    enPassants = game->ChessSet.Black.Pawns & Rank4Mask;
     promotionRank = Rank1;
     break;
   default:
@@ -712,10 +462,10 @@ pawnMoves(Game *game, MoveSlice *ret)
   }
 
   // En passant.
-  if(enPassantPawns != EmptyBoard) {
-    for(from = BitScanForward(enPassantPawns); enPassantPawns;
-        from = BitScanForward(enPassantPawns)) {
-      enPassantPawns ^= POSBOARD(from);
+  if(enPassants != EmptyBoard) {
+    for(from = BitScanForward(enPassants); enPassants;
+        from = BitScanForward(enPassants)) {
+      enPassants ^= POSBOARD(from);
 
       fromBoard = POSBOARD(from);
       switch(game->WhosTurn) {
@@ -741,6 +491,116 @@ pawnMoves(Game *game, MoveSlice *ret)
         if(Legal(game, &move)) {
           *ret = AppendMove(*ret, move);
         }
+      }
+    }
+  }
+}
+
+static void
+pieceMoves(Piece piece, Game *game, MoveSlice *ret)
+{
+  BitBoard captureTargets, moveTargets, pieceBoard;
+  bool white, black;
+  Move move;
+  Position from, to;
+
+  BitBoard (*getMoveTargets)(ChessSet*, Side, BitBoard);
+  BitBoard (*getCaptureTargets)(ChessSet*, Side, BitBoard);
+
+  white = game->WhosTurn == White;
+  black = game->WhosTurn == Black;
+
+  if(!white && !black) {
+    panic("Invalid side %d.", game->WhosTurn);
+  }
+
+  switch(piece) {
+  case Rook:
+    getMoveTargets = &RookMoveTargets;
+    getCaptureTargets = &RookCaptureTargets;
+
+    if(white) {
+      pieceBoard = game->ChessSet.White.Rooks;
+    } else {
+      pieceBoard = game->ChessSet.Black.Rooks;
+    }
+    break;
+  case Knight:
+    getMoveTargets = &KnightMoveTargets;
+    getCaptureTargets = &KnightCaptureTargets;
+
+    if(white) {
+      pieceBoard = game->ChessSet.White.Knights;
+    } else {
+      pieceBoard = game->ChessSet.Black.Knights;
+    }
+    break;
+  case Bishop:
+    getMoveTargets = &BishopMoveTargets;
+    getCaptureTargets = &BishopCaptureTargets;
+
+    if(white) {
+      pieceBoard = game->ChessSet.White.Bishops;
+    } else {
+      pieceBoard = game->ChessSet.Black.Bishops;
+    }
+    break;
+  case Queen:
+    getMoveTargets = &QueenMoveTargets;
+    getCaptureTargets = &QueenCaptureTargets;
+
+    if(white) {
+      pieceBoard = game->ChessSet.White.Queens;
+    } else {
+      pieceBoard = game->ChessSet.Black.Queens;
+    }
+    break;
+  case King:
+    getMoveTargets = &KingMoveTargets;
+    getCaptureTargets = &KingCaptureTargets;
+
+    if(white) {
+      pieceBoard = game->ChessSet.White.King;
+    } else {
+      pieceBoard = game->ChessSet.Black.King;
+    }
+    break;
+  default:
+    panic("Invalid piece type %d.", piece);
+  }
+
+  for(from = BitScanForward(pieceBoard); pieceBoard; from = BitScanForward(pieceBoard)) {
+    pieceBoard ^= POSBOARD(from);
+
+    moveTargets = getMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    captureTargets = getCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+
+    // Moves.
+    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
+      moveTargets ^= POSBOARD(to);
+
+      move.Piece = piece;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        *ret = AppendMove(*ret, move);
+      }
+    }
+
+    // Captures.
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);
+
+      move.Piece = piece;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+      if(Legal(game, &move)) {
+        *ret = AppendMove(*ret, move);
       }
     }
   }
@@ -892,7 +752,7 @@ static bool bishopLegal(Game *game, Move *move)
     return (to&BishopCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
   }
 
-  return (to&BishopMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;  
+  return (to&BishopMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
 static bool queenLegal(Game *game, Move *move)
@@ -906,7 +766,7 @@ static bool queenLegal(Game *game, Move *move)
     return (to&QueenCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
   }
 
-  return (to&QueenMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;  
+  return (to&QueenMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
 static bool kingLegal(Game *game, Move *move)
@@ -917,10 +777,10 @@ static bool kingLegal(Game *game, Move *move)
   to = POSBOARD(move->To);
 
   if(move->Capture) {
-    return (to&KingCaptureTargets(&game->ChessSet, game->WhosTurn)) != EmptyBoard;
+    return (to&KingCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
   }
 
-  return (to&KingMoveTargets(&game->ChessSet, game->WhosTurn)) != EmptyBoard;  
+  return (to&KingMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
 static CastleEvent updateCastlingRights(Game *game, Move *move)

@@ -17,7 +17,7 @@ AllKingThreats(ChessSet *chessSet, Side side)
 // Target squares for king movement. Doesn't take into account moves which put the king in
 // check.
 BitBoard
-KingCaptureTargets(ChessSet *chessSet, Side side)
+KingCaptureTargets(ChessSet *chessSet, Side side, BitBoard _)
 {
   BitBoard ret;
 
@@ -36,7 +36,7 @@ KingCaptureTargets(ChessSet *chessSet, Side side)
 // Target squares for king movement. Doesn't take into account moves which put the king in
 // check.
 BitBoard
-KingMoveTargets(ChessSet *chessSet, Side side)
+KingMoveTargets(ChessSet *chessSet, Side side, BitBoard _)
 {
   // Can't move into other pieces.
   return kingsSquares(chessSet, side) & EmptySquares(chessSet);
