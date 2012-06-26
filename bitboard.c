@@ -1,6 +1,7 @@
 #include <strings.h>
 #include "weak.h"
 
+// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
 #ifdef _MSC_VER
     #include <intrin.h>
     #ifdef _WIN64
@@ -9,7 +10,8 @@
         #define USING_INTRINSICS
     #endif
 #elif defined(__GNUC__) && defined(__LP64__)
-    static inline unsigned char _BitScanForward64(unsigned int* const Index, const BitBoard Mask)
+    static inline unsigned char _BitScanForward64(unsigned int* const Index,
+                                                  const BitBoard Mask)
     {
         BitBoard Ret;
         __asm__
@@ -21,7 +23,8 @@
         *Index = (unsigned int)Ret;
         return Mask?1:0;
     }
-    static inline unsigned char _BitScanReverse64(unsigned int* const Index, const BitBoard Mask)
+    static inline unsigned char _BitScanReverse64(unsigned int* const Index,
+                                                  const BitBoard Mask)
     {
         BitBoard Ret;
         __asm__
@@ -71,17 +74,21 @@ const int bitBackward8[256] = {
 Position
 BitScanBackward(BitBoard bitBoard)
 {
-#if defined(__LP64__)  
-  Position ret;
-  _BitScanReverse64(&ret, bitBoard);
-  return ret;
-#else
-  // See [10].  
-  int offset = 0;
+  // See [10].
 
   if(bitBoard == EmptyBoard) {
     panic("BitScanBackward attempted on empty BitBoard.");
   }
+
+#if defined(__LP64__)
+  Position ret;
+
+  _BitScanReverse64(&ret, bitBoard);
+  
+  return ret;
+#else
+
+  int offset = 0;
 
   if(bitBoard > C64(0xffffffff)) {
     bitBoard >>= 32;
@@ -104,16 +111,18 @@ BitScanBackward(BitBoard bitBoard)
 Position
 BitScanForward(BitBoard bitBoard)
 {
-#if defined(__LP64__)  
+  // See [9].
+
+#if defined(__LP64__)
   Position ret;
   _BitScanForward64(&ret, bitBoard);
-  return ret;  
+  return ret;
 #else
   const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
   BitBoard isolated, multiple;
   int index;
 
-	// Uses De Bruijn multiplication. See [9].
+	// Uses De Bruijn multiplication.
 
   if(bitBoard == EmptyBoard) {
     panic("BitScanForward attempted on empty BitBoard.");
