@@ -9,131 +9,18 @@ static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
+static void pawnMoves(Game*, MoveSlice*);
+
 // Get all valid moves for the current player.
 MoveSlice
 AllMoves(Game *game)
 {
-  // TODO: Clean up the duplication, for God's sake :-)
-
-  int k;
-  BitBoard bishops, captureTargets, enPassantPawns, fromBoard, kings, knights, moveTargets,
-    pawnCaptureSources, pawnPushSources, pawnCaptureTargets, pawnPushTargets, queens, rooks,
-    toBoard;
+  BitBoard bishops, captureTargets, kings, knights, moveTargets, queens, rooks;    
   Move move;
   Position from, to;
-  Rank promotionRank;
-  MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
   MoveSlice ret = NewMoveSlice();
 
-  // Pawns.
-
-  pawnPushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
-  pawnCaptureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
-
-  switch(game->WhosTurn) {
-  case White:
-    enPassantPawns = game->ChessSet.White.Pawns & Rank5Mask;
-    promotionRank = Rank8;
-    break;
-  case Black:
-    enPassantPawns = game->ChessSet.Black.Pawns & Rank4Mask;
-    promotionRank = Rank1;
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
-  }
-
-  // Pushes.
-  for(from = BitScanForward(pawnPushSources); pawnPushSources;
-      from = BitScanForward(pawnPushSources)) {
-    pawnPushSources ^= POSBOARD(from);
-
-    pawnPushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    for(to = BitScanForward(pawnPushTargets); pawnPushTargets;
-        to = BitScanForward(pawnPushTargets)) {
-      pawnPushTargets ^= POSBOARD(to);
-      move.Piece = Pawn;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-
-      if(RANK(to) == promotionRank) {
-        for(k = 0; k < 4; k++) {
-          move.Type = promotions[k];
-          if(Legal(game, &move)) {
-            ret = AppendMove(ret, move);
-          }
-        }
-      } else if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
-  // Captures.
-
-  for(from = BitScanForward(pawnCaptureSources); pawnCaptureSources;
-      from = BitScanForward(pawnCaptureSources)) {
-    pawnCaptureSources ^= POSBOARD(from);
-
-    pawnCaptureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    for(to = BitScanForward(pawnCaptureTargets); pawnCaptureTargets;
-        to = BitScanForward(pawnCaptureTargets)) {
-      pawnCaptureTargets ^= POSBOARD(to);
-
-      move.Piece = Pawn;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-
-      if(RANK(to) == promotionRank) {
-        for(k = 0; k < 4; k++) {
-          move.Type = promotions[k];
-          if(Legal(game, &move)) {
-            ret = AppendMove(ret, move);
-          }
-        }
-      } else if(Legal(game, &move)) {
-        ret = AppendMove(ret, move);
-      }
-    }
-  }
-
-  // En passant.
-  if(enPassantPawns != EmptyBoard) {
-    for(from = BitScanForward(enPassantPawns); enPassantPawns;
-        from = BitScanForward(enPassantPawns)) {
-      enPassantPawns ^= POSBOARD(from);
-
-      fromBoard = POSBOARD(from);
-      switch(game->WhosTurn) {
-      case White:
-        toBoard = NoWeOne(fromBoard) | NoEaOne(fromBoard);
-        break;
-      case Black:
-        toBoard = SoWeOne(fromBoard) | SoEaOne(fromBoard);
-        break;
-      default:
-        panic("Unrecognised side %d.", game->WhosTurn);
-        break;
-      }
-
-      for(to = BitScanForward(toBoard); toBoard; to = BitScanForward(toBoard)) {
-        toBoard ^= POSBOARD(to);
-
-        move.Piece = Pawn;
-        move.From = from;
-        move.To = to;
-        move.Capture = true;
-        move.Type = EnPassant;
-        if(Legal(game, &move)) {
-          ret = AppendMove(ret, move);
-        }
-      }
-    }
-  }
+  pawnMoves(game, &ret);
 
   // Rooks.
 
@@ -736,6 +623,126 @@ Unmove(Game *game)
     break;
   default:
     panic("Invalid side %d.", game->WhosTurn);
+  }
+}
+
+static void
+pawnMoves(Game *game, MoveSlice *ret)
+{
+  int k;
+  BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassantPawns,
+    fromBoard, toBoard;
+  Move move;
+  MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};    
+  Position from, to;
+  Rank promotionRank;
+
+  pushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
+  captureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
+
+  switch(game->WhosTurn) {
+  case White:
+    enPassantPawns = game->ChessSet.White.Pawns & Rank5Mask;
+    promotionRank = Rank8;
+    break;
+  case Black:
+    enPassantPawns = game->ChessSet.Black.Pawns & Rank4Mask;
+    promotionRank = Rank1;
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
+  }
+
+  // Pushes.
+  for(from = BitScanForward(pushSources); pushSources;
+      from = BitScanForward(pushSources)) {
+    pushSources ^= POSBOARD(from);
+
+    pushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    for(to = BitScanForward(pushTargets); pushTargets;
+        to = BitScanForward(pushTargets)) {
+      pushTargets ^= POSBOARD(to);
+      move.Piece = Pawn;
+      move.From = from;
+      move.To = to;
+      move.Capture = false;
+      move.Type = Normal;
+
+      if(RANK(to) == promotionRank) {
+        for(k = 0; k < 4; k++) {
+          move.Type = promotions[k];
+          if(Legal(game, &move)) {
+            *ret = AppendMove(*ret, move);
+          }
+        }
+      } else if(Legal(game, &move)) {
+        *ret = AppendMove(*ret, move);
+      }
+    }
+  }
+
+  // Captures.
+
+  for(from = BitScanForward(captureSources); captureSources;
+      from = BitScanForward(captureSources)) {
+    captureSources ^= POSBOARD(from);
+
+    captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    for(to = BitScanForward(captureTargets); captureTargets;
+        to = BitScanForward(captureTargets)) {
+      captureTargets ^= POSBOARD(to);
+
+      move.Piece = Pawn;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = Normal;
+
+      if(RANK(to) == promotionRank) {
+        for(k = 0; k < 4; k++) {
+          move.Type = promotions[k];
+          if(Legal(game, &move)) {
+            *ret = AppendMove(*ret, move);
+          }
+        }
+      } else if(Legal(game, &move)) {
+        *ret = AppendMove(*ret, move);
+      }
+    }
+  }
+
+  // En passant.
+  if(enPassantPawns != EmptyBoard) {
+    for(from = BitScanForward(enPassantPawns); enPassantPawns;
+        from = BitScanForward(enPassantPawns)) {
+      enPassantPawns ^= POSBOARD(from);
+
+      fromBoard = POSBOARD(from);
+      switch(game->WhosTurn) {
+      case White:
+        toBoard = NoWeOne(fromBoard) | NoEaOne(fromBoard);
+        break;
+      case Black:
+        toBoard = SoWeOne(fromBoard) | SoEaOne(fromBoard);
+        break;
+      default:
+        panic("Unrecognised side %d.", game->WhosTurn);
+        break;
+      }
+
+      for(to = BitScanForward(toBoard); toBoard; to = BitScanForward(toBoard)) {
+        toBoard ^= POSBOARD(to);
+
+        move.Piece = Pawn;
+        move.From = from;
+        move.To = to;
+        move.Capture = true;
+        move.Type = EnPassant;
+        if(Legal(game, &move)) {
+          *ret = AppendMove(*ret, move);
+        }
+      }
+    }
   }
 }
 
