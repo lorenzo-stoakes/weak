@@ -23,6 +23,6 @@ main(int argc, char **argv)
 
   stats = Perft(&game, 4);
   puts(StringPerft(&stats));
-  
+
   return 0;
 }
