@@ -9,6 +9,7 @@ static bool queenLegal(Game*, Move*);
 static bool kingLegal(Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
+static void castleMoves(Game*, MoveSlice*);
 static void pawnMoves(Game*, MoveSlice*);
 static void pieceMoves(Piece, Game*, MoveSlice*);
 
@@ -24,6 +25,7 @@ AllMoves(Game *game)
   pieceMoves(Bishop, game, &ret);
   pieceMoves(Queen, game, &ret);
   pieceMoves(King, game, &ret);
+  castleMoves(game, &ret);
 
   return ret;
 }
@@ -46,13 +48,43 @@ Stalemated(Game *game)
 void
 DoCastleKingSide(Game *game)
 {
-  panic("Not implemented.");
+  switch(game->WhosTurn) {
+  case White:
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1);
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G1);
+    break;
+  case Black:
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H8);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F8);
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E8);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G8);
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
+  }
 }
 
 void
 DoCastleQueenSide(Game *game)
 {
-  panic("Not implemented.");
+  switch(game->WhosTurn) {
+  case White:
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1);
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1);
+    break;
+  case Black:
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A8);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D8);
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E8);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C8);
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
+  }
 }
 
 // Determine whether the specified move places the current player into check.
@@ -373,6 +405,23 @@ Unmove(Game *game)
     break;
   default:
     panic("Invalid side %d.", game->WhosTurn);
+  }
+}
+
+static void
+castleMoves(Game *game, MoveSlice *ret)
+{
+  Move kingSide, queenSide;
+
+  kingSide.Type = CastleKingSide;
+  queenSide.Type = CastleQueenSide;
+
+  if(Legal(game, &kingSide)) {
+    *ret = AppendMove(*ret, kingSide);
+  }
+
+  if(Legal(game, &queenSide)) {
+    *ret = AppendMove(*ret, queenSide);
   }
 }
 
