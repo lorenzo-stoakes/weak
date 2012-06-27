@@ -658,7 +658,94 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
 static bool
 castleLegal(Game *game, bool queenSide)
 {
-  return false;
+  BitBoard attackMask, mask;
+  Piece piece;
+
+  if(Checked(&game->ChessSet, game->WhosTurn)) {
+    return false;
+  }
+
+  switch(game->WhosTurn) {
+  case White:
+    piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, E1);
+    if(piece != King) {
+      return false;
+    }
+
+    break;
+  case Black:
+    piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, E8);
+    if(piece != King) {
+      return false;
+    }
+
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
+  }
+
+  if(game->WhosTurn == White) {
+    if(queenSide) {
+      if(!game->CastleQueenSideWhite) {
+        return false;
+      }
+      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, A1);
+      if(piece != Rook) {
+        return false;
+      }
+
+      mask = CastleQueenSideWhiteMask;
+      attackMask = CastleQueenSideWhiteAttackMask;
+    } else {
+      if(!game->CastleKingSideWhite) {
+        return false;
+      }
+      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, H1);
+      if(piece != Rook) {
+        return false;
+      }
+
+      mask = CastleQueenSideWhiteMask;
+      attackMask = mask;
+    }
+  } else {
+    if(queenSide) {
+      if(!game->CastleQueenSideBlack) {
+        return false;
+      }
+      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, A8);
+      if(piece != Rook) {
+        return false;
+      }
+
+      mask = CastleQueenSideBlackMask;
+      attackMask = CastleQueenSideBlackAttackMask;
+    } else {
+      if(!game->CastleKingSideBlack) {
+        return false;
+      }
+      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, H8);
+      if(piece != Rook) {
+        return false;
+      }
+
+      mask = CastleKingSideBlackMask;
+      attackMask = mask;
+    }
+  }
+
+  // Obstructions clearly prevent castling.
+  if((mask&ChessSetOccupancy(&game->ChessSet)) != EmptyBoard) {
+    return false;
+  }
+
+  // If any of the squares the king passes through are threatened by the opponent then
+  // castling is prevented.
+  if((attackMask&AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn))) != EmptyBoard) {
+    return false;
+  }
+
+  return true;
 }
 
 // Is this pawn move legal?
