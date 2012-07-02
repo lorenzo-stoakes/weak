@@ -113,20 +113,19 @@ BitScanForward(BitBoard bitBoard)
 {
   // See [9].
 
+  if(bitBoard == EmptyBoard) {
+    panic("BitScanForward attempted on empty BitBoard.");
+  }
+
 #if defined(__LP64__)
   Position ret;
   _BitScanForward64(&ret, bitBoard);
   return ret;
 #else
+  // Uses De Bruijn multiplication.
   const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
   BitBoard isolated, multiple;
   int index;
-
-	// Uses De Bruijn multiplication.
-
-  if(bitBoard == EmptyBoard) {
-    panic("BitScanForward attempted on empty BitBoard.");
-  }
 
   isolated = bitBoard & -bitBoard;
   multiple = isolated * debruijn64;
