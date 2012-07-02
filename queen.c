@@ -7,7 +7,7 @@ AllQueenCaptureTargets(ChessSet *chessSet, Side side)
   case White:
     return QueenCaptureTargets(chessSet, side, chessSet->White.Queens);
   case Black:
-    return QueenCaptureTargets(chessSet, side, chessSet->Black.Queens);    
+    return QueenCaptureTargets(chessSet, side, chessSet->Black.Queens);
   }
 
   panic("Invalid side %d.", side);
@@ -21,10 +21,10 @@ AllQueenMoveTargets(ChessSet *chessSet, Side side)
   case White:
     return QueenMoveTargets(chessSet, side, chessSet->White.Queens);
   case Black:
-    return QueenMoveTargets(chessSet, side, chessSet->Black.Queens);    
+    return QueenMoveTargets(chessSet, side, chessSet->Black.Queens);
   }
 
-  panic("Invalid side %d.", side);  
+  panic("Invalid side %d.", side);
   return EmptyBoard;
 }
 

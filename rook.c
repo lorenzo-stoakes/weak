@@ -8,7 +8,7 @@ AllRookCaptureTargets(ChessSet *chessSet, Side side)
   case White:
     return RookCaptureTargets(chessSet, side, chessSet->White.Rooks);
   case Black:
-    return RookCaptureTargets(chessSet, side, chessSet->Black.Rooks);    
+    return RookCaptureTargets(chessSet, side, chessSet->Black.Rooks);
   }
 
   panic("Invalid side %d.", side);
@@ -23,9 +23,9 @@ AllRookMoveTargets(ChessSet *chessSet, Side side)
   case White:
     return RookMoveTargets(chessSet, side, chessSet->White.Rooks);
   case Black:
-    return RookMoveTargets(chessSet, side, chessSet->Black.Rooks);    
+    return RookMoveTargets(chessSet, side, chessSet->Black.Rooks);
   }
-  
+
   panic("Invalid side %d.", side);
   return EmptyBoard;
 }
