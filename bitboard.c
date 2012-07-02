@@ -84,7 +84,7 @@ BitScanBackward(BitBoard bitBoard)
   Position ret;
 
   _BitScanReverse64(&ret, bitBoard);
-  
+
   return ret;
 #else
 
