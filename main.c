@@ -18,6 +18,9 @@ main(int argc, char **argv)
   PerftStats stats;
   struct timeval start, end;
 
+  // Use unbuffered output.
+  setbuf(stdout, NULL);
+
   puts("WeakC v0.0.dev.\n");  
 
   printf("Initialising... ");
