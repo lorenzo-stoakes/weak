@@ -18,7 +18,6 @@ main(int argc, char **argv)
   PerftStats stats;
   struct timeval start, end;
 
-  init();
   puts("WeakC v0.0.dev.\n");  
 
   printf("Initialising... ");
