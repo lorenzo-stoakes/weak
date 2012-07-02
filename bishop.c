@@ -54,8 +54,9 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   }
 
   ret = EmptyBoard;
-  for(bishop = BitScanForward(bishops); bishops; bishop = BitScanForward(bishops)) {
-    bishops ^= POSBOARD(bishop);
+
+  for(; bishops; bishops ^= POSBOARD(bishop)) {
+    bishop = BitScanForward(bishops);
 
     noea = NoEaRay(bishop);
     blockers = noea & occupancy;
@@ -98,8 +99,8 @@ BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   occupancy = ChessSetOccupancy(chessSet);
 
   ret = EmptyBoard;
-  for(bishop = BitScanForward(bishops); bishops; bishop = BitScanForward(bishops)) {
-    bishops ^= POSBOARD(bishop);
+  for(; bishops; bishops ^= POSBOARD(bishop)) {
+    bishop = BitScanForward(bishops);
 
     noea = NoEaRay(bishop);
     blockers = noea & occupancy;

@@ -59,8 +59,8 @@ RookCaptureTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   }
 
   ret = EmptyBoard;
-  for(rook = BitScanForward(rooks); rooks; rook = BitScanForward(rooks)) {
-    rooks ^= POSBOARD(rook);
+  for(; rooks; rooks ^= POSBOARD(rook)) {
+    rook = BitScanForward(rooks);
 
     nort = NortRay(rook);
     blockers = nort & occupancy;
@@ -105,8 +105,8 @@ RookMoveTargets(ChessSet *chessSet, Side side, BitBoard rooks)
 
   ret = EmptyBoard;
 
-  for(rook = BitScanForward(rooks); rooks; rook = BitScanForward(rooks)) {
-    rooks ^= POSBOARD(rook);
+  for(; rooks; rooks ^= POSBOARD(rook)) {
+    rook = BitScanForward(rooks);
 
     nort = NortRay(rook);
     blockers = nort & occupancy;

@@ -113,8 +113,9 @@ KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 
   ret = EmptyBoard;
 
-  for(knight = BitScanForward(knights); knights; knight = BitScanForward(knights)) {
-    knights ^= POSBOARD(knight);
+  for(; knights; knights ^= POSBOARD(knight)) {
+    knight = BitScanForward(knights);
+
     ret |= knightSquares[knight] & opposition;
   }
 
@@ -128,8 +129,9 @@ KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
   Position knight;
 
   ret = EmptyBoard;
-  for(knight = BitScanForward(knights); knights; knight = BitScanForward(knights)) {
-    knights ^= POSBOARD(knight);
+  for(; knights; knights ^= POSBOARD(knight)) {
+    knight = BitScanForward(knights);
+
     ret |= knightSquares[knight];
   }
 

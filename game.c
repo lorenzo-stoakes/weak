@@ -453,14 +453,13 @@ pawnMoves(Game *game, MoveSlice *ret)
   }
 
   // Pushes.
-  for(from = BitScanForward(pushSources); pushSources;
-      from = BitScanForward(pushSources)) {
-    pushSources ^= POSBOARD(from);
+  for(; pushSources; pushSources ^= POSBOARD(from)) {
+    from = BitScanForward(pushSources);
 
     pushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    for(to = BitScanForward(pushTargets); pushTargets;
-        to = BitScanForward(pushTargets)) {
-      pushTargets ^= POSBOARD(to);
+    for(; pushTargets; pushTargets ^= POSBOARD(to)) {
+      to = BitScanForward(pushTargets);
+
       move.Piece = Pawn;
       move.From = from;
       move.To = to;
@@ -482,14 +481,12 @@ pawnMoves(Game *game, MoveSlice *ret)
 
   // Captures.
 
-  for(from = BitScanForward(captureSources); captureSources;
-      from = BitScanForward(captureSources)) {
-    captureSources ^= POSBOARD(from);
+  for(; captureSources; captureSources ^= POSBOARD(from)) {
+    from = BitScanForward(captureSources);
 
     captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);
+    for(; captureTargets; captureTargets ^= POSBOARD(to)) {
+      to = BitScanForward(captureTargets);
 
       move.Piece = Pawn;
       move.From = from;
@@ -511,35 +508,36 @@ pawnMoves(Game *game, MoveSlice *ret)
   }
 
   // En passant.
-  if(enPassants != EmptyBoard) {
-    for(from = BitScanForward(enPassants); enPassants;
-        from = BitScanForward(enPassants)) {
-      enPassants ^= POSBOARD(from);
+  if(enPassants == EmptyBoard) {
+    return;
+  }
 
-      fromBoard = POSBOARD(from);
-      switch(game->WhosTurn) {
-      case White:
-        toBoard = NoWeOne(fromBoard) | NoEaOne(fromBoard);
-        break;
-      case Black:
-        toBoard = SoWeOne(fromBoard) | SoEaOne(fromBoard);
-        break;
-      default:
-        panic("Unrecognised side %d.", game->WhosTurn);
-        break;
-      }
+  for(; enPassants; enPassants ^= POSBOARD(from)) {
+    from = BitScanForward(enPassants);
 
-      for(to = BitScanForward(toBoard); toBoard; to = BitScanForward(toBoard)) {
-        toBoard ^= POSBOARD(to);
+    fromBoard = POSBOARD(from);
+    switch(game->WhosTurn) {
+    case White:
+      toBoard = NoWeOne(fromBoard) | NoEaOne(fromBoard);
+      break;
+    case Black:
+      toBoard = SoWeOne(fromBoard) | SoEaOne(fromBoard);
+      break;
+    default:
+      panic("Unrecognised side %d.", game->WhosTurn);
+      break;
+    }
 
-        move.Piece = Pawn;
-        move.From = from;
-        move.To = to;
-        move.Capture = true;
-        move.Type = EnPassant;
-        if(Legal(game, &move)) {
-          *ret = AppendMove(*ret, move);
-        }
+    for(; toBoard; toBoard ^= POSBOARD(to)) {
+      to = BitScanForward(toBoard);
+
+      move.Piece = Pawn;
+      move.From = from;
+      move.To = to;
+      move.Capture = true;
+      move.Type = EnPassant;
+      if(Legal(game, &move)) {
+        *ret = AppendMove(*ret, move);
       }
     }
   }
@@ -618,15 +616,15 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
     panic("Invalid piece type %d.", piece);
   }
 
-  for(from = BitScanForward(pieceBoard); pieceBoard; from = BitScanForward(pieceBoard)) {
-    pieceBoard ^= POSBOARD(from);
+  for(; pieceBoard; pieceBoard ^= POSBOARD(from)) {
+    from = BitScanForward(pieceBoard);
 
     moveTargets = getMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = getCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
-    for(to = BitScanForward(moveTargets); moveTargets; to = BitScanForward(moveTargets)) {
-      moveTargets ^= POSBOARD(to);
+    for(; moveTargets; moveTargets ^= POSBOARD(to)) {
+      to = BitScanForward(moveTargets);
 
       move.Piece = piece;
       move.From = from;
@@ -639,9 +637,8 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
     }
 
     // Captures.
-    for(to = BitScanForward(captureTargets); captureTargets;
-        to = BitScanForward(captureTargets)) {
-      captureTargets ^= POSBOARD(to);
+    for(; captureTargets; captureTargets ^= POSBOARD(to)) {
+      to = BitScanForward(captureTargets);
 
       move.Piece = piece;
       move.From = from;
