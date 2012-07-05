@@ -858,7 +858,8 @@ pawnLegal(Game *game, Move *move)
   return sources != EmptyBoard && (targets&toBoard&validToRankMask) != EmptyBoard;
 }
 
-static bool rookLegal(Game *game, Move *move)
+static bool
+rookLegal(Game *game, Move *move)
 {
   BitBoard from, to;
 
@@ -872,7 +873,8 @@ static bool rookLegal(Game *game, Move *move)
   return (to&RookMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
-static bool knightLegal(Game *game, Move *move)
+static bool
+knightLegal(Game *game, Move *move)
 {
   BitBoard from, to;
 
@@ -886,7 +888,8 @@ static bool knightLegal(Game *game, Move *move)
   return (to&KnightMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
-static bool bishopLegal(Game *game, Move *move)
+static bool
+bishopLegal(Game *game, Move *move)
 {
   BitBoard from, to;
 
@@ -900,7 +903,8 @@ static bool bishopLegal(Game *game, Move *move)
   return (to&BishopMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
-static bool queenLegal(Game *game, Move *move)
+static bool
+queenLegal(Game *game, Move *move)
 {
   BitBoard from, to;
 
@@ -914,7 +918,8 @@ static bool queenLegal(Game *game, Move *move)
   return (to&QueenMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
-static bool kingLegal(Game *game, Move *move)
+static bool
+kingLegal(Game *game, Move *move)
 {
   BitBoard from, to;
 
@@ -928,7 +933,8 @@ static bool kingLegal(Game *game, Move *move)
   return (to&KingMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
-static CastleEvent updateCastlingRights(Game *game, Move *move)
+static CastleEvent
+updateCastlingRights(Game *game, Move *move)
 {
   CastleEvent ret = NoCastleEvent;
 
