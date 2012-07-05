@@ -260,6 +260,8 @@ DoMove(Game *game, Move *move)
 
     ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
     ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
+
+    break;
   }
 
   AppendCastleEvent(&game->History.CastleEvents, updateCastlingRights(game, move));
