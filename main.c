@@ -21,7 +21,7 @@ main(int argc, char **argv)
   // Use unbuffered output.
   setbuf(stdout, NULL);
 
-  puts("WeakC v0.0.dev.\n");  
+  puts("WeakC v0.0.dev.\n");
 
   printf("Initialising... ");
   init();
