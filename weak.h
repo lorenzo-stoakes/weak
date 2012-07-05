@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define USE_BITSCAN_ASM
+
 // See http://chessprogramming.wikispaces.com/Bitboards.
 #define C64(constantU64) constantU64##ULL
 #define RANK(pos) ((Rank)(pos/8))
@@ -218,8 +220,30 @@ BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
 
 // bitboard.c
+
+// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
+
+#if defined(USE_BITSCAN_ASM)
+FORCE_INLINE Position
+BitScanBackward(BitBoard bitBoard)
+{
+  BitBoard posBoard;
+  __asm__("bsrq %1, %0": "=r"(posBoard): "rm"(bitBoard));
+  return (Position)posBoard;
+}
+
+FORCE_INLINE Position
+BitScanForward(BitBoard bitBoard)
+{
+  BitBoard posBoard;
+  __asm__("bsfq %1, %0": "=r"(posBoard): "rm"(bitBoard));
+  return (Position)posBoard;
+}
+#else
 Position  BitScanBackward(BitBoard);
 Position  BitScanForward(BitBoard);
+#endif
+
 BitBoard  EastOne(BitBoard);
 BitBoard  FlipDiagA1H8(BitBoard);
 BitBoard  FlipVertical(BitBoard);

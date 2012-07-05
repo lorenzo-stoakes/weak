@@ -1,36 +1,6 @@
 #include <strings.h>
 #include "weak.h"
 
-// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
-#if defined(__GNUC__) && defined(__LP64__)
-    static inline unsigned char _BitScanForward64(unsigned int* const index,
-                                                  const BitBoard mask)
-    {
-        BitBoard ret;
-        __asm__
-        (
-            "bsfq %[mask], %[ret]"
-            :[ret] "=r" (ret)
-            :[mask] "mr" (mask)
-        );
-        *index = (unsigned int)ret;
-        return mask?1:0;
-    }
-    static inline unsigned char _BitScanReverse64(unsigned int* const index,
-                                                  const BitBoard mask)
-    {
-        BitBoard ret;
-        __asm__
-        (
-            "bsrq %[mask], %[ret]"
-            :[ret] "=r" (ret)
-            :[mask] "mr" (mask)
-        );
-        *index = (unsigned int)ret;
-        return mask?1:0;
-    }
-#endif
-
 // Used in BitScanForward.
 const Position deBruijnLookup[64] = {
   63, 0, 58, 1, 59, 47, 53, 2,
@@ -63,24 +33,17 @@ const int bitBackward8[256] = {
   7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 };
 
+#ifndef USE_BITSCAN_ASM
 Position
 BitScanBackward(BitBoard bitBoard)
 {
+  int offset = 0;
+
   // See [10].
 
   if(bitBoard == EmptyBoard) {
     panic("BitScanBackward attempted on empty BitBoard.");
   }
-
-#if defined(__LP64__)
-  Position ret;
-
-  _BitScanReverse64(&ret, bitBoard);
-
-  return ret;
-#else
-
-  int offset = 0;
 
   if(bitBoard > C64(0xffffffff)) {
     bitBoard >>= 32;
@@ -96,36 +59,30 @@ BitScanBackward(BitBoard bitBoard)
   }
 
   return offset + bitBackward8[bitBoard];
-#endif
 }
 
 // Determine the position of the first non-zero least significant bit.
 Position
 BitScanForward(BitBoard bitBoard)
 {
+  // Uses De Bruijn multiplication.
   // See [9].
+
+  const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
+  BitBoard isolated, multiple;
+  int index;
 
   if(bitBoard == EmptyBoard) {
     panic("BitScanForward attempted on empty BitBoard.");
   }
-
-#if defined(__LP64__)
-  Position ret;
-  _BitScanForward64(&ret, bitBoard);
-  return ret;
-#else
-  // Uses De Bruijn multiplication.
-  const BitBoard debruijn64 = C64(0x07EDD5E59A4E28C2);
-  BitBoard isolated, multiple;
-  int index;
 
   isolated = bitBoard & -bitBoard;
   multiple = isolated * debruijn64;
   index = multiple >> 58;
 
   return deBruijnLookup[index];
-#endif
 }
+#endif
 
 // Flip bitboard vertically (about the horizontal axis).
 BitBoard
