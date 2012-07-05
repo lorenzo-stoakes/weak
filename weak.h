@@ -123,6 +123,7 @@ struct PieceSlice {
 };
 
 struct Set {
+  BitBoard EmptySquares, Occupancy;
   BitBoard Pawns, Rooks, Knights, Bishops, Queens, King;
 };
 
