@@ -2,8 +2,6 @@
 #include "weak.h"
 
 // See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
-    #endif
-    static inline unsigned char _BitScanForward64(unsigned int* const Index,
 #if defined(__GNUC__) && defined(__LP64__)
     static inline unsigned char _BitScanForward64(unsigned int* const index,
                                                   const BitBoard mask)
@@ -24,7 +22,6 @@
         BitBoard ret;
         __asm__
         (
-            :[Ret] "=r" (Ret)
             "bsrq %[mask], %[ret]"
             :[ret] "=r" (ret)
             :[mask] "mr" (mask)
