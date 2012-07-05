@@ -14,6 +14,8 @@
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 #define POSITION(rank, file) ((Position)(rank*8 + file))
 
+#define INIT_MOVE_LEN 100
+
 enum CastleEvent {
   NoCastleEvent = 1 << 0,
   LostKingSideWhite = 1 << 1,
@@ -231,7 +233,7 @@ BitBoard  SoWeOne(BitBoard);
 BitBoard  WestOne(BitBoard);
 
 // castleevent.c
-CastleEventSlice AppendCastleEvent(CastleEventSlice, CastleEvent);
+void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
 CastleEventSlice NewCastleEventSlice(void);
 CastleEvent      PopCastleEvent(CastleEventSlice*);
 
@@ -246,16 +248,16 @@ BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
 // game.c
-MoveSlice AllMoves(Game*);
-bool      Checkmated(Game*);
-void      DoCastleKingSide(Game*);
-void      DoCastleQueenSide(Game*);
-bool      Legal(Game*, Move*);
-void      DoMove(Game*, Move*);
-Game      NewGame(bool, Side);
-bool      Stalemated(Game*);
-void      ToggleTurn(Game *game);
-void      Unmove(Game*);
+void AllMoves(MoveSlice*, Game*);
+bool Checkmated(Game*);
+void DoCastleKingSide(Game*);
+void DoCastleQueenSide(Game*);
+bool Legal(Game*, Move*);
+void DoMove(Game*, Move*);
+Game NewGame(bool, Side);
+bool Stalemated(Game*);
+void ToggleTurn(Game*);
+void Unmove(Game*);
 
 // king.c
 BitBoard AllKingThreats(ChessSet*, Side);
@@ -271,8 +273,8 @@ BitBoard  KnightCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard  KnightMoveTargets(ChessSet*, Side, BitBoard);
 
 // move.c
-MoveSlice AppendMove(MoveSlice, Move);
-MoveSlice NewMoveSlice(void);
+void      AppendMove(MoveSlice*, Move);
+MoveSlice NewMoveSlice(Move*, int);
 Move      PopMove(MoveSlice*);
 
 // movehistory.c

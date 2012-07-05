@@ -6,6 +6,7 @@ Perft(Game *game, int depth)
   int i;
   Move move;
   MoveSlice allMoves;
+  Move buffer[INIT_MOVE_LEN];
   PerftStats ret, stats;
 
   ret.Count = 0;
@@ -21,6 +22,8 @@ Perft(Game *game, int depth)
   }
 
   allMoves = AllMoves(game);
+  allMoves = NewMoveSlice(buffer, INIT_MOVE_LEN);
+  AllMoves(&allMoves, game);
 
   for(i = 0; i < allMoves.Len; i++) {
     move = allMoves.Vals[i];

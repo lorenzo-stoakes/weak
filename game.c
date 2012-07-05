@@ -14,27 +14,29 @@ static void pawnMoves(Game*, MoveSlice*);
 static void pieceMoves(Piece, Game*, MoveSlice*);
 
 // Get all valid moves for the current player.
-MoveSlice
-AllMoves(Game *game)
+void
+AllMoves(MoveSlice *slice, Game *game)
 {
-  MoveSlice ret = NewMoveSlice();
+  pawnMoves(game, slice);
+  pieceMoves(Rook, game, slice);
 
-  pawnMoves(game, &ret);
-  pieceMoves(Rook, game, &ret);
-  pieceMoves(Knight, game, &ret);
-  pieceMoves(Bishop, game, &ret);
-  pieceMoves(Queen, game, &ret);
-  pieceMoves(King, game, &ret);
-  castleMoves(game, &ret);
-
-  return ret;
+  pieceMoves(Knight, game, slice);
+  pieceMoves(Bishop, game, slice);
+  pieceMoves(Queen, game, slice);
+  pieceMoves(King, game, slice);
+  castleMoves(game, slice);
 }
 
 // Determine whether the current player is checkmated.
 bool
 Checkmated(Game *game)
 {
-  return Checked(&game->ChessSet, game->WhosTurn) && AllMoves(game).Len == 0;
+  Move buffer[INIT_MOVE_LEN];
+  MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
+
+  AllMoves(&slice, game);
+
+  return Checked(&game->ChessSet, game->WhosTurn) && slice.Len == 0;
 }
 
 // Determine whether the game is in a state of stalemate, i.e. the current player cannot make a
@@ -42,7 +44,12 @@ Checkmated(Game *game)
 bool
 Stalemated(Game *game)
 {
-  return !Checked(&game->ChessSet, game->WhosTurn) && AllMoves(game).Len == 0;
+  Move buffer[INIT_MOVE_LEN];
+  MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
+
+  AllMoves(&slice, game);
+
+  return !Checked(&game->ChessSet, game->WhosTurn) && slice.Len == 0;
 }
 
 void
@@ -249,9 +256,9 @@ DoMove(Game *game, Move *move)
     ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
   }
 
-  game->History.CastleEvents = AppendCastleEvent(game->History.CastleEvents,
-                                                 updateCastlingRights(game, move));
-  game->History.Moves = AppendMove(game->History.Moves, *move);
+  AppendCastleEvent(&game->History.CastleEvents, updateCastlingRights(game, move));
+  AppendMove(&game->History.Moves, *move);
+
   ToggleTurn(game);
 }
 
@@ -417,11 +424,11 @@ castleMoves(Game *game, MoveSlice *ret)
   queenSide.Type = CastleQueenSide;
 
   if(Legal(game, &kingSide)) {
-    *ret = AppendMove(*ret, kingSide);
+    AppendMove(ret, kingSide);
   }
 
   if(Legal(game, &queenSide)) {
-    *ret = AppendMove(*ret, queenSide);
+    AppendMove(ret, queenSide);
   }
 }
 
@@ -470,11 +477,11 @@ pawnMoves(Game *game, MoveSlice *ret)
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
           if(Legal(game, &move)) {
-            *ret = AppendMove(*ret, move);
+            AppendMove(ret, move);
           }
         }
       } else if(Legal(game, &move)) {
-        *ret = AppendMove(*ret, move);
+        AppendMove(ret, move);
       }
     }
   }
@@ -498,11 +505,11 @@ pawnMoves(Game *game, MoveSlice *ret)
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
           if(Legal(game, &move)) {
-            *ret = AppendMove(*ret, move);
+            AppendMove(ret, move);
           }
         }
       } else if(Legal(game, &move)) {
-        *ret = AppendMove(*ret, move);
+        AppendMove(ret, move);
       }
     }
   }
@@ -537,7 +544,7 @@ pawnMoves(Game *game, MoveSlice *ret)
       move.Capture = true;
       move.Type = EnPassant;
       if(Legal(game, &move)) {
-        *ret = AppendMove(*ret, move);
+        AppendMove(ret, move);
       }
     }
   }
@@ -632,7 +639,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
       move.Capture = false;
       move.Type = Normal;
       if(Legal(game, &move)) {
-        *ret = AppendMove(*ret, move);
+        AppendMove(ret, move);
       }
     }
 
@@ -646,7 +653,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
       move.Capture = true;
       move.Type = Normal;
       if(Legal(game, &move)) {
-        *ret = AppendMove(*ret, move);
+        AppendMove(ret, move);
       }
     }
   }
