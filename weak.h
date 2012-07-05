@@ -14,6 +14,8 @@
 #define POSBOARD(pos) ((BitBoard)(1ULL<<pos))
 #define POSITION(rank, file) ((Position)(rank*8 + file))
 
+#define FORCE_INLINE inline __attribute__((always_inline))
+
 #define INIT_MOVE_LEN 100
 
 enum CastleEvent {
