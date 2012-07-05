@@ -84,19 +84,19 @@ SetPlacePiece(Set *set, Piece piece, Position pos)
     break;
   case Rook:
     set->Rooks |= bitBoard;
-    break;    
+    break;
   case Knight:
     set->Knights |= bitBoard;
-    break;    
+    break;
   case Bishop:
     set->Bishops |= bitBoard;
-    break;    
+    break;
   case Queen:
     set->Queens |= bitBoard;
-    break;    
+    break;
   case King:
     set->King |= bitBoard;
-    break;    
+    break;
   default:
     panic("Invalid piece %d.", piece);
   }
