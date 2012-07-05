@@ -2,41 +2,36 @@
 #include "weak.h"
 
 // See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
-#ifdef _MSC_VER
-    #include <intrin.h>
-    #ifdef _WIN64
-        #pragma intrinsic(_BitScanForward64)
-        #pragma intrinsic(_BitScanReverse64)
-        #define USING_INTRINSICS
     #endif
-#elif defined(__GNUC__) && defined(__LP64__)
     static inline unsigned char _BitScanForward64(unsigned int* const Index,
-                                                  const BitBoard Mask)
+#if defined(__GNUC__) && defined(__LP64__)
+    static inline unsigned char _BitScanForward64(unsigned int* const index,
+                                                  const BitBoard mask)
     {
-        BitBoard Ret;
+        BitBoard ret;
         __asm__
         (
-            "bsfq %[Mask], %[Ret]"
-            :[Ret] "=r" (Ret)
-            :[Mask] "mr" (Mask)
+            "bsfq %[mask], %[ret]"
+            :[ret] "=r" (ret)
+            :[mask] "mr" (mask)
         );
-        *Index = (unsigned int)Ret;
-        return Mask?1:0;
+        *index = (unsigned int)ret;
+        return mask?1:0;
     }
-    static inline unsigned char _BitScanReverse64(unsigned int* const Index,
-                                                  const BitBoard Mask)
+    static inline unsigned char _BitScanReverse64(unsigned int* const index,
+                                                  const BitBoard mask)
     {
-        BitBoard Ret;
+        BitBoard ret;
         __asm__
         (
-            "bsrq %[Mask], %[Ret]"
             :[Ret] "=r" (Ret)
-            :[Mask] "mr" (Mask)
+            "bsrq %[mask], %[ret]"
+            :[ret] "=r" (ret)
+            :[mask] "mr" (mask)
         );
-        *Index = (unsigned int)Ret;
-        return Mask?1:0;
+        *index = (unsigned int)ret;
+        return mask?1:0;
     }
-    #define USING_INTRINSICS
 #endif
 
 // Used in BitScanForward.
