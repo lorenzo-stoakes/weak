@@ -238,17 +238,23 @@ DoMove(Game *game, Move *move)
       }
     }
 
-    if(move->Type == Normal) {
-      piece = move->Piece;
-    } else if(move->Type == PromoteKnight) {
+    switch(move->Type) {
+    case PromoteKnight:
       piece = Knight;
-    } else if(move->Type == PromoteBishop) {
+      break;
+    case PromoteBishop:
       piece = Bishop;
-    } else if(move->Type == PromoteRook) {
+      break;
+    case PromoteRook:
       piece = Rook;
-    } else if(move->Type == PromoteQueen) {
+      break;
+    case PromoteQueen:
       piece = Queen;
-    } else {
+      break;
+    case Normal:
+      piece = move->Piece;
+      break;
+    default:
       panic("Impossible.");
     }
 
