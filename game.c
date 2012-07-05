@@ -523,9 +523,6 @@ pawnMoves(Game *game, MoveSlice *ret)
   }
 
   // En passant.
-  if(enPassants == EmptyBoard) {
-    return;
-  }
 
   for(; enPassants; enPassants ^= POSBOARD(from)) {
     from = BitScanForward(enPassants);
