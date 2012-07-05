@@ -6,6 +6,7 @@
 static void
 init()
 {
+  InitBitBoard();
   InitKnight();
   InitRays();
 }

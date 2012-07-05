@@ -121,6 +121,13 @@ FlipDiagA1H8(BitBoard bitBoard)
   return bitBoard;
 }
 
+// Initialise bitboard-related stuff.
+void
+InitBitBoard()
+{
+  // Nothing yet, placeholder.
+}
+
 // Count the number of bits in the specified BitBoard.
 int
 PopCount(BitBoard x)

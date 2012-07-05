@@ -299,6 +299,9 @@ BitBoard  AllKnightThreats(ChessSet*, Side);
 BitBoard  KnightCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard  KnightMoveTargets(ChessSet*, Side, BitBoard);
 
+// magic.c
+void InitMagics(void);
+
 // move.c
 void      AppendMove(MoveSlice*, Move);
 MoveSlice NewMoveSlice(Move*, int);
