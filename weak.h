@@ -252,6 +252,7 @@ Position  BitScanForward(BitBoard);
 BitBoard  EastOne(BitBoard);
 BitBoard  FlipDiagA1H8(BitBoard);
 BitBoard  FlipVertical(BitBoard);
+void      InitBitBoard(void);
 BitBoard  NoEaOne(BitBoard);
 BitBoard  NortOne(BitBoard);
 BitBoard  NoWeOne(BitBoard);
