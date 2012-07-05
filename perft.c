@@ -1,5 +1,7 @@
 #include "weak.h"
 
+static PerftStats initStats(void);
+
 PerftStats
 Perft(Game *game, int depth)
 {
@@ -9,19 +11,12 @@ Perft(Game *game, int depth)
   Move buffer[INIT_MOVE_LEN];
   PerftStats ret, stats;
 
-  ret.Count = 0;
-  ret.Captures = 0;
-  ret.EnPassants = 0;
-  ret.Castles = 0;
-  ret.Promotions = 0;
-  ret.Checks = 0;
-  ret.Checkmates = 0;
-
   if(depth <= 0) {
     panic("Invalid depth %d.", depth);
-  }
+  }  
 
-  allMoves = AllMoves(game);
+  ret = initStats();
+
   allMoves = NewMoveSlice(buffer, INIT_MOVE_LEN);
   AllMoves(&allMoves, game);
 
@@ -74,6 +69,22 @@ Perft(Game *game, int depth)
       ret.Checkmates += stats.Checkmates;
     }
   }
+
+  return ret;
+}
+
+static PerftStats
+initStats()
+{
+  PerftStats ret;
+
+  ret.Count = 0;
+  ret.Captures = 0;
+  ret.EnPassants = 0;
+  ret.Castles = 0;
+  ret.Promotions = 0;
+  ret.Checks = 0;
+  ret.Checkmates = 0;
 
   return ret;
 }
