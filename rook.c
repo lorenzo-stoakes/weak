@@ -44,14 +44,14 @@ RookCaptureTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   BitBoard blockers, east, nort, sout, west, occupancy, opposition, ret;
   Position blocker, rook;
 
-  occupancy = ChessSetOccupancy(chessSet);
+  occupancy = chessSet->Occupancy;
 
   switch(side) {
   case White:
-    opposition = SetOccupancy(&chessSet->Black);
+    opposition = chessSet->Black.Occupancy;
     break;
   case Black:
-    opposition = SetOccupancy(&chessSet->White);
+    opposition = chessSet->White.Occupancy;
     break;
   default:
     panic("Invalid side %d.", side);
@@ -102,6 +102,7 @@ RookMoveTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   Position blocker, rook;
 
   occupancy = ChessSetOccupancy(chessSet);
+  occupancy = chessSet->Occupancy;
 
   ret = EmptyBoard;
 

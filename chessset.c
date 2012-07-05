@@ -28,12 +28,6 @@ Checked(ChessSet *chessSet, Side side)
   return (AllThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
 }
 
-BitBoard
-ChessSetOccupancy(ChessSet *chessSet)
-{
-  return SetOccupancy(&chessSet->White) | SetOccupancy(&chessSet->Black);
-}
-
 Piece
 ChessSetPieceAt(ChessSet *chessSet, Side side, Position pos)
 {
@@ -51,6 +45,9 @@ ChessSetPieceAt(ChessSet *chessSet, Side side, Position pos)
 void
 ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
+  chessSet->Occupancy ^= POSBOARD(pos);
+  chessSet->EmptySquares = ~chessSet->Occupancy;
+
   switch(side) {
   case White:
     SetPlacePiece(&chessSet->White, piece, pos);
@@ -66,6 +63,9 @@ ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 void
 ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
+  chessSet->Occupancy ^= POSBOARD(pos);
+  chessSet->EmptySquares = ~chessSet->Occupancy;
+
   switch(side) {
   case White:
     SetRemovePiece(&chessSet->White, piece, pos);
@@ -78,12 +78,6 @@ ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   }
 }
 
-BitBoard
-EmptySquares(ChessSet *chessSet)
-{
-  return ~ChessSetOccupancy(chessSet);
-}
-
 ChessSet
 NewChessSet()
 {
@@ -91,6 +85,8 @@ NewChessSet()
 
   ret.White = NewWhiteSet();
   ret.Black = NewBlackSet();
+  ret.Occupancy = InitOccupancy;
+  ret.EmptySquares = ~InitOccupancy;
 
   return ret;
 }

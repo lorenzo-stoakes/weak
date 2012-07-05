@@ -40,14 +40,14 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   BitBoard blockers, occupancy, opposition, noea, nowe, soea, sowe, ret;
   Position bishop, blocker;
 
-  occupancy = ChessSetOccupancy(chessSet);
+  occupancy = chessSet->Occupancy;
 
   switch(side) {
   case White:
-    opposition = SetOccupancy(&chessSet->Black);
+    opposition = chessSet->Black.Occupancy;
     break;
   case Black:
-    opposition = SetOccupancy(&chessSet->White);
+    opposition = chessSet->White.Occupancy;
     break;
   default:
     panic("Invalid side %d.", side);
@@ -96,7 +96,7 @@ BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   BitBoard blockers, noea, nowe, occupancy, ret, soea, sowe;
   Position bishop, blocker;
 
-  occupancy = ChessSetOccupancy(chessSet);
+  occupancy = chessSet->Occupancy;
 
   ret = EmptyBoard;
   for(; bishops; bishops ^= POSBOARD(bishop)) {

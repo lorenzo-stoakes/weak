@@ -1,15 +1,12 @@
 #include "weak.h"
 
-BitBoard
-SetOccupancy(Set *set)
-{
-  return set->Pawns | set->Rooks | set->Knights | set->Bishops | set->Queens | set->King;
-}
-
 Set
 NewBlackSet()
 {
   Set ret;
+
+  ret.Occupancy = InitBlackOccupancy;
+  ret.EmptySquares = ~InitBlackOccupancy;
 
   ret.Pawns = InitBlackPawns;
   ret.Rooks = InitBlackRooks;
@@ -25,6 +22,9 @@ Set
 NewWhiteSet()
 {
   Set ret;
+
+  ret.Occupancy = InitWhiteOccupancy;
+  ret.EmptySquares = ~InitWhiteOccupancy;
 
   ret.Pawns = InitWhitePawns;
   ret.Rooks = InitWhiteRooks;
@@ -75,6 +75,9 @@ SetPlacePiece(Set *set, Piece piece, Position pos)
 
   bitBoard = POSBOARD(pos);
 
+  set->Occupancy ^= bitBoard;
+  set->EmptySquares = ~set->Occupancy;
+
   switch(piece) {
   case Pawn:
     set->Pawns |= bitBoard;
@@ -110,6 +113,9 @@ SetRemovePiece(Set *set, Piece piece, Position pos)
   }
 
   complement = ~POSBOARD(pos);
+
+  set->Occupancy &= complement;
+  set->EmptySquares = ~set->Occupancy;
 
   switch(piece) {
   case Pawn:

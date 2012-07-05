@@ -102,10 +102,10 @@ KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 
   switch(side) {
   case White:
-    opposition = SetOccupancy(&chessSet->Black);
+    opposition = chessSet->Black.Occupancy;
     break;
   case Black:
-    opposition = SetOccupancy(&chessSet->White);
+    opposition = chessSet->White.Occupancy;
     break;
   default:
     panic("Invalid side %d.", side);
@@ -135,5 +135,5 @@ KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
     ret |= knightSquares[knight];
   }
 
-  return ret & EmptySquares(chessSet);
+  return ret & chessSet->EmptySquares;
 }

@@ -744,7 +744,7 @@ castleLegal(Game *game, bool queenSide)
   }
 
   // Obstructions clearly prevent castling.
-  if((mask&ChessSetOccupancy(&game->ChessSet)) != EmptyBoard) {
+  if((mask&game->ChessSet.Occupancy) != EmptyBoard) {
     return false;
   }
 

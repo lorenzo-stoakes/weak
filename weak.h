@@ -133,7 +133,8 @@ struct MoveHistory {
 };
 
 struct ChessSet {
-  Set White, Black;
+  BitBoard EmptySquares, Occupancy;
+  Set      White, Black;
 };
 
 struct Game {
@@ -178,12 +179,15 @@ static const BitBoard
   InitBlackBishops               = C64(0x2400000000000000),
   InitBlackKing                  = C64(0x1000000000000000),
   InitBlackKnights               = C64(0x4200000000000000),
+  InitBlackOccupancy             = C64(0xffff000000000000),
   InitBlackPawns                 = C64(0x00ff000000000000),
   InitBlackQueens                = C64(0x0800000000000000),
   InitBlackRooks                 = C64(0x8100000000000000),
+  InitOccupancy                  = C64(0xffff00000000ffff),
   InitWhiteBishops               = C64(0x0000000000000024),
   InitWhiteKing                  = C64(0x0000000000000010),
   InitWhiteKnights               = C64(0x0000000000000042),
+  InitWhiteOccupancy             = C64(0x000000000000ffff),
   InitWhitePawns                 = C64(0x000000000000ff00),
   InitWhiteQueens                = C64(0x0000000000000008),
   InitWhiteRooks                 = C64(0x0000000000000081),
@@ -269,9 +273,7 @@ BitBoard AllThreats(ChessSet*, Side);
 bool     Checked(ChessSet*, Side);
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
-BitBoard ChessSetOccupancy(ChessSet*);
 Piece    ChessSetPieceAt(ChessSet*, Side, Position);
-BitBoard EmptySquares(ChessSet*);
 ChessSet NewChessSet(void);
 
 // game.c
@@ -357,7 +359,6 @@ BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
 // set.c
 Set      NewBlackSet(void);
 Set      NewWhiteSet(void);
-BitBoard SetOccupancy(Set*);
 Piece    SetPieceAt(Set*, Position);
 void     SetPlacePiece(Set*, Piece, Position);
 void     SetRemovePiece(Set*, Piece, Position);

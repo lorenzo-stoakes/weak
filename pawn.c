@@ -75,11 +75,11 @@ AllPawnThreats(ChessSet *chessSet, Side side)
   case White:
     pawns = chessSet->White.Pawns;
     pawns = NoWeOne(pawns) | NoEaOne(pawns);
-    return pawns & ~SetOccupancy(&chessSet->White);
+    return pawns & chessSet->White.EmptySquares;
   case Black:
     pawns = chessSet->Black.Pawns;
     pawns = SoWeOne(pawns) | SoEaOne(pawns);
-    return pawns & ~SetOccupancy(&chessSet->Black);
+    return pawns & chessSet->Black.EmptySquares;
   }
 
   panic("Invalid side %s.", StringSide(side));
@@ -94,11 +94,11 @@ PawnCaptureSources(ChessSet *chessSet, Side side, BitBoard pawns)
 
   switch(side) {
   case White:
-    blackOccupancy = SetOccupancy(&chessSet->Black);
+    blackOccupancy = chessSet->Black.Occupancy;
 
     return pawns & (SoWeOne(blackOccupancy) | SoEaOne(blackOccupancy));
   case Black:
-    whiteOccupancy = SetOccupancy(&chessSet->White);
+    whiteOccupancy = chessSet->White.Occupancy;
 
     return pawns & (NoWeOne(whiteOccupancy) | NoEaOne(whiteOccupancy));
   }
@@ -115,11 +115,11 @@ PawnCaptureTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 
   switch(side) {
   case White:
-    blackOccupancy = SetOccupancy(&chessSet->Black);
+    blackOccupancy = chessSet->Black.Occupancy;
 
     return (NoWeOne(pawns) | NoEaOne(pawns)) & blackOccupancy;
   case Black:
-    whiteOccupancy = SetOccupancy(&chessSet->White);
+    whiteOccupancy = chessSet->White.Occupancy;
 
     return (SoWeOne(pawns) | SoEaOne(pawns)) & whiteOccupancy;
   }
@@ -155,9 +155,9 @@ singlePushSources(ChessSet *chessSet, Side side, BitBoard pawns)
   // would result in targets rather than sources.
   switch(side) {
   case White:
-    return SoutOne(EmptySquares(chessSet)) & pawns;
+    return SoutOne(chessSet->EmptySquares) & pawns;
   case Black:
-    return NortOne(EmptySquares(chessSet)) & pawns;
+    return NortOne(chessSet->EmptySquares) & pawns;
   }
 
   panic("Invalid side %d.", side);
@@ -170,7 +170,7 @@ doublePushSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   BitBoard emptyRank4, emptyRank3And4, emptyRank5, emptyRank5And6;
 
-  BitBoard empty = EmptySquares(chessSet);
+  BitBoard empty = chessSet->EmptySquares;
 
   // Uses logic similar to the single push, however we have to a. take into account
   // double push is only possible if the target is rank 4 (5 for black), and b. consider
@@ -200,9 +200,9 @@ singlePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
   // method is used before promotion concerns are applied).
   switch(side) {
   case White:
-    return NortOne(pawns) & EmptySquares(chessSet);
+    return NortOne(pawns) & chessSet->EmptySquares;
   case Black:
-    return SoutOne(pawns) & EmptySquares(chessSet);
+    return SoutOne(pawns) & chessSet->EmptySquares;
   }
 
   panic("Invalid side %d.", side);
@@ -219,9 +219,9 @@ doublePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
   // rank (5th for black).
   switch(side) {
   case White:
-    return NortOne(singlePushes) & EmptySquares(chessSet) & Rank4Mask;
+    return NortOne(singlePushes) & chessSet->EmptySquares & Rank4Mask;
   case Black:
-    return SoutOne(singlePushes) & EmptySquares(chessSet) & Rank5Mask;
+    return SoutOne(singlePushes) & chessSet->EmptySquares & Rank5Mask;
   }
 
   panic("Invalid side %d.", side);

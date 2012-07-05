@@ -24,9 +24,9 @@ KingCaptureTargets(ChessSet *chessSet, Side side, BitBoard _)
   ret = kingsSquares(chessSet, side);
   switch(side) {
   case White:
-    return ret & SetOccupancy(&chessSet->Black);
+    return ret & chessSet->Black.Occupancy;
   case Black:
-    return ret & SetOccupancy(&chessSet->White);
+    return ret & chessSet->White.Occupancy;
   }
 
   panic("Invalid side %d.", side);
@@ -39,7 +39,7 @@ BitBoard
 KingMoveTargets(ChessSet *chessSet, Side side, BitBoard _)
 {
   // Can't move into other pieces.
-  return kingsSquares(chessSet, side) & EmptySquares(chessSet);
+  return kingsSquares(chessSet, side) & chessSet->EmptySquares;
 }
 
 // Obtain bitboard encoding all squares where the king could move to or capture a piece in
