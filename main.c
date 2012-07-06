@@ -9,6 +9,7 @@ init()
   InitBitBoard();
   InitKnight();
   InitRays();
+  InitMagics();  
 }
 
 int
