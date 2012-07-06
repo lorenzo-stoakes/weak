@@ -46,8 +46,9 @@ AllBishopThreats(ChessSet *chessSet, Side side)
   }
 
   ret = EmptyBoard;
-  for(; bishops; bishops ^= POSBOARD(bishop)) {
-    bishop = BitScanForward(bishops);
+
+  while(bishops) {
+    bishop = PopForward(&bishops);
 
     ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
   }
@@ -73,8 +74,8 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
     panic("Invalid side %d.", side);
   }
 
-  for(; bishops; bishops ^= POSBOARD(bishop)) {
-    bishop = BitScanForward(bishops);
+  while(bishops) {
+    bishop = PopForward(&bishops);
 
     ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
   }
@@ -88,8 +89,8 @@ BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   BitBoard ret = EmptyBoard;
   Position bishop;
 
-  for(; bishops; bishops ^= POSBOARD(bishop)) {
-    bishop = BitScanForward(bishops);
+  while(bishops) {
+    bishop = PopForward(&bishops);
 
     ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
   }

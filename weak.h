@@ -257,6 +257,17 @@ BitBoard  NoEaOne(BitBoard);
 BitBoard  NortOne(BitBoard);
 BitBoard  NoWeOne(BitBoard);
 int       PopCount(BitBoard);
+
+FORCE_INLINE Position
+PopForward(BitBoard *bitBoard)
+{
+  Position ret = BitScanForward(*bitBoard);
+
+  *bitBoard &= ~POSBOARD(ret);
+
+  return ret;
+}
+
 bool      PositionOccupied(BitBoard, Position);
 BitBoard  Rotate90AntiClockwise(BitBoard);
 BitBoard  Rotate90Clockwise(BitBoard);

@@ -63,9 +63,9 @@ AllRookThreats(ChessSet *chessSet, Side side)
   }
 
   ret = EmptyBoard;
-  for(; rooks; rooks ^= POSBOARD(rook)) {
-    rook = BitScanForward(rooks);
 
+  while(rooks) {
+    rook = PopForward(&rooks);
     ret |= magicSquareThreats(rook, chessSet->Occupancy);
   }
 
@@ -93,8 +93,9 @@ RookCaptureTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   }
 
   ret = EmptyBoard;
-  for(; rooks; rooks ^= POSBOARD(rook)) {
-    rook = BitScanForward(rooks);
+
+  while(rooks) {
+    rook = PopForward(&rooks);
 
     ret |= magicSquareThreats(rook, chessSet->Occupancy);
   }
@@ -109,8 +110,8 @@ RookMoveTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   BitBoard ret = EmptyBoard;
   Position rook;
 
-  for(; rooks; rooks ^= POSBOARD(rook)) {
-    rook = BitScanForward(rooks);
+  while(rooks) {
+    rook = PopForward(&rooks);  
 
     ret |= magicSquareThreats(rook, chessSet->Occupancy);
   }

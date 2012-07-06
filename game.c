@@ -468,12 +468,13 @@ pawnMoves(Game *game, MoveSlice *ret)
   }
 
   // Pushes.
-  for(; pushSources; pushSources ^= POSBOARD(from)) {
-    from = BitScanForward(pushSources);
+  while(pushSources) {
+    from = PopForward(&pushSources);
 
     pushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    for(; pushTargets; pushTargets ^= POSBOARD(to)) {
-      to = BitScanForward(pushTargets);
+
+    while(pushTargets) {
+      to = PopForward(&pushTargets);
 
       move.Piece = Pawn;
       move.From = from;
@@ -496,12 +497,13 @@ pawnMoves(Game *game, MoveSlice *ret)
 
   // Captures.
 
-  for(; captureSources; captureSources ^= POSBOARD(from)) {
-    from = BitScanForward(captureSources);
+  while(captureSources) {
+    from = PopForward(&captureSources);
 
     captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    for(; captureTargets; captureTargets ^= POSBOARD(to)) {
-      to = BitScanForward(captureTargets);
+
+    while(captureTargets) {
+      to = PopForward(&captureTargets);
 
       move.Piece = Pawn;
       move.From = from;
@@ -524,8 +526,8 @@ pawnMoves(Game *game, MoveSlice *ret)
 
   // En passant.
 
-  for(; enPassants; enPassants ^= POSBOARD(from)) {
-    from = BitScanForward(enPassants);
+  while(enPassants) {
+    from = PopForward(&enPassants);
 
     fromBoard = POSBOARD(from);
     switch(game->WhosTurn) {
@@ -540,8 +542,8 @@ pawnMoves(Game *game, MoveSlice *ret)
       break;
     }
 
-    for(; toBoard; toBoard ^= POSBOARD(to)) {
-      to = BitScanForward(toBoard);
+    while(toBoard) {
+      to = PopForward(&toBoard);
 
       move.Piece = Pawn;
       move.From = from;
@@ -628,15 +630,15 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
     panic("Invalid piece type %d.", piece);
   }
 
-  for(; pieceBoard; pieceBoard ^= POSBOARD(from)) {
-    from = BitScanForward(pieceBoard);
+  while(pieceBoard) {
+    from = PopForward(&pieceBoard);
 
     moveTargets = getMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = getCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
-    for(; moveTargets; moveTargets ^= POSBOARD(to)) {
-      to = BitScanForward(moveTargets);
+    while(moveTargets) {
+      to = PopForward(&moveTargets);
 
       move.Piece = piece;
       move.From = from;
@@ -649,8 +651,8 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
     }
 
     // Captures.
-    for(; captureTargets; captureTargets ^= POSBOARD(to)) {
-      to = BitScanForward(captureTargets);
+    while(captureTargets) {
+      to = PopForward(&captureTargets);
 
       move.Piece = piece;
       move.From = from;
