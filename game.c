@@ -218,7 +218,7 @@ DoMove(Game *game, Move *move)
         panic("Piece taken via en passant is %s, not pawn.", piece);
       }
       ChessSetRemovePiece(&game->ChessSet, opposite, piece, enPassant);
-      game->History.CapturedPieces = AppendPiece(game->History.CapturedPieces, piece);
+      AppendPiece(&game->History.CapturedPieces, piece);
     }
 
     break;
@@ -234,7 +234,7 @@ DoMove(Game *game, Move *move)
               StringMove(move));
       } else {
         ChessSetRemovePiece(&game->ChessSet, opposite, piece, move->To);
-        game->History.CapturedPieces = AppendPiece(game->History.CapturedPieces, piece);
+        AppendPiece(&game->History.CapturedPieces, piece);
       }
     }
 
