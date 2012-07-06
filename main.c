@@ -10,7 +10,7 @@ init()
   InitRays();
 
   // Relies on above.
-  InitMagics();  
+  InitMagics();
 }
 
 int
