@@ -31,16 +31,36 @@ AllBishopMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 AllBishopThreats(ChessSet *chessSet, Side side)
 {
-  return AllBishopMoveTargets(chessSet, side) | AllBishopCaptureTargets(chessSet, side);
+  BitBoard ret, bishops;
+  Position bishop;
+
+  switch(side) {
+  case White:
+    bishops = chessSet->White.Bishops;
+    break;
+  case Black:
+    bishops = chessSet->Black.Bishops;
+    break;
+  default:
+    panic("Unrecognised side %d.", side);
+  }
+
+  ret = EmptyBoard;
+  for(; bishops; bishops ^= POSBOARD(bishop)) {
+    bishop = BitScanForward(bishops);
+
+    ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
+  }
+
+  return ret;
 }
 
 BitBoard
 BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 {
-  BitBoard blockers, occupancy, opposition, noea, nowe, soea, sowe, ret;
-  Position bishop, blocker;
-
-  occupancy = chessSet->Occupancy;
+  BitBoard opposition;
+  BitBoard ret = EmptyBoard;
+  Position bishop;
 
   switch(side) {
   case White:
@@ -53,38 +73,10 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
     panic("Invalid side %d.", side);
   }
 
-  ret = EmptyBoard;
-
   for(; bishops; bishops ^= POSBOARD(bishop)) {
     bishop = BitScanForward(bishops);
 
-    noea = NoEaRay(bishop);
-    blockers = noea & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanForward(blockers);
-      ret |= POSBOARD(blocker);
-    }
-
-    nowe = NoWeRay(bishop);
-    blockers = nowe & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanForward(blockers);
-      ret |= POSBOARD(blocker);
-    }
-
-    soea = SoEaRay(bishop);
-    blockers = soea & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanBackward(blockers);
-      ret |= POSBOARD(blocker);
-    }
-
-    sowe = SoWeRay(bishop);
-    blockers = sowe & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanBackward(blockers);
-      ret |= POSBOARD(blocker);
-    }
+    ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
   }
 
   return ret & opposition;
@@ -93,47 +85,56 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 BitBoard
 BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 {
-  BitBoard blockers, noea, nowe, occupancy, ret, soea, sowe;
-  Position bishop, blocker;
+  BitBoard ret = EmptyBoard;
+  Position bishop;
 
-  occupancy = chessSet->Occupancy;
-
-  ret = EmptyBoard;
   for(; bishops; bishops ^= POSBOARD(bishop)) {
     bishop = BitScanForward(bishops);
 
-    noea = NoEaRay(bishop);
-    blockers = noea & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanForward(blockers);
-      noea ^= blockers | NoEaRay(blocker);
-    }
-    ret |= noea;
-
-    nowe = NoWeRay(bishop);
-    blockers = nowe & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanForward(blockers);
-      nowe ^= blockers | NoWeRay(blocker);
-    }
-    ret |= nowe;
-
-    soea = SoEaRay(bishop);
-    blockers = soea & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanBackward(blockers);
-      soea ^= blockers | SoEaRay(blocker);
-    }
-    ret |= soea;
-
-    sowe = SoWeRay(bishop);
-    blockers = sowe & occupancy;
-    if(blockers != EmptyBoard) {
-      blocker = BitScanBackward(blockers);
-      sowe ^= blockers | SoWeRay(blocker);
-    }
-    ret |= sowe;
+    ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
   }
+
+  return ret & chessSet->EmptySquares;
+}
+
+BitBoard
+BishopSquareThreats(Position bishop, BitBoard occupancy)
+{
+  BitBoard blockers, noea, nowe, soea, sowe;
+  BitBoard ret = EmptyBoard;
+  Position blocker;
+
+  noea = NoEaRay(bishop);
+  blockers = noea & occupancy;
+  if(blockers != EmptyBoard) {
+    blocker = BitScanForward(blockers);
+    noea &= ~NoEaRay(blocker);
+  }
+  ret |= noea;
+
+  nowe = NoWeRay(bishop);
+  blockers = nowe & occupancy;
+  if(blockers != EmptyBoard) {
+    blocker = BitScanForward(blockers);
+    nowe &= ~NoWeRay(blocker);
+  }
+  ret |= nowe;
+
+  soea = SoEaRay(bishop);
+  blockers = soea & occupancy;
+  if(blockers != EmptyBoard) {
+    blocker = BitScanBackward(blockers);
+    soea &= ~SoEaRay(blocker);
+  }
+  ret |= soea;
+
+  sowe = SoWeRay(bishop);
+  blockers = sowe & occupancy;
+  if(blockers != EmptyBoard) {
+    blocker = BitScanBackward(blockers);
+    sowe &= ~SoWeRay(blocker);
+  }
+  ret |= sowe;
 
   return ret;
 }
