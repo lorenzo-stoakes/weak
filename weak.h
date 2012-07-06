@@ -328,6 +328,7 @@ BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 
 // perft.c
 PerftStats Perft(Game*, int);
+uint64_t   QuickPerft(Game*, int);
 
 // piece.c
 void       AppendPiece(PieceSlice*, Piece);

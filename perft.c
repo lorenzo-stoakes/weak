@@ -2,6 +2,35 @@
 
 static PerftStats initStats(void);
 
+uint64_t
+QuickPerft(Game *game, int depth)
+{
+  int i;
+  uint64_t ret = 0;
+  MoveSlice allMoves;
+  Move move;
+  Move buffer[INIT_MOVE_LEN];
+
+  allMoves = NewMoveSlice(buffer, INIT_MOVE_LEN);
+  AllMoves(&allMoves, game);
+
+  if(depth <= 1) {
+    return allMoves.Len;
+  }
+
+  for(i = 0; i < allMoves.Len; i++) {
+    if(depth == 1) {
+    } else {
+      move = allMoves.Vals[i];
+      DoMove(game, &move);
+      ret += QuickPerft(game, depth-1);
+      Unmove(game);
+    }
+  }
+
+  return ret;
+}
+
 PerftStats
 Perft(Game *game, int depth)
 {
@@ -13,7 +42,7 @@ Perft(Game *game, int depth)
 
   if(depth <= 0) {
     panic("Invalid depth %d.", depth);
-  }  
+  }
 
   ret = initStats();
 
@@ -56,6 +85,7 @@ Perft(Game *game, int depth)
         }
       }
       Unmove(game);
+
     } else {
       DoMove(game, &move);
       stats = Perft(game, depth - 1);
