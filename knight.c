@@ -101,7 +101,7 @@ AllKnightThreats(ChessSet *chessSet, Side side)
     break;
   case Black:
     knights = chessSet->Black.Knights;
-    break;    
+    break;
   }
 
   while(knights) {
