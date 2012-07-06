@@ -263,7 +263,7 @@ PopForward(BitBoard *bitBoard)
 {
   Position ret = BitScanForward(*bitBoard);
 
-  *bitBoard &= ~POSBOARD(ret);
+  *bitBoard ^= POSBOARD(ret);
 
   return ret;
 }
