@@ -32,7 +32,7 @@ InitMagics()
     do {
       index = (bitBoard * magic) >> shift;
 
-      BishopThreatBase[from][index] = BishopSquareThreats(from, bitBoard | POSBOARD(from)) & mask;
+      BishopThreatBase[from][index] = BishopSquareThreats(from, bitBoard) & mask;
 
       bishopCount--;
 
