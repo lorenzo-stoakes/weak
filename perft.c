@@ -19,13 +19,10 @@ QuickPerft(Game *game, int depth)
   }
 
   for(i = 0; i < allMoves.Len; i++) {
-    if(depth == 1) {
-    } else {
-      move = allMoves.Vals[i];
-      DoMove(game, &move);
-      ret += QuickPerft(game, depth-1);
-      Unmove(game);
-    }
+    move = allMoves.Vals[i];
+    DoMove(game, &move);
+    ret += QuickPerft(game, depth-1);
+    Unmove(game);
   }
 
   return ret;
