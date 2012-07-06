@@ -2,17 +2,7 @@
 #include "weak.h"
 #include "magic.h"
 
-static FORCE_INLINE BitBoard
-magicSquareThreats(Position rook, BitBoard occupancy) {
-  BitBoard magic = magicBoard[MAGIC_ROOK][rook];
-  BitBoard mask = magicMask[MAGIC_ROOK][rook];
-  int shift = magicShift[MAGIC_ROOK][rook];
-  BitBoard index = (magic*(occupancy&mask))>>shift;
-
-  // TODO: Include non-inner 6 bit positions!
-
-  return RookThreatBase[rook][index];
-}
+static FORCE_INLINE BitBoard magicSquareThreats(Position, BitBoard);
 
 // Get BitBoard encoding capture targets for *all* rooks on specified side.
 BitBoard
@@ -160,4 +150,16 @@ RookSquareThreats(Position rook, BitBoard occupancy)
   ret |= west;
 
   return ret;
+}
+
+static FORCE_INLINE BitBoard
+magicSquareThreats(Position rook, BitBoard occupancy) {
+  BitBoard magic = magicBoard[MAGIC_ROOK][rook];
+  BitBoard mask = magicMask[MAGIC_ROOK][rook];
+  int shift = magicShift[MAGIC_ROOK][rook];
+  BitBoard index = (magic*(occupancy&mask))>>shift;
+
+  // TODO: Include non-inner 6 bit positions!
+
+  return RookThreatBase[rook][index];
 }
