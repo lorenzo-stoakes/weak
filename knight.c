@@ -91,7 +91,26 @@ AllKnightMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 AllKnightThreats(ChessSet *chessSet, Side side)
 {
-  return AllKnightMoveTargets(chessSet, side) | AllKnightCaptureTargets(chessSet, side);
+  BitBoard knights;
+  BitBoard ret = EmptyBoard;
+  Position knight;
+
+  switch(side) {
+  case White:
+    knights = chessSet->White.Knights;
+    break;
+  case Black:
+    knights = chessSet->Black.Knights;
+    break;    
+  }
+
+  for(; knights; knights ^= POSBOARD(knight)) {
+    knight = BitScanForward(knights);
+
+    ret |= knightSquares[knight];
+  }
+
+  return ret;
 }
 
 BitBoard
