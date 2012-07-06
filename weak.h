@@ -223,6 +223,7 @@ BitBoard AllBishopMoveTargets(ChessSet*, Side);
 BitBoard AllBishopThreats(ChessSet*, Side);
 BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
+BitBoard BishopSquareThreats(Position, BitBoard);
 
 // bitboard.c
 
@@ -358,6 +359,7 @@ BitBoard AllRookMoveTargets(ChessSet*, Side);
 BitBoard AllRookThreats(ChessSet*, Side);
 BitBoard RookCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
+BitBoard RookSquareThreats(Position, BitBoard);
 
 // set.c
 Set      NewBlackSet(void);
