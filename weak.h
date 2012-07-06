@@ -308,6 +308,7 @@ void InitMagics(void);
 
 // move.c
 void      AppendMove(MoveSlice*, Move);
+void      AppendMoves(MoveSlice*, MoveSlice*);
 MoveSlice NewMoveSlice(Move*, int);
 Move      PopMove(MoveSlice*);
 

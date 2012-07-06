@@ -1,29 +1,34 @@
 #include <string.h>
 #include "weak.h"
 
+static int expand(MoveSlice*);
+
 // Append Move to specified Move slice.
 void
 AppendMove(MoveSlice *slice, Move move)
 {
   // TODO: Avoid duplication :-)
 
-  Move *buffer;
-
   if(slice->Len > slice->Cap) {
     panic("MoveSlice->Len %d > MoveSlice->Cap %d - Impossible!", slice->Len, slice->Cap);
   }
 
-  // Expand.
   if(slice->Len == slice->Cap) {
-    slice->Cap *= 2;
-    buffer = (Move*)allocate(sizeof(Move)*slice->Cap);
-    memcpy(buffer, slice->Vals, slice->Len);
-    release(slice->Vals);
-    slice->Vals = buffer;
+    expand(slice);
   }
 
   slice->Vals[slice->Len] = move;
   slice->Len++;
+}
+
+void
+AppendMoves(MoveSlice *dst, MoveSlice *src)
+{
+  while(dst->Cap < dst->Len + src->Len) {
+    expand(dst);
+  }
+
+  memcpy(dst->Vals + dst->Len, src->Vals, src->Len);
 }
 
 MoveSlice
@@ -51,4 +56,18 @@ PopMove(MoveSlice *slice)
   slice->Len--;
 
   return ret;
+}
+
+static int
+expand(MoveSlice *slice)
+{
+  Move *buffer;  
+
+  slice->Cap *= 2;
+  buffer = (Move*)allocate(sizeof(Move)*slice->Cap);
+  memcpy(buffer, slice->Vals, slice->Len);
+  release(slice->Vals);
+  slice->Vals = buffer;
+
+  return slice->Cap;
 }
