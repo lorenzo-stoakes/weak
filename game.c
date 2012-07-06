@@ -19,7 +19,6 @@ AllMoves(MoveSlice *slice, Game *game)
 {
   pawnMoves(game, slice);
   pieceMoves(Rook, game, slice);
-
   pieceMoves(Knight, game, slice);
   pieceMoves(Bishop, game, slice);
   pieceMoves(Queen, game, slice);
