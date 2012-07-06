@@ -3,6 +3,7 @@
 #include "weak.h"
 
 //#define GET_FULL_PERFT
+#define PERFT_PLYS 4
 
 // Initialise lookup tables, etc.
 static void
@@ -40,9 +41,9 @@ main(int argc, char **argv)
 
   gettimeofday(&start, NULL);
 #if defined(GET_FULL_PERFT)
-  stats = Perft(&game, 4);
+  stats = Perft(&game, PERFT_PLYS);
 #else
-  count = QuickPerft(&game, 4);
+  count = QuickPerft(&game, PERFT_PLYS);
 #endif
   gettimeofday(&end, NULL);
 
