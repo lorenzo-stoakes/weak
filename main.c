@@ -6,9 +6,10 @@
 static void
 init()
 {
-  InitBitBoard();
   InitKnight();
   InitRays();
+
+  // Relies on above.
   InitMagics();  
 }
 
