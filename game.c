@@ -619,7 +619,7 @@ pawnMoves(Game *game, BitBoard opponentThreats, MoveSlice *slice)
       move.To = to;
       move.Capture = true;
       move.Type = EnPassant;
-      if(!ExposesCheck(game, opponentThreats, &move)) {
+      if(Legal(game, &move)) {
         AppendMove(slice, move);
       }
     }
