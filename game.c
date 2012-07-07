@@ -284,7 +284,7 @@ DoMove(Game *game, Move *move)
       panic("No piece at %s when attempting en passant.", StringPosition(enPassant));
     } else {
       if(piece != Pawn) {
-        panic("Piece taken via en passant is %s, not pawn.", piece);
+        panic("Piece taken via en passant is %s, not pawn.", StringPiece(piece));
       }
       ChessSetRemovePiece(&game->ChessSet, opposite, piece, enPassant);
       AppendPiece(&game->History.CapturedPieces, piece);
