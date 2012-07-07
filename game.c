@@ -10,19 +10,21 @@ static bool kingLegal(Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
 static void castleMoves(Game*, MoveSlice*);
-static void pawnMoves(Game*, MoveSlice*);
-static void pieceMoves(Piece, Game*, MoveSlice*);
+static void pawnMoves(Game*, BitBoard, MoveSlice*);
+static void pieceMoves(Piece, Game*, BitBoard, MoveSlice*);
 
 // Get all valid moves for the current player.
 void
 AllMoves(MoveSlice *slice, Game *game)
 {
-  pawnMoves(game, slice);
-  pieceMoves(Rook, game, slice);
-  pieceMoves(Knight, game, slice);
-  pieceMoves(Bishop, game, slice);
-  pieceMoves(Queen, game, slice);
-  pieceMoves(King, game, slice);
+  BitBoard opponentThreats = AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
+
+  pawnMoves(game, opponentThreats, slice);
+  pieceMoves(Rook, game, opponentThreats, slice);
+  pieceMoves(Knight, game, opponentThreats, slice);
+  pieceMoves(Bishop, game, opponentThreats, slice);
+  pieceMoves(Queen, game, opponentThreats, slice);
+  pieceMoves(King, game, opponentThreats, slice);
   castleMoves(game, slice);
 }
 
@@ -95,15 +97,80 @@ DoCastleQueenSide(Game *game)
 
 // Determine whether the specified move places the current player into check.
 bool
-ExposesCheck(Game *game, Move *move)
+ExposesCheck(Game *game, BitBoard opponentThreats, Move *move)
 {
+  bool test = false;
   bool ret;
+  BitBoard king;
+  ChessSet clone;
+  Side side = game->WhosTurn;
 
-  DoMove(game, move);
-  ret = Checked(&game->ChessSet, OPPOSITE(game->WhosTurn));
-  Unmove(game);
+  switch(move->Type) {
+  case CastleQueenSide:
+  case CastleKingSide:
+    // Castles are already checked for potential check scenarios.
+    return false;
+  case EnPassant:
+    // TODO: Find a cleaner means of testing this for en passant.
 
-  return ret;
+    DoMove(game, move);
+    ret = Checked(&game->ChessSet, OPPOSITE(game->WhosTurn));
+    Unmove(game);
+    return ret;
+  case Normal:
+  case PromoteKnight:
+  case PromoteBishop:
+  case PromoteRook:
+  case PromoteQueen:
+    break;
+  }
+
+  switch(side) {
+  case White:
+    king = game->ChessSet.White.King;
+    break;
+  case Black:
+    king = game->ChessSet.Black.King;
+    break;
+  default:
+    panic("Unrecognised side %d.", side);
+  }
+
+  // Are we moving the king?
+  if(move->Piece == King) {
+    // Then it has to be to a square that is not attacked.
+    return (POSBOARD(move->To) & opponentThreats) != EmptyBoard;
+  }
+
+  // Are we in check now, but not moving the king?
+  if((opponentThreats & king) != EmptyBoard) {
+    // If where we're moving to does not at all intersect with attacks,
+    // it can't possibly solve the check.
+    if((POSBOARD(move->To) & opponentThreats) == EmptyBoard) {
+      return true;
+    }
+    // Otherwise, we need to check to see whether the check is resolved.
+    test = true;
+  } else {
+    // Are we not in check (but not moving the king)?
+    // Then only revealed checks can expose check.
+    if((POSBOARD(move->From) & opponentThreats) == EmptyBoard) {
+      return false;
+    }
+
+    test = true;
+  }
+
+  if(!test) {
+    return false;
+  }
+  
+  clone = game->ChessSet;
+
+  ChessSetRemovePiece(&clone, side, move->Piece, move->From);
+  ChessSetPlacePiece(&clone, side, move->Piece, move->To);
+
+  return Checked(&clone, side);
 }
 
 // Is the proposed move legal in this game?
@@ -111,6 +178,7 @@ bool
 Legal(Game *game, Move *move)
 {
   bool pieceLegal;
+  BitBoard opponentThreats;
   Piece piece;
 
   switch(move->Type) {
@@ -165,7 +233,9 @@ Legal(Game *game, Move *move)
     panic("Unrecognised piece %d.", move->Piece);
   }
 
-  return pieceLegal && !ExposesCheck(game, move);
+  opponentThreats = AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
+
+  return pieceLegal && !ExposesCheck(game, opponentThreats, move);
 }
 
 // Attempt to move piece.
@@ -440,7 +510,7 @@ castleMoves(Game *game, MoveSlice *ret)
 }
 
 static void
-pawnMoves(Game *game, MoveSlice *ret)
+pawnMoves(Game *game, BitBoard opponentThreats, MoveSlice *slice)
 {
   int k;
   BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassants,
@@ -484,12 +554,12 @@ pawnMoves(Game *game, MoveSlice *ret)
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
-          if(Legal(game, &move)) {
-            AppendMove(ret, move);
+          if(!ExposesCheck(game, opponentThreats, &move)) {
+            AppendMove(slice, move);
           }
         }
-      } else if(Legal(game, &move)) {
-        AppendMove(ret, move);
+      } else if(!ExposesCheck(game, opponentThreats, &move)) {
+        AppendMove(slice, move);
       }
     }
   }
@@ -513,12 +583,12 @@ pawnMoves(Game *game, MoveSlice *ret)
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
-          if(Legal(game, &move)) {
-            AppendMove(ret, move);
+          if(!ExposesCheck(game, opponentThreats, &move)) {
+            AppendMove(slice, move);
           }
         }
-      } else if(Legal(game, &move)) {
-        AppendMove(ret, move);
+      } else if(!ExposesCheck(game, opponentThreats, &move)) {
+        AppendMove(slice, move);
       }
     }
   }
@@ -549,15 +619,15 @@ pawnMoves(Game *game, MoveSlice *ret)
       move.To = to;
       move.Capture = true;
       move.Type = EnPassant;
-      if(Legal(game, &move)) {
-        AppendMove(ret, move);
+      if(!ExposesCheck(game, opponentThreats, &move)) {
+        AppendMove(slice, move);
       }
     }
   }
 }
 
 static void
-pieceMoves(Piece piece, Game *game, MoveSlice *ret)
+pieceMoves(Piece piece, Game *game, BitBoard opponentThreats, MoveSlice *ret)
 {
   BitBoard captureTargets, moveTargets, pieceBoard;
   bool white, black;
@@ -644,7 +714,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
       move.To = to;
       move.Capture = false;
       move.Type = Normal;
-      if(Legal(game, &move)) {
+      if(!ExposesCheck(game, opponentThreats, &move)) {
         AppendMove(ret, move);
       }
     }
@@ -658,7 +728,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
       move.To = to;
       move.Capture = true;
       move.Type = Normal;
-      if(Legal(game, &move)) {
+      if(!ExposesCheck(game, opponentThreats, &move)) {
         AppendMove(ret, move);
       }
     }

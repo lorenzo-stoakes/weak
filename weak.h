@@ -294,6 +294,7 @@ void AllMoves(MoveSlice*, Game*);
 bool Checkmated(Game*);
 void DoCastleKingSide(Game*);
 void DoCastleQueenSide(Game*);
+bool ExposesCheck(Game*, BitBoard, Move*);
 bool Legal(Game*, Move*);
 void DoMove(Game*, Move*);
 Game NewGame(bool, Side);
