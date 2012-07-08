@@ -1,4 +1,7 @@
 #include "weak.h"
+#include "magic.h"
+
+static FORCE_INLINE BitBoard magicSquareThreats(Position, BitBoard);
 
 BitBoard
 AllBishopCaptureTargets(ChessSet *chessSet, Side side)
@@ -79,7 +82,7 @@ BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   while(bishops) {
     bishop = PopForward(&bishops);
 
-    ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
+    ret |= magicSquareThreats(bishop, chessSet->Occupancy);
   }
 
   return ret & opposition;
@@ -94,7 +97,7 @@ BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
   while(bishops) {
     bishop = PopForward(&bishops);
 
-    ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
+    ret |= magicSquareThreats(bishop, chessSet->Occupancy);
   }
 
   return ret & chessSet->EmptySquares;
@@ -140,4 +143,14 @@ BishopSquareThreats(Position bishop, BitBoard occupancy)
   ret |= sowe;
 
   return ret;
+}
+
+static FORCE_INLINE BitBoard
+magicSquareThreats(Position bishop, BitBoard occupancy) {
+  BitBoard magic = magicBoard[MAGIC_BISHOP][bishop];
+  BitBoard mask = magicMask[MAGIC_BISHOP][bishop];
+  int shift = magicShift[MAGIC_BISHOP][bishop];
+  BitBoard index = (magic*(occupancy&mask))>>shift;
+
+  return BishopThreatBase[bishop][index];
 }
