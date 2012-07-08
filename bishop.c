@@ -31,6 +31,7 @@ AllBishopMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 AllBishopThreats(ChessSet *chessSet, Side side)
 {
+  BitBoard bishops, opposition, ret;
   Position bishop;
 
   switch(side) {
