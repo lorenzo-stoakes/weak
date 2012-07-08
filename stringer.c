@@ -30,7 +30,7 @@ StringBitBoard(BitBoard bitBoard)
   Rank rank;
   File file;
   Position pos;
-  int newline, index;
+  int newline, ind;
 
   char ret[64+8+1];
 
@@ -38,16 +38,16 @@ StringBitBoard(BitBoard bitBoard)
     rank = Rank8 - RANK(pos);
     file = FILE(pos);
     newline = rank;
-    index = 8*rank + file + newline;
+    ind = 8*rank + file + newline;
 
     if(file == 7) {
-        ret[index+1] = '\n';
+        ret[ind+1] = '\n';
     }
 
     if((POSBOARD(pos)&bitBoard) == 0) {
-      ret[index] = '.';
+      ret[ind] = '.';
     } else {
-      ret[index] = '1';
+      ret[ind] = '1';
     }
   }
   ret[64+8] = '\0';
@@ -62,7 +62,7 @@ StringChessSet(ChessSet *chessSet)
   // Include space for newlines.
   char ret[64+8+1];
   char pieceChr;
-  int index, newline;
+  int ind, newline;
   File file;
   Piece piece;
   Position pos;
@@ -93,10 +93,10 @@ StringChessSet(ChessSet *chessSet)
 	// number of ranks which will appear before this one in the ASCII board,
 	// e.g. the vertically flipped rank.
     newline = rank;
-    index = 8*rank + file + newline;
+    ind = 8*rank + file + newline;
 
     if(file == 7) {
-      ret[index+1] = '\n';
+      ret[ind+1] = '\n';
     }
 
     piece = SetPieceAt(&chessSet->White, pos);
@@ -109,16 +109,17 @@ StringChessSet(ChessSet *chessSet)
     }
 
     if(piece == MissingPiece) {
-      ret[index] = '.';
+      ret[ind] = '.';
     } else {
       pieceChr = CharPiece(piece);
 
       switch(side) {
       case White:
-        ret[index] = pieceChr;
+        ret[ind] = pieceChr;
         break;
       case Black:
         ret[index] = tolower(pieceChr);
+        ret[ind] = tolower(pieceChr);
         break;
       default:
         panic("Impossible.");
