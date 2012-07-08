@@ -71,6 +71,8 @@ AllPawnThreats(ChessSet *chessSet, Side side)
 {
   BitBoard pawns;
 
+  // TODO: Consider en passant.
+
   switch(side) {
   case White:
     pawns = chessSet->White.Pawns;
