@@ -1,6 +1,6 @@
 CC=clang
 
-CFLAGS=-g -pedantic -Wall -Werror -std=c99 -m64 -ltcmalloc -O3 -fomit-frame-pointer
+CFLAGS=-g -pedantic -Wall -Werror -Wshadow -std=c99 -m64 -ltcmalloc -O3 -fomit-frame-pointer
 
 all: weak
 
