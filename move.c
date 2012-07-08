@@ -1,7 +1,7 @@
 #include <string.h>
 #include "weak.h"
 
-static int expand(MoveSlice*);
+static uint64_t expand(MoveSlice*);
 
 // Append Move to specified Move slice.
 void
@@ -32,7 +32,7 @@ AppendMoves(MoveSlice *dst, MoveSlice *src)
 }
 
 MoveSlice
-NewMoveSlice(Move *buffer, int cap)
+NewMoveSlice(Move *buffer, uint64_t cap)
 {
   MoveSlice ret;
 
@@ -58,7 +58,7 @@ PopMove(MoveSlice *slice)
   return ret;
 }
 
-static int
+static uint64_t
 expand(MoveSlice *slice)
 {
   Move *buffer;  
