@@ -165,9 +165,26 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
 
   checked = (kingThreats & king) != EmptyBoard;
 
-  // If not checked and piece being moved is not attacked, can't expose check.
-  if(!checked && (POSBOARD(move->From) & kingThreats) == EmptyBoard) {
-    return false;
+  if(!checked) {
+    // If not checked and piece being moved is not attacked, can't expose check.
+    if((POSBOARD(move->From) & kingThreats) == EmptyBoard) {
+      return false;
+    }
+
+    // Not checked and piece being moved *is* being attacked.
+
+    // If piece can't possibly result in revealed check, then can't expose check.
+    if((kingAttackBoard & POSBOARD(move->From)) == EmptyBoard) {
+      return false;
+    }
+
+  } else {
+    // Is checked and piece being moved is not a king.
+
+    // If move does not block check, then it must leave the check in place.
+    if(!move->Capture && (kingAttackBoard & POSBOARD(move->To)) == EmptyBoard) {
+      return true;
+    }
   }
 
   clone = game->ChessSet;
