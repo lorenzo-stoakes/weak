@@ -8,6 +8,20 @@
 static void
 init()
 {
+  GetMoveTargets[Pawn] = &PawnPushTargets;
+  GetMoveTargets[Knight] = &KnightMoveTargets;
+  GetMoveTargets[Bishop] = &BishopMoveTargets;
+  GetMoveTargets[Rook] = &RookMoveTargets;
+  GetMoveTargets[Queen] = &QueenMoveTargets;
+  GetMoveTargets[King] = &KingMoveTargets;
+
+  GetCaptureTargets[Pawn] = &PawnCaptureTargets;
+  GetCaptureTargets[Knight] = &KnightCaptureTargets;
+  GetCaptureTargets[Bishop] = &BishopCaptureTargets;
+  GetCaptureTargets[Rook] = &RookCaptureTargets;
+  GetCaptureTargets[Queen] = &QueenCaptureTargets;
+  GetCaptureTargets[King] = &KingCaptureTargets;
+
   InitKnight();
   InitRays();
 

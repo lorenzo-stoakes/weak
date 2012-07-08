@@ -19,12 +19,13 @@ AllMoves(MoveSlice *slice, Game *game)
 {
   BitBoard king;
   BitBoard kingAttackBoard, kingThreats;
+  ChessSet clone;
+  Piece piece;
 
   // TODO: Clean this up. Horrid hack. We remove the king and calculate
   // threats so that when calculating check exposure we don't allow a
   // move into check from a sliding piece attacking the rear of the king.
-  ChessSet clone = game->ChessSet;
-
+  clone = game->ChessSet;
   king = game->ChessSet.Sets[game->WhosTurn].Boards[King];
   ChessSetRemovePiece(&clone, game->WhosTurn, King,
                       BitScanForward(clone.Sets[game->WhosTurn].Boards[King]));
@@ -33,11 +34,9 @@ AllMoves(MoveSlice *slice, Game *game)
   kingAttackBoard = QueenThreats(&game->ChessSet, king);
 
   pawnMoves(game, kingThreats, kingAttackBoard, slice);
-  pieceMoves(Rook, game, kingThreats, kingAttackBoard, slice);
-  pieceMoves(Knight, game, kingThreats, kingAttackBoard, slice);
-  pieceMoves(Bishop, game, kingThreats, kingAttackBoard, slice);
-  pieceMoves(Queen, game, kingThreats, kingAttackBoard, slice);
-  pieceMoves(King, game, kingThreats, kingAttackBoard, slice);
+  for(piece = Knight; piece <= King; piece++) {
+    pieceMoves(piece, game, kingThreats, kingAttackBoard, slice);
+  }
   castleMoves(game, slice);
 }
 
@@ -598,46 +597,13 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoa
   Move move;
   Position from, to;
 
-  BitBoard (*getMoveTargets)(ChessSet*, Side, BitBoard);
-  BitBoard (*getCaptureTargets)(ChessSet*, Side, BitBoard);
-
   pieceBoard = game->ChessSet.Sets[game->WhosTurn].Boards[piece];
-
-  switch(piece) {
-  case Rook:
-    getMoveTargets = &RookMoveTargets;
-    getCaptureTargets = &RookCaptureTargets;
-
-    break;
-  case Knight:
-    getMoveTargets = &KnightMoveTargets;
-    getCaptureTargets = &KnightCaptureTargets;
-
-    break;
-  case Bishop:
-    getMoveTargets = &BishopMoveTargets;
-    getCaptureTargets = &BishopCaptureTargets;
-
-    break;
-  case Queen:
-    getMoveTargets = &QueenMoveTargets;
-    getCaptureTargets = &QueenCaptureTargets;
-
-    break;
-  case King:
-    getMoveTargets = &KingMoveTargets;
-    getCaptureTargets = &KingCaptureTargets;
-
-    break;
-  default:
-    panic("Invalid piece type %d.", piece);
-  }
 
   while(pieceBoard) {
     from = PopForward(&pieceBoard);
 
-    moveTargets = getMoveTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = getCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    moveTargets = GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    captureTargets = GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
     // Moves.
     while(moveTargets) {

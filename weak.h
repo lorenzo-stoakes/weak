@@ -399,4 +399,7 @@ void* allocateZero(size_t, size_t);
 void  release(void*);
 void  panic(char*, ...);
 
+BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
+BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);
+
 #endif
