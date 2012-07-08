@@ -53,7 +53,7 @@ main(int argc, char **argv)
 #if defined(GET_FULL_PERFT)
   puts(StringPerft(&stats));
 #else
-  printf("%lld moves.\n\n", count);
+  printf("%llu moves.\n\n", count);
 #endif
 
   printf("%f ms elapsed.\n", elapsed);
