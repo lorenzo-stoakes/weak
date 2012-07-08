@@ -7,7 +7,7 @@ InitMagics()
 {
   long len, shift;
   long bishopCount = 0, rookCount = 0;
-  BitBoard bitBoard, index, magic, mask;
+  BitBoard bitBoard, currThreats, index, magic, mask, threats;
   Position from, pos;
 
   for(pos = A1; pos <= H8; pos++) {
@@ -31,8 +31,24 @@ InitMagics()
     bitBoard = EmptyBoard;
     do {
       index = (bitBoard * magic) >> shift;
+      threats = BishopSquareThreats(from, bitBoard);
+      currThreats = BishopThreatBase[from][index];
 
-      BishopThreatBase[from][index] = BishopSquareThreats(from, bitBoard) & mask;
+      if(currThreats != EmptyBoard && currThreats != threats) {
+        panic("Invalid magic for bishops in position %s, index %llu. Have threats:-\n"
+              "%s\n"
+              "But already have:-\n"
+              "%s\n"
+              "When looking at permutation:-\n"
+              "%s\n",
+              StringPosition(from),
+              index,
+              StringBitBoard(threats),
+              StringBitBoard(currThreats),
+              StringBitBoard(bitBoard));
+      }
+
+      BishopThreatBase[from][index] = threats;
 
       bishopCount--;
 
@@ -47,7 +63,24 @@ InitMagics()
     do {
       index = (bitBoard * magic) >> shift;
 
-      RookThreatBase[from][index] = RookSquareThreats(from, bitBoard) & mask;
+      threats = RookSquareThreats(from, bitBoard);
+      currThreats = RookThreatBase[from][index];
+
+      if(currThreats != EmptyBoard && currThreats != threats) {
+        panic("Invalid magic for rooks in position %s, index %llu. Have threats:-\n"
+              "%s\n"
+              "But already have:-\n"
+              "%s\n"
+              "When looking at permutation:-\n"
+              "%s\n",
+              StringPosition(from),
+              index,
+              StringBitBoard(threats),
+              StringBitBoard(currThreats),
+              StringBitBoard(bitBoard));      
+      }
+
+      RookThreatBase[from][index] = threats;
 
       rookCount--;
 
