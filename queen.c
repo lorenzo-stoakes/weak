@@ -44,7 +44,7 @@ AllQueenThreats(ChessSet *chessSet, Side side)
     panic("Invalid side %d.", side);
   }
 
-  return RookThreats(chessSet, queens) | BishopThreats(chessSet, queens);
+  return QueenThreats(chessSet, queens);
 }
 
 BitBoard
@@ -58,4 +58,9 @@ BitBoard
 QueenMoveTargets(ChessSet *chessSet, Side side, BitBoard queens)
 {
   return RookMoveTargets(chessSet, side, queens) | BishopMoveTargets(chessSet, side, queens);
+}
+
+BitBoard
+QueenThreats(ChessSet *chessSet, BitBoard queens) {
+  return RookThreats(chessSet, queens) | BishopThreats(chessSet, queens);
 }
