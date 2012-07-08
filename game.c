@@ -37,7 +37,7 @@ Checkmated(Game *game)
 
   AllMoves(&slice, game);
 
-  return Checked(&game->ChessSet, game->WhosTurn) && slice.Len == 0;
+  return slice.Len == 0 && Checked(&game->ChessSet, game->WhosTurn);
 }
 
 // Determine whether the game is in a state of stalemate, i.e. the current player cannot make a
@@ -50,7 +50,7 @@ Stalemated(Game *game)
 
   AllMoves(&slice, game);
 
-  return !Checked(&game->ChessSet, game->WhosTurn) && slice.Len == 0;
+  return slice.Len == 0 && !Checked(&game->ChessSet, game->WhosTurn);
 }
 
 void
