@@ -38,15 +38,17 @@ AllRookMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 AllRookThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard ret, rooks;
+  BitBoard opposition, ret, rooks;
   Position rook;
 
   switch(side) {
   case White:
     rooks = chessSet->White.Rooks;
+    opposition = chessSet->Black.Occupancy;
     break;
   case Black:
     rooks = chessSet->Black.Rooks;
+    opposition = chessSet->White.Occupancy;
     break;
   default:
     panic("Unrecognised side %d.", side);
@@ -59,7 +61,7 @@ AllRookThreats(ChessSet *chessSet, Side side)
     ret |= magicSquareThreats(rook, chessSet->Occupancy);
   }
 
-  return ret;
+  return ret & (opposition | chessSet->EmptySquares);  
 }
 
 // Get BitBoard encoding capture targets for specified rooks without using magic BitBoards.

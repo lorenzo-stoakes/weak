@@ -31,15 +31,16 @@ AllBishopMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 AllBishopThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard ret, bishops;
   Position bishop;
 
   switch(side) {
   case White:
     bishops = chessSet->White.Bishops;
+    opposition = chessSet->Black.Occupancy;
     break;
   case Black:
     bishops = chessSet->Black.Bishops;
+    opposition = chessSet->White.Occupancy;
     break;
   default:
     panic("Unrecognised side %d.", side);
@@ -50,10 +51,10 @@ AllBishopThreats(ChessSet *chessSet, Side side)
   while(bishops) {
     bishop = PopForward(&bishops);
 
-    ret |= BishopSquareThreats(bishop, chessSet->Occupancy);
+    ret |= magicSquareThreats(bishop, chessSet->Occupancy);
   }
 
-  return ret;
+  return ret & (opposition | chessSet->EmptySquares);
 }
 
 BitBoard
