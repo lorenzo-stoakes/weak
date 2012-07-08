@@ -290,6 +290,9 @@ DoMove(Game *game, Move *move)
       AppendPiece(&game->History.CapturedPieces, piece);
     }
 
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);    
+
     break;
   case PromoteKnight:
   case PromoteBishop:
