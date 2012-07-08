@@ -9,77 +9,43 @@ static BitBoard doublePushTargets(ChessSet*, Side, BitBoard);
 BitBoard
 AllPawnCaptureSources(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return PawnCaptureSources(chessSet, side, chessSet->White.Pawns);
-  case Black:
-    return PawnCaptureSources(chessSet, side, chessSet->Black.Pawns);
-  }
-
-  panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;
+  return PawnCaptureSources(chessSet, side, chessSet->Sets[side].Pawns);
 }
 
 // Get BitBoard encoding capture targets for *all* pawns on specified side.
 BitBoard
 AllPawnCaptureTargets(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return PawnCaptureTargets(chessSet, side, chessSet->White.Pawns);
-  case Black:
-    return PawnCaptureTargets(chessSet, side, chessSet->Black.Pawns);
-  }
-
-  panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;
+  return PawnCaptureSources(chessSet, side, chessSet->Sets[side].Pawns);
 }
 
 // Get BitBoard encoding push sources for *all* pawns on specified side.
 BitBoard
 AllPawnPushSources(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return PawnPushSources(chessSet, side, chessSet->White.Pawns);
-  case Black:
-    return PawnPushSources(chessSet, side, chessSet->Black.Pawns);
-  }
-
-  panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;
+  return PawnPushSources(chessSet, side, chessSet->Sets[side].Pawns);
 }
 
 // Get BitBoard encoding push targets for *all* pawns on specified side.
 BitBoard
 AllPawnPushTargets(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return PawnPushTargets(chessSet, side, chessSet->White.Pawns);
-  case Black:
-    return PawnPushTargets(chessSet, side, chessSet->Black.Pawns);
-  }
-
-  panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;
+  return PawnPushTargets(chessSet, side, chessSet->Sets[side].Pawns);
 }
 
 // Get BitBoard encoding all squares threatened by pawns.
 BitBoard
 AllPawnThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard pawns;
+  BitBoard pawns = chessSet->Sets[side].Pawns;
 
   // TODO: Consider en passant.
 
   switch(side) {
   case White:
-    pawns = chessSet->White.Pawns;
     pawns = NoWeOne(pawns) | NoEaOne(pawns);
     return pawns;
   case Black:
-    pawns = chessSet->Black.Pawns;
     pawns = SoWeOne(pawns) | SoEaOne(pawns);
     return pawns;
   }
@@ -92,17 +58,13 @@ AllPawnThreats(ChessSet *chessSet, Side side)
 BitBoard
 PawnCaptureSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
-  BitBoard whiteOccupancy, blackOccupancy;
+  BitBoard opposition = chessSet->Sets[OPPOSITE(side)].Occupancy;
 
   switch(side) {
   case White:
-    blackOccupancy = chessSet->Black.Occupancy;
-
-    return pawns & (SoWeOne(blackOccupancy) | SoEaOne(blackOccupancy));
+    return pawns & (SoWeOne(opposition) | SoEaOne(opposition));
   case Black:
-    whiteOccupancy = chessSet->White.Occupancy;
-
-    return pawns & (NoWeOne(whiteOccupancy) | NoEaOne(whiteOccupancy));
+    return pawns & (NoWeOne(opposition) | NoEaOne(opposition));
   }
 
   panic("Invalid side %s.", StringSide(side));
@@ -113,17 +75,13 @@ PawnCaptureSources(ChessSet *chessSet, Side side, BitBoard pawns)
 BitBoard
 PawnCaptureTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 {
-  BitBoard whiteOccupancy, blackOccupancy;
+  BitBoard opposition = chessSet->Sets[OPPOSITE(side)].Occupancy;
 
   switch(side) {
   case White:
-    blackOccupancy = chessSet->Black.Occupancy;
-
-    return (NoWeOne(pawns) | NoEaOne(pawns)) & blackOccupancy;
+    return (NoWeOne(pawns) | NoEaOne(pawns)) & opposition;
   case Black:
-    whiteOccupancy = chessSet->White.Occupancy;
-
-    return (SoWeOne(pawns) | SoEaOne(pawns)) & whiteOccupancy;
+    return (SoWeOne(pawns) | SoEaOne(pawns)) & opposition;
   }
 
   panic("Invalid side %s.", StringSide(side));

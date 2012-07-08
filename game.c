@@ -24,18 +24,10 @@ AllMoves(MoveSlice *slice, Game *game)
   // threats so that when calculating check exposure we don't allow a
   // move into check from a sliding piece attacking the rear of the king.
   ChessSet clone = game->ChessSet;
-  switch(game->WhosTurn) {
-  case White:
-    king = game->ChessSet.White.King;
 
-    ChessSetRemovePiece(&clone, White, King, BitScanForward(clone.White.King));
-    break;
-  case Black:
-    king = game->ChessSet.Black.King;    
-
-    ChessSetRemovePiece(&clone, Black, King, BitScanForward(clone.Black.King));
-    break;
-  }
+  king = game->ChessSet.Sets[game->WhosTurn].King;
+  ChessSetRemovePiece(&clone, game->WhosTurn, King,
+                      BitScanForward(clone.Sets[game->WhosTurn].King));
 
   kingThreats = AllThreats(&clone, OPPOSITE(game->WhosTurn));
   kingAttackBoard = QueenThreats(&game->ChessSet, king);
@@ -77,43 +69,23 @@ Stalemated(Game *game)
 void
 DoCastleKingSide(Game *game)
 {
-  switch(game->WhosTurn) {
-  case White:
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1);
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G1);
-    break;
-  case Black:
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H8);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F8);
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E8);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G8);
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
-  }
+  int offset = game->WhosTurn*8*7;
+
+  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1 + offset);
+  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1 + offset);
+  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
+  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G1 + offset);
 }
 
 void
 DoCastleQueenSide(Game *game)
 {
-  switch(game->WhosTurn) {
-  case White:
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1);
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1);
-    break;
-  case Black:
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A8);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D8);
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E8);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C8);
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
-  }
+  int offset = game->WhosTurn*8*7;
+
+  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1 + offset);
+  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1 + offset);
+  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
+  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);
 }
 
 // Determine whether the specified move places the current player into check.
@@ -146,16 +118,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
     break;
   }
 
-  switch(side) {
-  case White:
-    king = game->ChessSet.White.King;
-    break;
-  case Black:
-    king = game->ChessSet.Black.King;
-    break;
-  default:
-    panic("Unrecognised side %d.", side);
-  }
+  king = game->ChessSet.Sets[side].King;
 
   // Are we moving the king?
   if(move->Piece == King) {
@@ -292,16 +255,7 @@ DoMove(Game *game, Move *move)
       panic("En passant move, but not capture.");
     }
 
-    switch(game->WhosTurn) {
-    case White:
-      offset = -1;
-      break;
-    case Black:
-      offset = 1;
-      break;
-    default:
-      panic("Unrecognised side %d.", game->WhosTurn);
-    }
+    offset = -1 + 2*game->WhosTurn;
 
     enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
 
@@ -446,16 +400,7 @@ Unmove(Game *game)
 
         opposite = OPPOSITE(game->WhosTurn);
         if(move.Type == EnPassant) {
-          switch(game->WhosTurn) {
-          case White:
-            offset = -1;
-            break;
-          case Black:
-            offset = 1;
-            break;
-          default:
-            panic("Unrecognised side %d.", game->WhosTurn);
-          }
+          offset = -1 + game->WhosTurn*2;
           to = POSITION(RANK(move.To)+offset, FILE(move.To));
           ChessSetPlacePiece(&game->ChessSet, opposite, captured, to);
         } else {
@@ -547,23 +492,13 @@ pawnMoves(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, MoveSlice 
   Move move;
   MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
   Position from, to;
-  Rank promotionRank;
+  Rank promotionRank = game->WhosTurn == White ? Rank8 : Rank1;
 
   pushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
   captureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
 
-  switch(game->WhosTurn) {
-  case White:
-    enPassants = game->ChessSet.White.Pawns & Rank5Mask;
-    promotionRank = Rank8;
-    break;
-  case Black:
-    enPassants = game->ChessSet.Black.Pawns & Rank4Mask;
-    promotionRank = Rank1;
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
-  }
+  enPassants = game->ChessSet.Sets[game->WhosTurn].Pawns &
+    (game->WhosTurn == White ? Rank5Mask : Rank4Mask);
 
   // Pushes.
   while(pushSources) {
@@ -660,70 +595,46 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoa
            MoveSlice *ret)
 {
   BitBoard captureTargets, moveTargets, pieceBoard;
-  bool white, black;
   Move move;
   Position from, to;
 
   BitBoard (*getMoveTargets)(ChessSet*, Side, BitBoard);
   BitBoard (*getCaptureTargets)(ChessSet*, Side, BitBoard);
 
-  white = game->WhosTurn == White;
-  black = game->WhosTurn == Black;
-
-  if(!white && !black) {
-    panic("Invalid side %d.", game->WhosTurn);
-  }
-
   switch(piece) {
   case Rook:
     getMoveTargets = &RookMoveTargets;
     getCaptureTargets = &RookCaptureTargets;
 
-    if(white) {
-      pieceBoard = game->ChessSet.White.Rooks;
-    } else {
-      pieceBoard = game->ChessSet.Black.Rooks;
-    }
+    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Rooks;
     break;
   case Knight:
     getMoveTargets = &KnightMoveTargets;
     getCaptureTargets = &KnightCaptureTargets;
 
-    if(white) {
-      pieceBoard = game->ChessSet.White.Knights;
-    } else {
-      pieceBoard = game->ChessSet.Black.Knights;
-    }
+    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Knights;
+
     break;
   case Bishop:
     getMoveTargets = &BishopMoveTargets;
     getCaptureTargets = &BishopCaptureTargets;
 
-    if(white) {
-      pieceBoard = game->ChessSet.White.Bishops;
-    } else {
-      pieceBoard = game->ChessSet.Black.Bishops;
-    }
+    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Bishops;
+
     break;
   case Queen:
     getMoveTargets = &QueenMoveTargets;
     getCaptureTargets = &QueenCaptureTargets;
 
-    if(white) {
-      pieceBoard = game->ChessSet.White.Queens;
-    } else {
-      pieceBoard = game->ChessSet.Black.Queens;
-    }
+    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Queens;
+
     break;
   case King:
     getMoveTargets = &KingMoveTargets;
     getCaptureTargets = &KingCaptureTargets;
 
-    if(white) {
-      pieceBoard = game->ChessSet.White.King;
-    } else {
-      pieceBoard = game->ChessSet.Black.King;
-    }
+    pieceBoard = game->ChessSet.Sets[game->WhosTurn].King;    
+
     break;
   default:
     panic("Invalid piece type %d.", piece);

@@ -13,17 +13,7 @@ AllThreats(ChessSet *chessSet, Side side)
 bool
 Checked(ChessSet *chessSet, Side side)
 {
-  BitBoard king;
-  switch(side) {
-  case White:
-    king = chessSet->White.King;
-    break;
-  case Black:
-    king = chessSet->Black.King;
-    break;
-  default:
-    panic("Invalid side %d.", side);
-  }
+  BitBoard king = chessSet->Sets[side].King;
 
   return (AllThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
 }
@@ -31,15 +21,7 @@ Checked(ChessSet *chessSet, Side side)
 Piece
 ChessSetPieceAt(ChessSet *chessSet, Side side, Position pos)
 {
-  switch(side) {
-  case White:
-    return SetPieceAt(&chessSet->White, pos);
-  case Black:
-    return SetPieceAt(&chessSet->Black, pos);
-  }
-
-  panic("Unrecognised side %d.", side);
-  return MissingPiece;
+  return SetPieceAt(&chessSet->Sets[side], pos);
 }
 
 void
@@ -48,16 +30,7 @@ ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   chessSet->Occupancy ^= POSBOARD(pos);
   chessSet->EmptySquares = ~chessSet->Occupancy;
 
-  switch(side) {
-  case White:
-    SetPlacePiece(&chessSet->White, piece, pos);
-    break;
-  case Black:
-    SetPlacePiece(&chessSet->Black, piece, pos);
-    break;
-  default:
-    panic("Invalid side %d.", side);
-  }
+  SetPlacePiece(&chessSet->Sets[side], piece, pos);
 }
 
 void
@@ -66,16 +39,7 @@ ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   chessSet->Occupancy ^= POSBOARD(pos);
   chessSet->EmptySquares = ~chessSet->Occupancy;
 
-  switch(side) {
-  case White:
-    SetRemovePiece(&chessSet->White, piece, pos);
-    break;
-  case Black:
-    SetRemovePiece(&chessSet->Black, piece, pos);
-    break;
-  default:
-    panic("Invalid side %d.", side);
-  }
+  SetRemovePiece(&chessSet->Sets[side], piece, pos);
 }
 
 ChessSet
@@ -83,8 +47,8 @@ NewChessSet()
 {
   ChessSet ret;
 
-  ret.White = NewWhiteSet();
-  ret.Black = NewBlackSet();
+  ret.Sets[White] = NewWhiteSet();
+  ret.Sets[Black] = NewBlackSet();
   ret.Occupancy = InitOccupancy;
   ret.EmptySquares = ~InitOccupancy;
 

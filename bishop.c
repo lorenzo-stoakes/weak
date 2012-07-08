@@ -6,67 +6,27 @@ static FORCE_INLINE BitBoard magicSquareThreats(Position, BitBoard);
 BitBoard
 AllBishopCaptureTargets(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return BishopCaptureTargets(chessSet, side, chessSet->White.Bishops);
-  case Black:
-    return BishopCaptureTargets(chessSet, side, chessSet->Black.Bishops);
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
+  return BishopCaptureTargets(chessSet, side, chessSet->Sets[side].Bishops);
 }
 
 BitBoard
 AllBishopMoveTargets(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return BishopMoveTargets(chessSet, side, chessSet->White.Bishops);
-  case Black:
-    return BishopMoveTargets(chessSet, side, chessSet->Black.Bishops);
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
+  return BishopMoveTargets(chessSet, side, chessSet->Sets[side].Bishops);  
 }
 
 BitBoard
 AllBishopThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard bishops;
-
-  switch(side) {
-  case White:
-    bishops = chessSet->White.Bishops;
-    break;
-  case Black:
-    bishops = chessSet->Black.Bishops;
-    break;
-  default:
-    panic("Unrecognised side %d.", side);
-  }
-
-  return BishopThreats(chessSet, bishops);
+  return BishopThreats(chessSet, chessSet->Sets[side].Bishops);
 }
 
 BitBoard
 BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
 {
-  BitBoard opposition;
+  BitBoard opposition = chessSet->Sets[OPPOSITE(side)].Occupancy;
   BitBoard ret = EmptyBoard;
   Position bishop;
-
-  switch(side) {
-  case White:
-    opposition = chessSet->Black.Occupancy;
-    break;
-  case Black:
-    opposition = chessSet->White.Occupancy;
-    break;
-  default:
-    panic("Invalid side %d.", side);
-  }
 
   while(bishops) {
     bishop = PopForward(&bishops);

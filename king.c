@@ -10,7 +10,7 @@ static BitBoard kingsSquares(ChessSet*, Side);
 BitBoard
 AllKingThreats(ChessSet *chessSet, Side side)
 {
-  // King capture and movement threats happen to be the same.  
+  // King capture and movement threats happen to be the same.
   return kingsSquares(chessSet, side);
 }
 
@@ -19,18 +19,7 @@ AllKingThreats(ChessSet *chessSet, Side side)
 BitBoard
 KingCaptureTargets(ChessSet *chessSet, Side side, BitBoard _)
 {
-  BitBoard ret;
-
-  ret = kingsSquares(chessSet, side);
-  switch(side) {
-  case White:
-    return ret & chessSet->Black.Occupancy;
-  case Black:
-    return ret & chessSet->White.Occupancy;
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
+  return kingsSquares(chessSet, side) & chessSet->Sets[OPPOSITE(side)].Occupancy;
 }
 
 // Target squares for king movement. Doesn't take into account moves which put the king in
@@ -47,23 +36,14 @@ KingMoveTargets(ChessSet *chessSet, Side side, BitBoard _)
 static BitBoard
 kingsSquares(ChessSet *chessSet, Side side)
 {
-  BitBoard kingSet, ret;
+  BitBoard king, ret;
 
-  switch(side) {
-  case White:
-    kingSet = chessSet->White.King;
-    break;
-  case Black:
-    kingSet = chessSet->Black.King;
-    break;
-  default:
-    panic("Invalid side %d.", side);
-  }
+  king = chessSet->Sets[side].King;
 
   // TODO: Put these values into a lookup table.
-  ret = EastOne(kingSet) | WestOne(kingSet);
-  kingSet |= ret;
-  ret |= NortOne(kingSet) | SoutOne(kingSet);
+  ret = EastOne(king) | WestOne(king);
+  king |= ret;
+  ret |= NortOne(king) | SoutOne(king);
 
   return ret;
 }

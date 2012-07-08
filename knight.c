@@ -61,48 +61,23 @@ InitKnight()
 BitBoard
 AllKnightCaptureTargets(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return KnightCaptureTargets(chessSet, side, chessSet->White.Knights);
-  case Black:
-    return KnightCaptureTargets(chessSet, side, chessSet->Black.Knights);
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
+  return KnightCaptureTargets(chessSet, side, chessSet->Sets[side].Knights);
 }
 
 // Get BitBoard encoding move targets for *all* knights on specified side.
 BitBoard
 AllKnightMoveTargets(ChessSet *chessSet, Side side)
 {
-  switch(side) {
-  case White:
-    return KnightMoveTargets(chessSet, side, chessSet->White.Knights);
-  case Black:
-    return KnightMoveTargets(chessSet, side, chessSet->Black.Knights);
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
+  return KnightMoveTargets(chessSet, side, chessSet->Sets[side].Knights);
 }
 
 // Get BitBoard encoding all squares threatened by knights.
 BitBoard
 AllKnightThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard knights;
+  BitBoard knights = chessSet->Sets[side].Knights;
   BitBoard ret = EmptyBoard;
   Position knight;
-
-  switch(side) {
-  case White:
-    knights = chessSet->White.Knights;
-    break;
-  case Black:
-    knights = chessSet->Black.Knights;
-    break;
-  }
 
   while(knights) {
     knight = PopForward(&knights);
@@ -117,18 +92,8 @@ BitBoard
 KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {
   Position knight;
-  BitBoard opposition, ret;
-
-  switch(side) {
-  case White:
-    opposition = chessSet->Black.Occupancy;
-    break;
-  case Black:
-    opposition = chessSet->White.Occupancy;
-    break;
-  default:
-    panic("Invalid side %d.", side);
-  }
+  BitBoard ret;
+  BitBoard opposition = chessSet->Sets[OPPOSITE(side)].Occupancy;
 
   ret = EmptyBoard;
 

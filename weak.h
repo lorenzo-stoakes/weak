@@ -135,7 +135,7 @@ struct MoveHistory {
 
 struct ChessSet {
   BitBoard EmptySquares, Occupancy;
-  Set      White, Black;
+  Set      Sets[2];
 };
 
 struct Game {
