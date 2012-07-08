@@ -17,14 +17,27 @@ static void pieceMoves(Piece, Game*, BitBoard, MoveSlice*);
 void
 AllMoves(MoveSlice *slice, Game *game)
 {
-  BitBoard opponentThreats = AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
+  // TODO: Clean this up. Horrid hack. We remove the king and calculate
+  // threats so that when calculating check exposure we don't allow a
+  // move into check from a sliding piece attacking the rear of the king.
+  ChessSet clone = game->ChessSet;
+  switch(game->WhosTurn) {
+  case White:
+    ChessSetRemovePiece(&clone, White, King, BitScanForward(clone.White.King));
+    break;
+  case Black:
+    ChessSetRemovePiece(&clone, Black, King, BitScanForward(clone.Black.King));
+    break;
+  }
 
-  pawnMoves(game, opponentThreats, slice);
-  pieceMoves(Rook, game, opponentThreats, slice);
-  pieceMoves(Knight, game, opponentThreats, slice);
-  pieceMoves(Bishop, game, opponentThreats, slice);
-  pieceMoves(Queen, game, opponentThreats, slice);
-  pieceMoves(King, game, opponentThreats, slice);
+  BitBoard kingThreats = AllThreats(&clone, OPPOSITE(game->WhosTurn));
+
+  pawnMoves(game, kingThreats, slice);
+  pieceMoves(Rook, game, kingThreats, slice);
+  pieceMoves(Knight, game, kingThreats, slice);
+  pieceMoves(Bishop, game, kingThreats, slice);
+  pieceMoves(Queen, game, kingThreats, slice);
+  pieceMoves(King, game, kingThreats, slice);
   castleMoves(game, slice);
 }
 
