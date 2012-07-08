@@ -247,17 +247,17 @@ BitScanForward(BitBoard bitBoard)
   return (Position)posBoard;
 }
 #else
-Position  BitScanBackward(BitBoard);
-Position  BitScanForward(BitBoard);
+Position BitScanBackward(BitBoard);
+Position BitScanForward(BitBoard);
 #endif
 
-BitBoard  EastOne(BitBoard);
-BitBoard  FlipDiagA1H8(BitBoard);
-BitBoard  FlipVertical(BitBoard);
-BitBoard  NoEaOne(BitBoard);
-BitBoard  NortOne(BitBoard);
-BitBoard  NoWeOne(BitBoard);
-int       PopCount(BitBoard);
+BitBoard EastOne(BitBoard);
+BitBoard FlipDiagA1H8(BitBoard);
+BitBoard FlipVertical(BitBoard);
+BitBoard NoEaOne(BitBoard);
+BitBoard NortOne(BitBoard);
+BitBoard NoWeOne(BitBoard);
+int      PopCount(BitBoard);
 
 FORCE_INLINE Position
 PopForward(BitBoard *bitBoard)
@@ -269,13 +269,13 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
-bool      PositionOccupied(BitBoard, Position);
-BitBoard  Rotate90AntiClockwise(BitBoard);
-BitBoard  Rotate90Clockwise(BitBoard);
-BitBoard  SoEaOne(BitBoard);
-BitBoard  SoutOne(BitBoard);
-BitBoard  SoWeOne(BitBoard);
-BitBoard  WestOne(BitBoard);
+bool     PositionOccupied(BitBoard, Position);
+BitBoard Rotate90AntiClockwise(BitBoard);
+BitBoard Rotate90Clockwise(BitBoard);
+BitBoard SoEaOne(BitBoard);
+BitBoard SoutOne(BitBoard);
+BitBoard SoWeOne(BitBoard);
+BitBoard WestOne(BitBoard);
 
 // castleevent.c
 void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
@@ -377,11 +377,11 @@ BitBoard RookSquareThreats(Position, BitBoard);
 BitBoard RookThreats(ChessSet*, BitBoard);
 
 // set.c
-Set      NewBlackSet(void);
-Set      NewWhiteSet(void);
-Piece    SetPieceAt(Set*, Position);
-void     SetPlacePiece(Set*, Piece, Position);
-void     SetRemovePiece(Set*, Piece, Position);
+Set   NewBlackSet(void);
+Set   NewWhiteSet(void);
+Piece SetPieceAt(Set*, Position);
+void  SetPlacePiece(Set*, Piece, Position);
+void  SetRemovePiece(Set*, Piece, Position);
 
 // stringer.c
 char  CharPiece(Piece);
