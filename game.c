@@ -1,12 +1,8 @@
 #include "weak.h"
 
-static bool castleLegal(Game*, bool);
-static bool pawnLegal(Game*, Move*);
-static bool rookLegal(Game*, Move*);
-static bool knightLegal(Game*, Move*);
-static bool bishopLegal(Game*, Move*);
-static bool queenLegal(Game*, Move*);
-static bool kingLegal(Game*, Move*);
+static bool        castleLegal(Game*, bool);
+static bool        pawnLegal(Game*, Move*);
+static bool        pieceLegal(Piece, Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
 static void castleMoves(Game*, MoveSlice*);
@@ -164,7 +160,6 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
 bool
 Legal(Game *game, Move *move)
 {
-  bool pieceLegal;
   BitBoard kingAttackBoard, kingThreats;
   Piece piece;
 
@@ -197,33 +192,11 @@ Legal(Game *game, Move *move)
     return false;
   }
 
-  switch(move->Piece) {
-  case Pawn:
-    pieceLegal = pawnLegal(game, move);
-    break;
-  case Rook:
-    pieceLegal = rookLegal(game, move);
-    break;
-  case Knight:
-    pieceLegal = knightLegal(game, move);
-    break;
-  case Bishop:
-    pieceLegal = bishopLegal(game, move);
-    break;
-  case Queen:
-    pieceLegal = queenLegal(game, move);
-    break;
-  case King:
-    pieceLegal = kingLegal(game, move);
-    break;
-  default:
-    panic("Unrecognised piece %d.", move->Piece);
-  }
-
   kingThreats = AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
   kingAttackBoard = QueenThreats(&game->ChessSet, King);
 
-  return pieceLegal && !ExposesCheck(game, kingThreats, kingAttackBoard, move);
+  return (move->Piece == Pawn ? pawnLegal(game, move) : pieceLegal(move->Piece, game, move)) &&
+    !ExposesCheck(game, kingThreats, kingAttackBoard, move);
 }
 
 // Attempt to move piece.
@@ -830,78 +803,15 @@ pawnLegal(Game *game, Move *move)
 }
 
 static bool
-rookLegal(Game *game, Move *move)
+pieceLegal(Piece piece, Game *game, Move *move)
 {
-  BitBoard from, to;
-
-  from = POSBOARD(move->From);
-  to = POSBOARD(move->To);
+  BitBoard from = POSBOARD(move->From), to = POSBOARD(move->To);
 
   if(move->Capture) {
-    return (to&RookCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
+    return (to&GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
   }
 
-  return (to&RookMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-}
-
-static bool
-knightLegal(Game *game, Move *move)
-{
-  BitBoard from, to;
-
-  from = POSBOARD(move->From);
-  to = POSBOARD(move->To);
-
-  if(move->Capture) {
-    return (to&KnightCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-  }
-
-  return (to&KnightMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-}
-
-static bool
-bishopLegal(Game *game, Move *move)
-{
-  BitBoard from, to;
-
-  from = POSBOARD(move->From);
-  to = POSBOARD(move->To);
-
-  if(move->Capture) {
-    return (to&BishopCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-  }
-
-  return (to&BishopMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-}
-
-static bool
-queenLegal(Game *game, Move *move)
-{
-  BitBoard from, to;
-
-  from = POSBOARD(move->From);
-  to = POSBOARD(move->To);
-
-  if(move->Capture) {
-    return (to&QueenCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-  }
-
-  return (to&QueenMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-}
-
-static bool
-kingLegal(Game *game, Move *move)
-{
-  BitBoard from, to;
-
-  from = POSBOARD(move->From);
-  to = POSBOARD(move->To);
-
-  if(move->Capture) {
-    return (to&KingCaptureTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-  }
-
-  return (to&KingMoveTargets(&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
+  return (to&GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
 }
 
 static CastleEvent
