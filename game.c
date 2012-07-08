@@ -153,7 +153,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
 
   ChessSetRemovePiece(&clone, side, move->Piece, move->From);
   if(move->Capture) {
-    piece = ChessSetPieceAt(&clone, OPPOSITE(side), move->To);
+    piece = PieceAt(&clone.Sets[OPPOSITE(side)], move->To);
     ChessSetRemovePiece(&clone, OPPOSITE(side), piece, move->To);
   }
   ChessSetPlacePiece(&clone, side, move->Piece, move->To);
@@ -192,7 +192,7 @@ Legal(Game *game, Move *move)
 
   // Have to move from an occupied square, and it has to be the piece the move purports
   // it to be.
-  piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, move->From);
+  piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], move->From);
   if(piece == MissingPiece || piece != move->Piece) {
     return false;
   }
@@ -258,7 +258,7 @@ DoMove(Game *game, Move *move)
 
     enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
 
-    piece = ChessSetPieceAt(&game->ChessSet, opposite, enPassant);
+    piece = PieceAt(&game->ChessSet.Sets[opposite], enPassant);
     if(piece == MissingPiece) {
       panic("No piece at %s when attempting en passant.", StringPosition(enPassant));
     } else {
@@ -279,7 +279,7 @@ DoMove(Game *game, Move *move)
   case PromoteQueen:
   case Normal:
     if(move->Capture) {
-      piece = ChessSetPieceAt(&game->ChessSet, opposite, move->To);
+      piece = PieceAt(&game->ChessSet.Sets[opposite], move->To);
       if(piece == MissingPiece) {
         panic("No piece at %s when attempting capture %s.", StringPosition(move->To),
               StringMove(move));
@@ -647,14 +647,14 @@ castleLegal(Game *game, bool queenSide)
 
   switch(game->WhosTurn) {
   case White:
-    piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, E1);
+    piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], E1);
     if(piece != King) {
       return false;
     }
 
     break;
   case Black:
-    piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, E8);
+    piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], E8);
     if(piece != King) {
       return false;
     }
@@ -669,7 +669,7 @@ castleLegal(Game *game, bool queenSide)
       if(!game->CastleQueenSideWhite) {
         return false;
       }
-      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, A1);
+      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], A1);
       if(piece != Rook) {
         return false;
       }
@@ -680,7 +680,7 @@ castleLegal(Game *game, bool queenSide)
       if(!game->CastleKingSideWhite) {
         return false;
       }
-      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, H1);
+      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], H1);
       if(piece != Rook) {
         return false;
       }
@@ -693,7 +693,7 @@ castleLegal(Game *game, bool queenSide)
       if(!game->CastleQueenSideBlack) {
         return false;
       }
-      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, A8);
+      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], A8);
       if(piece != Rook) {
         return false;
       }
@@ -704,7 +704,7 @@ castleLegal(Game *game, bool queenSide)
       if(!game->CastleKingSideBlack) {
         return false;
       }
-      piece = ChessSetPieceAt(&game->ChessSet, game->WhosTurn, H8);
+      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], H8);
       if(piece != Rook) {
         return false;
       }

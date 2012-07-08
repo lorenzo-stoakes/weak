@@ -18,12 +18,6 @@ Checked(ChessSet *chessSet, Side side)
   return (AllThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
 }
 
-Piece
-ChessSetPieceAt(ChessSet *chessSet, Side side, Position pos)
-{
-  return SetPieceAt(&chessSet->Sets[side], pos);
-}
-
 void
 ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {

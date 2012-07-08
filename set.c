@@ -39,7 +39,7 @@ NewWhiteSet()
 // Determine whether the set has a piece at the specified position, and if so what that piece
 // is.
 Piece
-SetPieceAt(Set *set, Position pos)
+PieceAt(Set *set, Position pos)
 {
   Piece piece;
 
@@ -56,13 +56,7 @@ SetPieceAt(Set *set, Position pos)
 void
 SetPlacePiece(Set *set, Piece piece, Position pos)
 {
-  BitBoard bitBoard;
-
-  if(pos > 63) {
-    panic("Invaild position %d.", pos);
-  }
-
-  bitBoard = POSBOARD(pos);
+  BitBoard bitBoard = POSBOARD(pos);
 
   set->Occupancy ^= bitBoard;
   set->EmptySquares = ~set->Occupancy;
@@ -74,13 +68,7 @@ SetPlacePiece(Set *set, Piece piece, Position pos)
 void
 SetRemovePiece(Set *set, Piece piece, Position pos)
 {
-  BitBoard complement;
-
-  if(pos > 63) {
-    panic("Invaild position %d.", pos);
-  }
-
-  complement = ~POSBOARD(pos);
+  BitBoard complement = ~POSBOARD(pos);
 
   set->Occupancy &= complement;
   set->EmptySquares = ~set->Occupancy;

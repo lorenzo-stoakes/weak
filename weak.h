@@ -287,7 +287,6 @@ BitBoard AllThreats(ChessSet*, Side);
 bool     Checked(ChessSet*, Side);
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
-Piece    ChessSetPieceAt(ChessSet*, Side, Position);
 ChessSet NewChessSet(void);
 
 // game.c
@@ -379,7 +378,7 @@ BitBoard RookThreats(ChessSet*, BitBoard);
 // set.c
 Set   NewBlackSet(void);
 Set   NewWhiteSet(void);
-Piece SetPieceAt(Set*, Position);
+Piece PieceAt(Set*, Position);
 void  SetPlacePiece(Set*, Piece, Position);
 void  SetRemovePiece(Set*, Piece, Position);
 

@@ -99,13 +99,13 @@ StringChessSet(ChessSet *chessSet)
       ret[ind+1] = '\n';
     }
 
-    piece = SetPieceAt(&chessSet->Sets[White], pos);
+    piece = PieceAt(&chessSet->Sets[White], pos);
 
     if(piece != MissingPiece) {
       side = White;
     } else {
       side = Black;
-      piece = SetPieceAt(&chessSet->Sets[Black], pos);
+      piece = PieceAt(&chessSet->Sets[Black], pos);
     }
 
     if(piece == MissingPiece) {
