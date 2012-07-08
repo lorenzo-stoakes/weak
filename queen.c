@@ -13,9 +13,10 @@ AllQueenMoveTargets(ChessSet *chessSet, Side side)
 }
 
 BitBoard
-AllQueenThreats(ChessSet *chessSet, Side side)
+QueenKingThreats(ChessSet *chessSet, Side side)
 {
-  return QueenThreats(chessSet, chessSet->Sets[side].Boards[Queen]);
+  return QueenThreats(chessSet->Sets[side].Boards[Queen],
+                      chessSet->Occupancy ^ chessSet->Sets[OPPOSITE(side)].Boards[King]);
 }
 
 BitBoard
@@ -32,6 +33,6 @@ QueenMoveTargets(ChessSet *chessSet, Side side, BitBoard queens)
 }
 
 BitBoard
-QueenThreats(ChessSet *chessSet, BitBoard queens) {
-  return RookThreats(chessSet, queens) | BishopThreats(chessSet, queens);
+QueenThreats(BitBoard queens, BitBoard occupancy) {
+  return RookThreats(queens, occupancy) | BishopThreats(queens, occupancy);
 }

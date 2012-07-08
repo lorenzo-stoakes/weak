@@ -35,7 +35,7 @@ AllPawnPushTargets(ChessSet *chessSet, Side side)
 
 // Get BitBoard encoding all squares threatened by pawns.
 BitBoard
-AllPawnThreats(ChessSet *chessSet, Side side)
+PawnKingThreats(ChessSet *chessSet, Side side)
 {
   BitBoard pawns = chessSet->Sets[side].Boards[Pawn];
 

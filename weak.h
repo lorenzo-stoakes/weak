@@ -220,11 +220,11 @@ static const BitBoard
 // bishop.c
 BitBoard AllBishopCaptureTargets(ChessSet*, Side);
 BitBoard AllBishopMoveTargets(ChessSet*, Side);
-BitBoard AllBishopThreats(ChessSet*, Side);
 BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard BishopKingThreats(ChessSet*, Side);
 BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard BishopSquareThreats(Position, BitBoard);
-BitBoard BishopThreats(ChessSet*, BitBoard);
+BitBoard BishopThreats(BitBoard, BitBoard);
 
 // bitboard.c
 
@@ -283,7 +283,7 @@ CastleEventSlice NewCastleEventSlice(void);
 CastleEvent      PopCastleEvent(CastleEventSlice*);
 
 // chessset.c
-BitBoard AllThreats(ChessSet*, Side);
+BitBoard KingThreats(ChessSet*, Side);
 bool     Checked(ChessSet*, Side);
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
@@ -303,17 +303,17 @@ void ToggleTurn(Game*);
 void Unmove(Game*);
 
 // king.c
-BitBoard AllKingThreats(ChessSet*, Side);
+BitBoard KingKingThreats(ChessSet*, Side);
 BitBoard KingCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard KingMoveTargets(ChessSet*, Side, BitBoard);
 
 // knight.c
-void      InitKnight(void);
-BitBoard  AllKnightCaptureTargets(ChessSet*, Side);
-BitBoard  AllKnightMoveTargets(ChessSet*, Side);
-BitBoard  AllKnightThreats(ChessSet*, Side);
-BitBoard  KnightCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard  KnightMoveTargets(ChessSet*, Side, BitBoard);
+void     InitKnight(void);
+BitBoard AllKnightCaptureTargets(ChessSet*, Side);
+BitBoard AllKnightMoveTargets(ChessSet*, Side);
+BitBoard KnightCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard KnightKingThreats(ChessSet*, Side);
+BitBoard KnightMoveTargets(ChessSet*, Side, BitBoard);
 
 // magic.c
 void InitMagics(void);
@@ -332,9 +332,9 @@ BitBoard AllPawnCaptureSources(ChessSet*, Side);
 BitBoard AllPawnCaptureTargets(ChessSet*, Side);
 BitBoard AllPawnPushSources(ChessSet*, Side);
 BitBoard AllPawnPushTargets(ChessSet*, Side);
-BitBoard AllPawnThreats(ChessSet*, Side);
 BitBoard PawnCaptureSources(ChessSet*, Side, BitBoard);
 BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard PawnKingThreats(ChessSet*, Side);
 BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
 BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 
@@ -361,19 +361,19 @@ BitBoard SoWeRay(Position);
 // queen.c
 BitBoard AllQueenCaptureTargets(ChessSet*, Side);
 BitBoard AllQueenMoveTargets(ChessSet*, Side);
-BitBoard AllQueenThreats(ChessSet*, Side);
+BitBoard QueenKingThreats(ChessSet*, Side);
 BitBoard QueenCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard QueenMoveTargets(ChessSet*, Side, BitBoard);
-BitBoard QueenThreats(ChessSet*, BitBoard);
+BitBoard QueenThreats(BitBoard, BitBoard);
 
 // rook.c
 BitBoard AllRookCaptureTargets(ChessSet*, Side);
 BitBoard AllRookMoveTargets(ChessSet*, Side);
-BitBoard AllRookThreats(ChessSet*, Side);
 BitBoard RookCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard RookKingThreats(ChessSet*, Side);
 BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard RookSquareThreats(Position, BitBoard);
-BitBoard RookThreats(ChessSet*, BitBoard);
+BitBoard RookThreats(BitBoard, BitBoard);
 
 // set.c
 Set   NewBlackSet(void);

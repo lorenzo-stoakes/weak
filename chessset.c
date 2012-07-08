@@ -3,11 +3,11 @@
 // Get the bitboard which encodes a mask of all squares threatened by the specified side in the
 // chess set.
 BitBoard
-AllThreats(ChessSet *chessSet, Side side)
+KingThreats(ChessSet *chessSet, Side side)
 {
-  return AllPawnThreats(chessSet, side) | AllRookThreats(chessSet, side) |
-    AllKnightThreats(chessSet, side) | AllBishopThreats(chessSet, side) |
-    AllQueenThreats(chessSet, side) | AllKingThreats(chessSet, side);
+  return PawnKingThreats(chessSet, side) | RookKingThreats(chessSet, side) |
+    KnightKingThreats(chessSet, side) | BishopKingThreats(chessSet, side) |
+    QueenKingThreats(chessSet, side) | KingKingThreats(chessSet, side);
 }
 
 bool
@@ -15,7 +15,7 @@ Checked(ChessSet *chessSet, Side side)
 {
   BitBoard king = chessSet->Sets[side].Boards[King];
 
-  return (AllThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
+  return (KingThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
 }
 
 void

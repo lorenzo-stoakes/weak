@@ -73,7 +73,7 @@ AllKnightMoveTargets(ChessSet *chessSet, Side side)
 
 // Get BitBoard encoding all squares threatened by knights.
 BitBoard
-AllKnightThreats(ChessSet *chessSet, Side side)
+KnightKingThreats(ChessSet *chessSet, Side side)
 {
   BitBoard knights = chessSet->Sets[side].Boards[Knight];
   BitBoard ret = EmptyBoard;

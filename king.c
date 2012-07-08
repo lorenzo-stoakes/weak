@@ -8,7 +8,7 @@ static BitBoard kingsSquares(ChessSet*, Side);
 // Get BitBoard encoding all squares threatened by king. Doesn't take into account threats of
 // moves which would put the king into check.
 BitBoard
-AllKingThreats(ChessSet *chessSet, Side side)
+KingKingThreats(ChessSet *chessSet, Side side)
 {
   // King capture and movement threats happen to be the same.
   return kingsSquares(chessSet, side);

@@ -15,10 +15,12 @@ AllBishopMoveTargets(ChessSet *chessSet, Side side)
   return BishopMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Bishop]);
 }
 
+// Get BitBoard encoding all squares threatened by bishops, ignoring opposing king.
 BitBoard
-AllBishopThreats(ChessSet *chessSet, Side side)
+BishopKingThreats(ChessSet *chessSet, Side side)
 {
-  return BishopThreats(chessSet, chessSet->Sets[side].Boards[Bishop]);
+  return BishopThreats(chessSet->Sets[side].Boards[Bishop],
+                       chessSet->Occupancy ^ chessSet->Sets[OPPOSITE(side)].Boards[King]);
 }
 
 BitBoard
@@ -95,7 +97,7 @@ BishopSquareThreats(Position bishop, BitBoard occupancy)
 }
 
 BitBoard
-BishopThreats(ChessSet *chessSet, BitBoard bishops)
+BishopThreats(BitBoard bishops, BitBoard occupancy)
 {
   BitBoard ret;
   Position bishop;
@@ -104,7 +106,7 @@ BishopThreats(ChessSet *chessSet, BitBoard bishops)
   while(bishops) {
     bishop = PopForward(&bishops);
 
-    ret |= magicSquareThreats(bishop, chessSet->Occupancy);
+    ret |= magicSquareThreats(bishop, occupancy);
   }
 
   return ret;
