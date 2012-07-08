@@ -118,7 +118,6 @@ StringChessSet(ChessSet *chessSet)
         ret[ind] = pieceChr;
         break;
       case Black:
-        ret[index] = tolower(pieceChr);
         ret[ind] = tolower(pieceChr);
         break;
       default:
