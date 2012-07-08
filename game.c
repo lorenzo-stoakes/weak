@@ -304,7 +304,7 @@ DoMove(Game *game, Move *move)
     }
 
     ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);    
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);
 
     break;
   case PromoteKnight:
