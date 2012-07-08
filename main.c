@@ -3,7 +3,6 @@
 #include "weak.h"
 
 //#define GET_FULL_PERFT
-#define PERFT_PLYS 4
 
 // Initialise lookup tables, etc.
 static void
@@ -21,6 +20,7 @@ main(int argc, char **argv)
 {
   double elapsed;
   Game game;
+  int plies;
 #if defined(GET_FULL_PERFT)
   PerftStats stats;
 #else
@@ -31,19 +31,32 @@ main(int argc, char **argv)
   // Use unbuffered output.
   setbuf(stdout, NULL);
 
+  if(argc <= 1) {
+    printf("Usage: %s [perft plies]\n", argv[0]);
+    return 1;
+  }
+
+  plies = atoi(argv[1]);
+
+  if(plies < 1) {
+    printf("Invalid integer %s.\n", argv[1]);
+  }
+
   puts("WeakC v0.0.dev.\n");
 
   printf("Initialising... ");
   init();
   puts("done.\n");
 
+  printf("%d plies.\n", plies);
+
   game = NewGame(false, White);
 
   gettimeofday(&start, NULL);
 #if defined(GET_FULL_PERFT)
-  stats = Perft(&game, PERFT_PLYS);
+  stats = Perft(&game, plies);
 #else
-  count = QuickPerft(&game, PERFT_PLYS);
+  count = QuickPerft(&game, plies);
 #endif
   gettimeofday(&end, NULL);
 
@@ -54,7 +67,7 @@ main(int argc, char **argv)
   puts(StringPerft(&stats));
 #else
   printf("%llu moves.\n", count);
-  printf("%llu nps\n\n", (uint64_t)(1000*count/elapsed));
+  printf("%llu nps.\n\n", (uint64_t)(1000*count/elapsed));
 #endif
 
   printf("%f ms elapsed.\n", elapsed);
