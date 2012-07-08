@@ -75,11 +75,11 @@ AllPawnThreats(ChessSet *chessSet, Side side)
   case White:
     pawns = chessSet->White.Pawns;
     pawns = NoWeOne(pawns) | NoEaOne(pawns);
-    return pawns & chessSet->White.EmptySquares;
+    return pawns;
   case Black:
     pawns = chessSet->Black.Pawns;
     pawns = SoWeOne(pawns) | SoEaOne(pawns);
-    return pawns & chessSet->Black.EmptySquares;
+    return pawns;
   }
 
   panic("Invalid side %s.", StringSide(side));
