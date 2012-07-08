@@ -112,10 +112,10 @@ DoCastleQueenSide(Game *game)
 bool
 ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
 {
-  bool test = false;
-  bool ret;
+  bool checked, ret;
   BitBoard king;
   ChessSet clone;
+  Piece piece;
   Side side = game->WhosTurn;
 
   switch(move->Type) {
@@ -155,34 +155,21 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
     return (POSBOARD(move->To) & kingThreats) != EmptyBoard;
   }
 
-  // Are we in check now, but not moving the king?
-  if((opponentThreats & king) != EmptyBoard) {
-    // If where we're moving to does not at all intersect with attacks,
-    // it can't possibly solve the check.
-    if((POSBOARD(move->To) & opponentThreats) == EmptyBoard) {
-      return true;
-    }
-    // Otherwise, we need to check to see whether the check is resolved.
-    test = true;
-  } else {
-    // Are we not in check (but not moving the king)?
-    // Then only revealed checks can expose check.
-    if((POSBOARD(move->From) & opponentThreats) == EmptyBoard) {
-      return false;
-    }
+  checked = (kingThreats & king) != EmptyBoard;
 
-    test = true;
-  }
-
-  if(!test) {
+  // If not checked and piece being moved is not attacked, can't expose check.
+  if(!checked && (POSBOARD(move->From) & kingThreats) == EmptyBoard) {
     return false;
   }
-  
+
   clone = game->ChessSet;
 
   ChessSetRemovePiece(&clone, side, move->Piece, move->From);
+  if(move->Capture) {
+    piece = ChessSetPieceAt(&clone, OPPOSITE(side), move->To);
+    ChessSetRemovePiece(&clone, OPPOSITE(side), piece, move->To);
+  }
   ChessSetPlacePiece(&clone, side, move->Piece, move->To);
-
   return Checked(&clone, side);
 }
 
