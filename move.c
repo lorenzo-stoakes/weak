@@ -7,16 +7,6 @@ static uint64_t expand(MoveSlice*);
 void
 AppendMove(MoveSlice *slice, Move move)
 {
-  // TODO: Avoid duplication :-)
-
-  if(slice->Len > slice->Cap) {
-    panic("MoveSlice->Len %d > MoveSlice->Cap %d - Impossible!", slice->Len, slice->Cap);
-  }
-
-  if(slice->Len == slice->Cap) {
-    expand(slice);
-  }
-
   slice->Vals[slice->Len] = move;
   slice->Len++;
 }
