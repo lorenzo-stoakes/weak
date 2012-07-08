@@ -572,35 +572,34 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoa
 
   pieceBoard = game->ChessSet.Sets[game->WhosTurn].Boards[piece];
 
+  move.Piece = piece;
+  move.Type = Normal;
+
   while(pieceBoard) {
     from = PopForward(&pieceBoard);
 
     moveTargets = GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
+    move.From = from;    
+
     // Moves.
+    move.Capture = false;        
     while(moveTargets) {
       to = PopForward(&moveTargets);
-
-      move.Piece = piece;
-      move.From = from;
       move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
+
       if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
         AppendMove(ret, move);
       }
     }
 
     // Captures.
+    move.Capture = true;    
     while(captureTargets) {
       to = PopForward(&captureTargets);
 
-      move.Piece = piece;
-      move.From = from;
       move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
       if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
         AppendMove(ret, move);
       }
