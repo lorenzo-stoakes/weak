@@ -161,7 +161,5 @@ magicSquareThreats(Position rook, BitBoard occupancy) {
   int shift = magicShift[MAGIC_ROOK][rook];
   BitBoard index = (magic*(occupancy&mask))>>shift;
 
-  // TODO: Include non-inner 6 bit positions!
-
   return RookThreatBase[rook][index];
 }
