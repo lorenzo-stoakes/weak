@@ -391,7 +391,8 @@ char* StringPosition(Position);
 char* StringSide(Side);
 
 // util.c
-void* allocate(size_t);
+void* allocate(size_t, size_t);
+void* allocateZero(size_t, size_t);
 void  release(void*);
 void  panic(char*, ...);
 

@@ -37,7 +37,7 @@ NewPieceSlice()
 
   ret.Cap = INIT_PIECE_COUNT;
   ret.Len = 0;
-  ret.Vals = (Piece*)allocate(sizeof(Piece)*INIT_PIECE_COUNT);
+  ret.Vals = (Piece*)allocate(sizeof(Piece), INIT_PIECE_COUNT);
 
   return ret;
 }

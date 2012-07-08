@@ -19,7 +19,7 @@ AppendCastleEvent(CastleEventSlice *slice, CastleEvent event)
   // Expand.
   if(slice->Len == slice->Cap) {
     slice->Cap *= 2;
-    buffer = (CastleEvent*)allocate(sizeof(CastleEvent)*slice->Cap);
+    buffer = (CastleEvent*)allocate(sizeof(CastleEvent), slice->Cap);
     memcpy(buffer, slice->Vals, slice->Len);
     release(slice->Vals);
     slice->Vals = buffer;
@@ -36,7 +36,7 @@ NewCastleEventSlice()
 
   ret.Len = 0;
   ret.Cap = INIT_CASTLE_EVENT_COUNT;
-  ret.Vals = (CastleEvent*)allocate(sizeof(CastleEvent)*INIT_CASTLE_EVENT_COUNT);
+  ret.Vals = (CastleEvent*)allocate(sizeof(CastleEvent), INIT_CASTLE_EVENT_COUNT);
 
   return ret;
 }

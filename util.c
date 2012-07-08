@@ -6,9 +6,15 @@
 
 // Wrapper for malloc. We might change the implementation later.
 void*
-allocate(size_t size)
+allocate(size_t size, size_t num)
 {
-  return malloc(size);
+  return malloc(size*num);
+}
+
+void*
+allocateZero(size_t size, size_t num)
+{
+  return calloc(num, size);
 }
 
 // Wrapper for free. We might change the implementation later.
@@ -26,14 +32,14 @@ panic(char *msg, ...)
   char *msgNl;
   va_list args;
 
-  va_start(args, msg);  
+  va_start(args, msg);
 
   len = strlen(msg);
-  msgNl = (char*)allocate(len+1);
+  msgNl = (char*)allocate(sizeof(char), len+1);
   strcpy(msgNl, msg);
   msgNl[len] = '\n';
   vfprintf(stderr, msgNl, args);
-  
+
   va_end(args);
 
   abort();

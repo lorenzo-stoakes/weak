@@ -64,7 +64,7 @@ expand(MoveSlice *slice)
   Move *buffer;  
 
   slice->Cap *= 2;
-  buffer = (Move*)allocate(sizeof(Move)*slice->Cap);
+  buffer = (Move*)allocate(sizeof(Move), slice->Cap);
   memcpy(buffer, slice->Vals, slice->Len);
   release(slice->Vals);
   slice->Vals = buffer;

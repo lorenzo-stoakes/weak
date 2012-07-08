@@ -12,12 +12,12 @@ InitMagics()
 
   for(pos = A1; pos <= H8; pos++) {
     len = 1<<(64 - magicShift[MAGIC_BISHOP][pos]);
-    BishopThreatBase[pos] = (BitBoard*)allocate(sizeof(BitBoard)*len);
+    BishopThreatBase[pos] = (BitBoard*)allocateZero(sizeof(BitBoard), len);
 
     bishopCount += len;
 
     len = 1<<(64 - magicShift[MAGIC_ROOK][pos]);
-    RookThreatBase[pos] = (BitBoard*)allocate(sizeof(BitBoard)*len);
+    RookThreatBase[pos] = (BitBoard*)allocateZero(sizeof(BitBoard), len);
 
     rookCount += len;
   }
