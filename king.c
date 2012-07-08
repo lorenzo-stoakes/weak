@@ -38,7 +38,7 @@ kingsSquares(ChessSet *chessSet, Side side)
 {
   BitBoard king, ret;
 
-  king = chessSet->Sets[side].King;
+  king = chessSet->Sets[side].Boards[King];
 
   // TODO: Put these values into a lookup table.
   ret = EastOne(king) | WestOne(king);

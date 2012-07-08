@@ -13,7 +13,7 @@ AllThreats(ChessSet *chessSet, Side side)
 bool
 Checked(ChessSet *chessSet, Side side)
 {
-  BitBoard king = chessSet->Sets[side].King;
+  BitBoard king = chessSet->Sets[side].Boards[King];
 
   return (AllThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
 }

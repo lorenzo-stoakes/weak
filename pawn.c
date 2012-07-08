@@ -9,35 +9,35 @@ static BitBoard doublePushTargets(ChessSet*, Side, BitBoard);
 BitBoard
 AllPawnCaptureSources(ChessSet *chessSet, Side side)
 {
-  return PawnCaptureSources(chessSet, side, chessSet->Sets[side].Pawns);
+  return PawnCaptureSources(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
 }
 
 // Get BitBoard encoding capture targets for *all* pawns on specified side.
 BitBoard
 AllPawnCaptureTargets(ChessSet *chessSet, Side side)
 {
-  return PawnCaptureSources(chessSet, side, chessSet->Sets[side].Pawns);
+  return PawnCaptureSources(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
 }
 
 // Get BitBoard encoding push sources for *all* pawns on specified side.
 BitBoard
 AllPawnPushSources(ChessSet *chessSet, Side side)
 {
-  return PawnPushSources(chessSet, side, chessSet->Sets[side].Pawns);
+  return PawnPushSources(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
 }
 
 // Get BitBoard encoding push targets for *all* pawns on specified side.
 BitBoard
 AllPawnPushTargets(ChessSet *chessSet, Side side)
 {
-  return PawnPushTargets(chessSet, side, chessSet->Sets[side].Pawns);
+  return PawnPushTargets(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
 }
 
 // Get BitBoard encoding all squares threatened by pawns.
 BitBoard
 AllPawnThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard pawns = chessSet->Sets[side].Pawns;
+  BitBoard pawns = chessSet->Sets[side].Boards[Pawn];
 
   // TODO: Consider en passant.
 

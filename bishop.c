@@ -6,19 +6,19 @@ static FORCE_INLINE BitBoard magicSquareThreats(Position, BitBoard);
 BitBoard
 AllBishopCaptureTargets(ChessSet *chessSet, Side side)
 {
-  return BishopCaptureTargets(chessSet, side, chessSet->Sets[side].Bishops);
+  return BishopCaptureTargets(chessSet, side, chessSet->Sets[side].Boards[Bishop]);
 }
 
 BitBoard
 AllBishopMoveTargets(ChessSet *chessSet, Side side)
 {
-  return BishopMoveTargets(chessSet, side, chessSet->Sets[side].Bishops);  
+  return BishopMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Bishop]);
 }
 
 BitBoard
 AllBishopThreats(ChessSet *chessSet, Side side)
 {
-  return BishopThreats(chessSet, chessSet->Sets[side].Bishops);
+  return BishopThreats(chessSet, chessSet->Sets[side].Boards[Bishop]);
 }
 
 BitBoard

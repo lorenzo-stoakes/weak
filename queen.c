@@ -3,19 +3,19 @@
 BitBoard
 AllQueenCaptureTargets(ChessSet *chessSet, Side side)
 {
-  return QueenCaptureTargets(chessSet, side, chessSet->Sets[side].Queens);
+  return QueenCaptureTargets(chessSet, side, chessSet->Sets[side].Boards[Queen]);
 }
 
 BitBoard
 AllQueenMoveTargets(ChessSet *chessSet, Side side)
 {
-  return QueenMoveTargets(chessSet, side, chessSet->Sets[side].Queens);
+  return QueenMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Queen]);
 }
 
 BitBoard
 AllQueenThreats(ChessSet *chessSet, Side side)
 {
-  return QueenThreats(chessSet, chessSet->Sets[side].Queens);
+  return QueenThreats(chessSet, chessSet->Sets[side].Boards[Queen]);
 }
 
 BitBoard

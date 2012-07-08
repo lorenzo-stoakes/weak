@@ -8,12 +8,12 @@ NewBlackSet()
   ret.Occupancy = InitBlackOccupancy;
   ret.EmptySquares = ~InitBlackOccupancy;
 
-  ret.Pawns = InitBlackPawns;
-  ret.Rooks = InitBlackRooks;
-  ret.Knights = InitBlackKnights;
-  ret.Bishops = InitBlackBishops;
-  ret.Queens = InitBlackQueens;
-  ret.King = InitBlackKing;
+  ret.Boards[Pawn] = InitBlackPawns;
+  ret.Boards[Rook] = InitBlackRooks;
+  ret.Boards[Knight] = InitBlackKnights;
+  ret.Boards[Bishop] = InitBlackBishops;
+  ret.Boards[Queen] = InitBlackQueens;
+  ret.Boards[King] = InitBlackKing;
 
   return ret;
 }
@@ -26,12 +26,12 @@ NewWhiteSet()
   ret.Occupancy = InitWhiteOccupancy;
   ret.EmptySquares = ~InitWhiteOccupancy;
 
-  ret.Pawns = InitWhitePawns;
-  ret.Rooks = InitWhiteRooks;
-  ret.Knights = InitWhiteKnights;
-  ret.Bishops = InitWhiteBishops;
-  ret.Queens = InitWhiteQueens;
-  ret.King = InitWhiteKing;
+  ret.Boards[Pawn] = InitWhitePawns;
+  ret.Boards[Rook] = InitWhiteRooks;
+  ret.Boards[Knight] = InitWhiteKnights;
+  ret.Boards[Bishop] = InitWhiteBishops;
+  ret.Boards[Queen] = InitWhiteQueens;
+  ret.Boards[King] = InitWhiteKing;
 
   return ret;
 }
@@ -41,23 +41,12 @@ NewWhiteSet()
 Piece
 SetPieceAt(Set *set, Position pos)
 {
-  if(PositionOccupied(set->Pawns, pos)) {
-    return Pawn;
-  }
-  if(PositionOccupied(set->Rooks, pos)) {
-    return Rook;
-  }
-  if(PositionOccupied(set->Knights, pos)) {
-    return Knight;
-  }
-  if(PositionOccupied(set->Bishops, pos)) {
-    return Bishop;
-  }
-  if(PositionOccupied(set->Queens, pos)) {
-    return Queen;
-  }
-  if(PositionOccupied(set->King, pos)) {
-    return King;
+  Piece piece;
+
+  for(piece = Pawn; piece <= King; piece++) {
+    if(PositionOccupied(set->Boards[piece], pos)) {
+      return piece;
+    }
   }
 
   return MissingPiece;
@@ -78,28 +67,7 @@ SetPlacePiece(Set *set, Piece piece, Position pos)
   set->Occupancy ^= bitBoard;
   set->EmptySquares = ~set->Occupancy;
 
-  switch(piece) {
-  case Pawn:
-    set->Pawns |= bitBoard;
-    break;
-  case Rook:
-    set->Rooks |= bitBoard;
-    break;
-  case Knight:
-    set->Knights |= bitBoard;
-    break;
-  case Bishop:
-    set->Bishops |= bitBoard;
-    break;
-  case Queen:
-    set->Queens |= bitBoard;
-    break;
-  case King:
-    set->King |= bitBoard;
-    break;
-  default:
-    panic("Invalid piece %d.", piece);
-  }
+  set->Boards[piece] |= bitBoard;
 }
 
 // Remove piece on set.
@@ -117,26 +85,5 @@ SetRemovePiece(Set *set, Piece piece, Position pos)
   set->Occupancy &= complement;
   set->EmptySquares = ~set->Occupancy;
 
-  switch(piece) {
-  case Pawn:
-    set->Pawns &= complement;
-    break;
-  case Rook:
-    set->Rooks &= complement;
-    break;
-  case Knight:
-    set->Knights &= complement;
-    break;
-  case Bishop:
-    set->Bishops &= complement;
-    break;
-  case Queen:
-    set->Queens &= complement;
-    break;
-  case King:
-    set->King &= complement;
-    break;
-  default:
-    panic("Invalid piece %d.", piece);
-  }
+  set->Boards[piece] &= complement;
 }

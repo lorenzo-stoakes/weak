@@ -25,9 +25,9 @@ AllMoves(MoveSlice *slice, Game *game)
   // move into check from a sliding piece attacking the rear of the king.
   ChessSet clone = game->ChessSet;
 
-  king = game->ChessSet.Sets[game->WhosTurn].King;
+  king = game->ChessSet.Sets[game->WhosTurn].Boards[King];
   ChessSetRemovePiece(&clone, game->WhosTurn, King,
-                      BitScanForward(clone.Sets[game->WhosTurn].King));
+                      BitScanForward(clone.Sets[game->WhosTurn].Boards[King]));
 
   kingThreats = AllThreats(&clone, OPPOSITE(game->WhosTurn));
   kingAttackBoard = QueenThreats(&game->ChessSet, king);
@@ -118,7 +118,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
     break;
   }
 
-  king = game->ChessSet.Sets[side].King;
+  king = game->ChessSet.Sets[side].Boards[King];
 
   // Are we moving the king?
   if(move->Piece == King) {
@@ -497,7 +497,7 @@ pawnMoves(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, MoveSlice 
   pushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
   captureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
 
-  enPassants = game->ChessSet.Sets[game->WhosTurn].Pawns &
+  enPassants = game->ChessSet.Sets[game->WhosTurn].Boards[Pawn] &
     (game->WhosTurn == White ? Rank5Mask : Rank4Mask);
 
   // Pushes.
@@ -601,39 +601,32 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoa
   BitBoard (*getMoveTargets)(ChessSet*, Side, BitBoard);
   BitBoard (*getCaptureTargets)(ChessSet*, Side, BitBoard);
 
+  pieceBoard = game->ChessSet.Sets[game->WhosTurn].Boards[piece];
+
   switch(piece) {
   case Rook:
     getMoveTargets = &RookMoveTargets;
     getCaptureTargets = &RookCaptureTargets;
 
-    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Rooks;
     break;
   case Knight:
     getMoveTargets = &KnightMoveTargets;
     getCaptureTargets = &KnightCaptureTargets;
-
-    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Knights;
 
     break;
   case Bishop:
     getMoveTargets = &BishopMoveTargets;
     getCaptureTargets = &BishopCaptureTargets;
 
-    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Bishops;
-
     break;
   case Queen:
     getMoveTargets = &QueenMoveTargets;
     getCaptureTargets = &QueenCaptureTargets;
 
-    pieceBoard = game->ChessSet.Sets[game->WhosTurn].Queens;
-
     break;
   case King:
     getMoveTargets = &KingMoveTargets;
     getCaptureTargets = &KingCaptureTargets;
-
-    pieceBoard = game->ChessSet.Sets[game->WhosTurn].King;    
 
     break;
   default:

@@ -61,21 +61,21 @@ InitKnight()
 BitBoard
 AllKnightCaptureTargets(ChessSet *chessSet, Side side)
 {
-  return KnightCaptureTargets(chessSet, side, chessSet->Sets[side].Knights);
+  return KnightCaptureTargets(chessSet, side, chessSet->Sets[side].Boards[Knight]);
 }
 
 // Get BitBoard encoding move targets for *all* knights on specified side.
 BitBoard
 AllKnightMoveTargets(ChessSet *chessSet, Side side)
 {
-  return KnightMoveTargets(chessSet, side, chessSet->Sets[side].Knights);
+  return KnightMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Knight]);
 }
 
 // Get BitBoard encoding all squares threatened by knights.
 BitBoard
 AllKnightThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard knights = chessSet->Sets[side].Knights;
+  BitBoard knights = chessSet->Sets[side].Boards[Knight];
   BitBoard ret = EmptyBoard;
   Position knight;
 

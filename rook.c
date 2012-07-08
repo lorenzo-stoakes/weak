@@ -8,21 +8,21 @@ static FORCE_INLINE BitBoard magicSquareThreats(Position, BitBoard);
 BitBoard
 AllRookCaptureTargets(ChessSet *chessSet, Side side)
 {
-  return RookCaptureTargets(chessSet, side, chessSet->Sets[side].Rooks);
+  return RookCaptureTargets(chessSet, side, chessSet->Sets[side].Boards[Rook]);
 }
 
 // Get BitBoard encoding move targets for *all* rooks on specified side.
 BitBoard
 AllRookMoveTargets(ChessSet *chessSet, Side side)
 {
-  return RookMoveTargets(chessSet, side, chessSet->Sets[side].Rooks);
+  return RookMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Rook]);
 }
 
 // Get BitBoard encoding all squares threatened by rooks.
 BitBoard
 AllRookThreats(ChessSet *chessSet, Side side)
 {
-  return RookThreats(chessSet, chessSet->Sets[side].Rooks);
+  return RookThreats(chessSet, chessSet->Sets[side].Boards[Rook]);
 }
 
 // Get BitBoard encoding capture targets for specified rooks without using magic BitBoards.
