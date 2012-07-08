@@ -113,7 +113,7 @@ struct CastleEventSlice {
 };
 
 struct MoveSlice {
-  int Len, Cap;
+  uint64_t Len, Cap;
   Move *Vals;
 };
 
@@ -321,7 +321,7 @@ void InitMagics(void);
 // move.c
 void      AppendMove(MoveSlice*, Move);
 void      AppendMoves(MoveSlice*, MoveSlice*);
-MoveSlice NewMoveSlice(Move*, int);
+MoveSlice NewMoveSlice(Move*, uint64_t);
 Move      PopMove(MoveSlice*);
 
 // movehistory.c
