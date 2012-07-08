@@ -155,7 +155,7 @@ StringMove(Move *move)
   case CastleQueenSide:
     return strdup("O-O-O");
   case CastleKingSide:
-    return strdup("O-O");    
+    return strdup("O-O");
   case EnPassant:
     suffix = "ep";
     break;
@@ -175,7 +175,7 @@ StringMove(Move *move)
     suffix = "";
     break;
   }
-  
+
   if(move->Capture) {
     actionChr = 'x';
   } else {
