@@ -31,7 +31,20 @@ AllQueenMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 AllQueenThreats(ChessSet *chessSet, Side side)
 {
-  return AllQueenMoveTargets(chessSet, side) | AllQueenCaptureTargets(chessSet, side);
+  BitBoard queens;
+
+  switch(side) {
+  case White:
+    queens = chessSet->White.Queens;
+    break;
+  case Black:
+    queens = chessSet->Black.Queens;
+    break;
+  default:
+    panic("Invalid side %d.", side);
+  }
+
+  return RookThreats(chessSet, queens) | BishopThreats(chessSet, queens);
 }
 
 BitBoard
