@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include "weak.h"
+
+//#define SHOW_MOVES
 
 static PerftStats initStats(void);
 
@@ -15,6 +18,13 @@ QuickPerft(Game *game, int depth)
   AllMoves(&allMoves, game);
 
   if(depth <= 1) {
+#if defined(SHOW_MOVES)
+    for(i = 0; i < allMoves.Len; i++) {
+      move = allMoves.Vals[i];
+      puts(StringMove(&move));
+    }
+#endif
+
     return allMoves.Len;
   }
 
@@ -51,6 +61,9 @@ Perft(Game *game, int depth)
     move = allMoves.Vals[i];
 
     if(depth == 1) {
+#if defined(SHOW_MOVES)
+      puts(StringMove(&move));
+#endif
       ret.Count++;
       if(move.Capture) {
         ret.Captures++;
