@@ -4,6 +4,9 @@
 
 //#define GET_FULL_PERFT
 
+// Perft position 2, see http://chessprogramming.wikispaces.com/Perft+Results
+#define FEN "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+
 // Initialise lookup tables, etc.
 static void
 init()
@@ -61,11 +64,10 @@ main(int argc, char **argv)
 
   printf("Initialising... ");
   init();
+  game = ParseFen(FEN);  
   puts("done.\n");
 
-  printf("%d plies.\n", plies);
-
-  game = NewGame(false, White);
+  puts(StringChessSet(&game.ChessSet));
 
   gettimeofday(&start, NULL);
 #if defined(GET_FULL_PERFT)
@@ -77,6 +79,8 @@ main(int argc, char **argv)
 
   elapsed = (end.tv_sec - start.tv_sec) * 1000.0;
   elapsed += (end.tv_usec - start.tv_usec) / 1000.0;
+
+  printf("%d plies.\n", plies);
 
 #if defined(GET_FULL_PERFT)
   puts(StringPerft(&stats));
