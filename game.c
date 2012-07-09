@@ -515,7 +515,6 @@ castleMoves(Game *game, MoveSlice *ret)
   }
 
   if(doKingSide && Legal(game, &kingSide)) {
-
       AppendMove(ret, kingSide);
   }
 

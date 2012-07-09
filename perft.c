@@ -83,7 +83,6 @@ Perft(Game *game, int depth)
         }
       }
       Unmove(game);
-
     } else {
       DoMove(game, &move);
       stats = Perft(game, depth - 1);
