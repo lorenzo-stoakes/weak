@@ -725,7 +725,7 @@ castleLegal(Game *game, bool queenSide)
         return false;
       }
 
-      mask = CastleQueenSideWhiteMask;
+      mask = CastleKingSideWhiteMask;
       attackMask = mask;
     }
   } else {
