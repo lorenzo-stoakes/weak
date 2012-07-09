@@ -3,7 +3,7 @@
 static BitBoard singlePushSources(ChessSet*, Side, BitBoard);
 static BitBoard doublePushSources(ChessSet*, Side, BitBoard);
 static BitBoard singlePushTargets(ChessSet*, Side, BitBoard);
-static BitBoard doublePushTargets(ChessSet*, Side, BitBoard);
+static BitBoard doublePushTargets(ChessSet*, Side, BitBoard, BitBoard);
 
 // Get BitBoard encoding capture sources for *all* pawns on specified side.
 BitBoard
@@ -100,8 +100,9 @@ PawnPushSources(ChessSet *chessSet, Side side, BitBoard pawns)
 BitBoard
 PawnPushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 {
-  return singlePushTargets(chessSet, side, pawns) |
-    doublePushTargets(chessSet, side, pawns);
+  BitBoard singlePushes = singlePushTargets(chessSet, side, pawns);
+
+  return singlePushes | doublePushTargets(chessSet, side, pawns, singlePushes);
 }
 
 // Get BitBoard encoding which of specified pawns are able to single push.
@@ -171,10 +172,8 @@ singlePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
 
 // Get BitBoard encoding double push targets for specified pawns.
 static BitBoard
-doublePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
+doublePushTargets(ChessSet *chessSet, Side side, BitBoard pawns, BitBoard singlePushes)
 {
-  BitBoard singlePushes = singlePushTargets(chessSet, side, pawns);
-
   // We can only double-push pawns if they are on the 2nd rank and thus end up on the 4th
   // rank (5th for black).
   switch(side) {
