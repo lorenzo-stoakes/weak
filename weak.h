@@ -89,23 +89,23 @@ enum Side {
 
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
 // We use little-endian rank-file (LERF) mapping [1].
-typedef uint64_t                 BitBoard;
-typedef enum CastleEvent         CastleEvent;
-typedef struct CastleEventSlice  CastleEventSlice;
-typedef struct ChessSet          ChessSet;
-typedef struct Game              Game;
-typedef struct Move              Move;
-typedef struct MoveHistory       MoveHistory;
-typedef struct MoveSlice         MoveSlice;
-typedef enum MoveType            MoveType;
-typedef struct PerftStats        PerftStats;
-typedef enum Piece               Piece;
-typedef struct PieceSlice        PieceSlice;
-typedef enum Position            Position;
-typedef enum Rank                Rank;
-typedef enum File                File;
-typedef struct Set               Set;
-typedef enum Side                Side;
+typedef uint64_t                BitBoard;
+typedef enum CastleEvent        CastleEvent;
+typedef struct CastleEventSlice CastleEventSlice;
+typedef struct ChessSet         ChessSet;
+typedef struct Game             Game;
+typedef struct Move             Move;
+typedef struct MoveHistory      MoveHistory;
+typedef struct MoveSlice        MoveSlice;
+typedef enum MoveType           MoveType;
+typedef struct PerftStats       PerftStats;
+typedef enum Piece              Piece;
+typedef struct PieceSlice       PieceSlice;
+typedef enum Position           Position;
+typedef enum Rank               Rank;
+typedef enum File               File;
+typedef struct Set              Set;
+typedef enum Side               Side;
 
 struct CastleEventSlice {
   int Len, Cap;
