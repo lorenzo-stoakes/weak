@@ -6,8 +6,8 @@ static bool        pieceLegal(Piece, Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
 static void castleMoves(Game*, MoveSlice*);
-static void pawnMoves(Game*, BitBoard, BitBoard, MoveSlice*);
-static void pieceMoves(Piece, Game*, BitBoard, BitBoard, MoveSlice*);
+static void pawnMoves(Game*, BitBoard, MoveSlice*);
+static void pieceMoves(Piece, Game*, BitBoard, MoveSlice*);
 
 // Get all valid moves for the current player.
 void
