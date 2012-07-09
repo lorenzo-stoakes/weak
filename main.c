@@ -2,10 +2,14 @@
 #include <sys/time.h>
 #include "weak.h"
 
-//#define GET_FULL_PERFT
+#define GET_FULL_PERFT
 
-// Perft position 2, see http://chessprogramming.wikispaces.com/Perft+Results
-#define FEN "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+// Perft positions, see http://chessprogramming.wikispaces.com/Perft+Results.
+
+#define FEN2 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+#define FEN3 "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -"
+#define FEN4a "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"
+#define FEN4b "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"
 
 // Initialise lookup tables, etc.
 static void
@@ -64,7 +68,7 @@ main(int argc, char **argv)
 
   printf("Initialising... ");
   init();
-  game = ParseFen(FEN);  
+  game = ParseFen(FEN4a);
   puts("done.\n");
 
   puts(StringChessSet(&game.ChessSet));
