@@ -647,10 +647,10 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
     moveTargets = GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
     captureTargets = GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
 
-    move.From = from;    
+    move.From = from;
 
     // Moves.
-    move.Capture = false;        
+    move.Capture = false;
     while(moveTargets) {
       to = PopForward(&moveTargets);
       move.To = to;
@@ -661,7 +661,7 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
     }
 
     // Captures.
-    move.Capture = true;    
+    move.Capture = true;
     while(captureTargets) {
       to = PopForward(&captureTargets);
 
