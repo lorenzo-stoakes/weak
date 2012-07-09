@@ -295,7 +295,8 @@ void AllMoves(MoveSlice*, Game*);
 bool Checkmated(Game*);
 void DoCastleKingSide(Game*);
 void DoCastleQueenSide(Game*);
-bool ExposesCheck(Game*, BitBoard, BitBoard, Move*);
+bool ExposesCheck(Game*, BitBoard, Move*);
+void InitCanSlideAttacks(void);
 bool Legal(Game*, Move*);
 void DoMove(Game*, Move*);
 Game NewEmptyGame(bool, Side);
@@ -403,5 +404,9 @@ void  panic(char*, ...);
 
 BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
 BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);
+
+// Array containing lookups determining whether any sliding attack is possible
+// between the two positions.
+bool CanSlideAttack[64][64];
 
 #endif

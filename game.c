@@ -13,25 +13,13 @@ static void pieceMoves(Piece, Game*, BitBoard, BitBoard, MoveSlice*);
 void
 AllMoves(MoveSlice *slice, Game *game)
 {
-  BitBoard king;
-  BitBoard kingAttackBoard, kingThreats;
-  ChessSet clone;
+  BitBoard kingThreats;
   Piece piece;
 
-  // TODO: Clean this up. Horrid hack. We remove the king and calculate
-  // threats so that when calculating check exposure we don't allow a
-  // move into check from a sliding piece attacking the rear of the king.
-  clone = game->ChessSet;
-  king = game->ChessSet.Sets[game->WhosTurn].Boards[King];
-  ChessSetRemovePiece(&clone, game->WhosTurn, King,
-                      BitScanForward(clone.Sets[game->WhosTurn].Boards[King]));
-
-  kingThreats = AllThreats(&clone, OPPOSITE(game->WhosTurn));
-  kingAttackBoard = QueenThreats(&game->ChessSet, king);
-
-  pawnMoves(game, kingThreats, kingAttackBoard, slice);
+  kingThreats = KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
+  pawnMoves(game, kingThreats, slice);
   for(piece = Knight; piece <= King; piece++) {
-    pieceMoves(piece, game, kingThreats, kingAttackBoard, slice);
+    pieceMoves(piece, game, kingThreats, slice);
   }
   castleMoves(game, slice);
 }
@@ -85,7 +73,7 @@ DoCastleQueenSide(Game *game)
 
 // Determine whether the specified move places the current player into check.
 bool
-ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *move)
+ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
 {
   bool checked, ret;
   BitBoard king;
@@ -132,7 +120,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
     // Not checked and piece being moved *is* being attacked.
 
     // If piece can't possibly result in revealed check, then can't expose check.
-    if((kingAttackBoard & POSBOARD(move->From)) == EmptyBoard) {
+    if(!CanSlideAttack[move->From][kingPos]) {
       return false;
     }
 
@@ -140,7 +128,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
     // Is checked and piece being moved is not a king.
 
     // If move does not block check, then it must leave the check in place.
-    if(!move->Capture && (kingAttackBoard & POSBOARD(move->To)) == EmptyBoard) {
+    if(!move->Capture && !CanSlideAttack[move->To][BitScanForward(king)]) {
       return true;
     }
   }
@@ -156,11 +144,30 @@ ExposesCheck(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, Move *m
   return Checked(&clone, side);
 }
 
+void
+InitCanSlideAttacks()
+{
+  BitBoard queenThreats;
+  Position from, to;
+
+  for(from = A1; from <= H8; from++) {
+    for(to = A1; to <= H8; to++) {
+      CanSlideAttack[from][to] = false;
+    }
+
+    queenThreats = QueenThreats(POSBOARD(from), EmptyBoard);
+    while(queenThreats) {
+      to = PopForward(&queenThreats);
+      CanSlideAttack[from][to] = true;
+    }
+  }
+}
+
 // Is the proposed move legal in this game?
 bool
 Legal(Game *game, Move *move)
 {
-  BitBoard kingAttackBoard, kingThreats;
+  BitBoard kingThreats;
   Piece piece;
 
   switch(move->Type) {
@@ -192,11 +199,9 @@ Legal(Game *game, Move *move)
     return false;
   }
 
-  kingThreats = AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
-  kingAttackBoard = QueenThreats(&game->ChessSet, King);
 
   return (move->Piece == Pawn ? pawnLegal(game, move) : pieceLegal(move->Piece, game, move)) &&
-    !ExposesCheck(game, kingThreats, kingAttackBoard, move);
+    !ExposesCheck(game, kingThreats, move);
 }
 
 // Attempt to move piece.
@@ -466,8 +471,8 @@ castleMoves(Game *game, MoveSlice *ret)
   }
 }
 
-static void
-pawnMoves(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, MoveSlice *slice)
+void
+pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
 {
   int k;
   BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassants,
@@ -501,11 +506,10 @@ pawnMoves(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, MoveSlice 
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
-          if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
             AppendMove(slice, move);
           }
         }
-      } else if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
+      } else if(!ExposesCheck(game, kingThreats, &move)) {
         AppendMove(slice, move);
       }
     }
@@ -530,11 +534,11 @@ pawnMoves(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, MoveSlice 
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
-          if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
+          if(!ExposesCheck(game, kingThreats, &move)) {
             AppendMove(slice, move);
           }
         }
-      } else if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
+      } else if(!ExposesCheck(game, kingThreats, &move)) {
         AppendMove(slice, move);
       }
     }
@@ -573,9 +577,8 @@ pawnMoves(Game *game, BitBoard kingThreats, BitBoard kingAttackBoard, MoveSlice 
   }
 }
 
-static void
-pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoard,
-           MoveSlice *ret)
+void
+pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
 {
   BitBoard captureTargets, moveTargets, pieceBoard;
   Move move;
@@ -600,7 +603,7 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoa
       to = PopForward(&moveTargets);
       move.To = to;
 
-      if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
+      if(!ExposesCheck(game, kingThreats, &move)) {
         AppendMove(ret, move);
       }
     }
@@ -611,7 +614,7 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, BitBoard kingAttackBoa
       to = PopForward(&captureTargets);
 
       move.To = to;
-      if(!ExposesCheck(game, kingThreats, kingAttackBoard, &move)) {
+      if(!ExposesCheck(game, kingThreats, &move)) {
         AppendMove(ret, move);
       }
     }
