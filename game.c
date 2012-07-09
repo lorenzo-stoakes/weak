@@ -464,15 +464,60 @@ static void
 castleMoves(Game *game, MoveSlice *ret)
 {
   Move kingSide, queenSide;
+  BitBoard kingSideMask, queenSideMask, initKing, initRooks;
+  bool doQueenSide = true, doKingSide = true;
+  bool queenSideRights, kingSideRights;
+
+  // TODO: Add further checks, reduce duplication between this + castleLegal.
 
   kingSide.Type = CastleKingSide;
   queenSide.Type = CastleQueenSide;
 
-  if(Legal(game, &kingSide)) {
-    AppendMove(ret, kingSide);
+  switch(game->WhosTurn) {
+  case White:
+    kingSideMask = CastleKingSideWhiteMask;
+    queenSideMask = CastleQueenSideWhiteMask;
+    initKing = InitWhiteKing;
+    initRooks = InitWhiteRooks;
+    kingSideRights = game->CastleKingSideWhite;
+    queenSideRights = game->CastleQueenSideWhite;
+
+    break;
+  case Black:
+    kingSideMask = CastleKingSideBlackMask;
+    queenSideMask = CastleQueenSideBlackMask;
+    initKing = InitBlackKing;
+    initRooks = InitBlackRooks;
+    kingSideRights = game->CastleKingSideBlack;
+    queenSideRights = game->CastleQueenSideBlack;
+
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
   }
 
-  if(Legal(game, &queenSide)) {
+  // Some simple checks, before taking the expensive route.
+
+  // If the king has moved, or both rooks aren't present, we can't castle.
+  if((game->ChessSet.Occupancy & initKing) == EmptyBoard ||
+     (game->ChessSet.Occupancy & initRooks) == EmptyBoard) {
+    return;
+  }
+
+  // If we are obstructed, or don't have appropriate rights, can't castle.
+  if((game->ChessSet.Occupancy & kingSideMask) != EmptyBoard || !kingSideRights) {
+    doKingSide = false;
+  }
+  if((game->ChessSet.Occupancy & queenSideMask) != EmptyBoard || !queenSideRights) {
+    doQueenSide = false;
+  }
+
+  if(doKingSide && Legal(game, &kingSide)) {
+
+      AppendMove(ret, kingSide);
+  }
+
+  if(doQueenSide && Legal(game, &queenSide)) {
     AppendMove(ret, queenSide);
   }
 }
