@@ -557,6 +557,7 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
+          if(!ExposesCheck(game, kingThreats, &move)) {
             AppendMove(slice, move);
           }
         }
