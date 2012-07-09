@@ -1,6 +1,11 @@
+.DS_Store
 *.dSYM
 *.out
 *.out.*
 *.prof
-weak
 .#*
+
+# I often output profile files to this name.
+analysis
+# Binary.
+weak
