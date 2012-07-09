@@ -27,6 +27,7 @@ init()
 
   // Relies on above.
   InitMagics();
+  InitCanSlideAttacks();
 }
 
 int
