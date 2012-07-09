@@ -759,7 +759,7 @@ castleLegal(Game *game, bool queenSide)
 
   // If any of the squares the king passes through are threatened by the opponent then
   // castling is prevented.
-  if((attackMask&AllThreats(&game->ChessSet, OPPOSITE(game->WhosTurn))) != EmptyBoard) {
+  if((attackMask&KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn))) != EmptyBoard) {
     return false;
   }
 
