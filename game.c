@@ -36,19 +36,6 @@ Checkmated(Game *game)
   return slice.Len == 0 && Checked(&game->ChessSet, game->WhosTurn);
 }
 
-// Determine whether the game is in a state of stalemate, i.e. the current player cannot make a
-// move.
-bool
-Stalemated(Game *game)
-{
-  Move buffer[INIT_MOVE_LEN];
-  MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
-
-  AllMoves(&slice, game);
-
-  return slice.Len == 0 && !Checked(&game->ChessSet, game->WhosTurn);
-}
-
 void
 DoCastleKingSide(Game *game)
 {
@@ -69,6 +56,101 @@ DoCastleQueenSide(Game *game)
   ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1 + offset);
   ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
   ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);
+}
+
+// Attempt to move piece.
+void
+DoMove(Game *game, Move *move)
+{
+  Piece piece;
+  Position enPassant;
+  Rank offset;
+  Side opposite = OPPOSITE(game->WhosTurn);
+
+  switch(move->Type) {
+  default:
+    panic("Move type %d not recognised.", move->Type);
+  case CastleKingSide:
+    DoCastleKingSide(game);
+    break;
+  case CastleQueenSide:
+    DoCastleQueenSide(game);
+    break;
+  case EnPassant:
+    // Panic, because in the usual course of the game .Legal() would have picked
+    // these up, and the move makes no sense without these conditions being true.
+    if(move->Piece != Pawn) {
+      panic("Expected pawn, en passant performed on piece %s.", move->Piece);
+    }
+    if(!move->Capture) {
+      panic("En passant move, but not capture.");
+    }
+
+    offset = -1 + 2*game->WhosTurn;
+
+    enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
+
+    piece = PieceAt(&game->ChessSet.Sets[opposite], enPassant);
+    if(piece == MissingPiece) {
+      panic("No piece at %s when attempting en passant.", StringPosition(enPassant));
+    } else {
+      if(piece != Pawn) {
+        panic("Piece taken via en passant is %s, not pawn.", StringPiece(piece));
+      }
+      ChessSetRemovePiece(&game->ChessSet, opposite, piece, enPassant);
+      AppendPiece(&game->History.CapturedPieces, piece);
+    }
+
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);
+
+    break;
+  case PromoteKnight:
+  case PromoteBishop:
+  case PromoteRook:
+  case PromoteQueen:
+  case Normal:
+    if(move->Capture) {
+      piece = PieceAt(&game->ChessSet.Sets[opposite], move->To);
+      if(piece == MissingPiece) {
+        panic("No piece at %s when attempting capture %s.", StringPosition(move->To),
+              StringMove(move));
+      } else {
+        ChessSetRemovePiece(&game->ChessSet, opposite, piece, move->To);
+        AppendPiece(&game->History.CapturedPieces, piece);
+      }
+    }
+
+    switch(move->Type) {
+    case PromoteKnight:
+      piece = Knight;
+      break;
+    case PromoteBishop:
+      piece = Bishop;
+      break;
+    case PromoteRook:
+      piece = Rook;
+      break;
+    case PromoteQueen:
+      piece = Queen;
+      break;
+    case Normal:
+      piece = move->Piece;
+      break;
+    default:
+      panic("Impossible.");
+    }
+
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
+
+    break;
+  }
+
+  AppendCastleEvent(&game->History.CastleEvents, updateCastlingRights(game, move));
+  AppendMove(&game->History.Moves, *move);
+
+  ToggleTurn(game);
 }
 
 // Determine whether the specified move places the current player into check.
@@ -204,101 +286,12 @@ Legal(Game *game, Move *move)
     !ExposesCheck(game, kingThreats, move);
 }
 
-// Attempt to move piece.
-void
-DoMove(Game *game, Move *move)
 // Create a new game with an empty board.
 Game
 NewEmptyGame(bool debug, Side humanSide)
 {
-  Piece piece;
-  Position enPassant;
-  Rank offset;
-  Side opposite = OPPOSITE(game->WhosTurn);
-
-  switch(move->Type) {
-  default:
-    panic("Move type %d not recognised.", move->Type);
-  case CastleKingSide:
-    DoCastleKingSide(game);
-    break;
-  case CastleQueenSide:
-    DoCastleQueenSide(game);
-    break;
-  case EnPassant:
-    // Panic, because in the usual course of the game .Legal() would have picked
-    // these up, and the move makes no sense without these conditions being true.
-    if(move->Piece != Pawn) {
-      panic("Expected pawn, en passant performed on piece %s.", move->Piece);
-    }
-    if(!move->Capture) {
-      panic("En passant move, but not capture.");
-    }
-
-    offset = -1 + 2*game->WhosTurn;
-
-    enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
-
-    piece = PieceAt(&game->ChessSet.Sets[opposite], enPassant);
-    if(piece == MissingPiece) {
-      panic("No piece at %s when attempting en passant.", StringPosition(enPassant));
-    } else {
-      if(piece != Pawn) {
-        panic("Piece taken via en passant is %s, not pawn.", StringPiece(piece));
-      }
-      ChessSetRemovePiece(&game->ChessSet, opposite, piece, enPassant);
-      AppendPiece(&game->History.CapturedPieces, piece);
-    }
-
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);
-
-    break;
-  case PromoteKnight:
-  case PromoteBishop:
-  case PromoteRook:
-  case PromoteQueen:
-  case Normal:
-    if(move->Capture) {
-      piece = PieceAt(&game->ChessSet.Sets[opposite], move->To);
-      if(piece == MissingPiece) {
-        panic("No piece at %s when attempting capture %s.", StringPosition(move->To),
-              StringMove(move));
-      } else {
-        ChessSetRemovePiece(&game->ChessSet, opposite, piece, move->To);
-        AppendPiece(&game->History.CapturedPieces, piece);
-      }
-    }
-
-    switch(move->Type) {
-    case PromoteKnight:
-      piece = Knight;
-      break;
-    case PromoteBishop:
-      piece = Bishop;
-      break;
-    case PromoteRook:
-      piece = Rook;
-      break;
-    case PromoteQueen:
-      piece = Queen;
-      break;
-    case Normal:
-      piece = move->Piece;
-      break;
-    default:
-      panic("Impossible.");
-    }
-
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
-
-    break;
-  }
   Game ret;
 
-  AppendCastleEvent(&game->History.CastleEvents, updateCastlingRights(game, move));
-  AppendMove(&game->History.Moves, *move);
   ret = NewGame(debug, humanSide);
   ret.CastleKingSideWhite = false;
   ret.CastleQueenSideWhite = false;
@@ -306,7 +299,6 @@ NewEmptyGame(bool debug, Side humanSide)
   ret.CastleQueenSideBlack = false;
   ret.ChessSet = NewEmptyChessSet();
 
-  ToggleTurn(game);
   return ret;
 }
 
@@ -328,6 +320,19 @@ NewGame(bool debug, Side humanSide)
   ret.History = NewMoveHistory();
 
   return ret;
+}
+
+// Determine whether the game is in a state of stalemate, i.e. the current player cannot make a
+// move.
+bool
+Stalemated(Game *game)
+{
+  Move buffer[INIT_MOVE_LEN];
+  MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
+
+  AllMoves(&slice, game);
+
+  return slice.Len == 0 && !Checked(&game->ChessSet, game->WhosTurn);
 }
 
 // Toggle whose turn it is.
