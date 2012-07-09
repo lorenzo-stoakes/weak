@@ -470,7 +470,9 @@ castleMoves(Game *game, MoveSlice *ret)
 
   // TODO: Add further checks, reduce duplication between this + castleLegal.
 
+  kingSide.Capture = false;
   kingSide.Type = CastleKingSide;
+  queenSide.Capture = false;  
   queenSide.Type = CastleQueenSide;
 
   switch(game->WhosTurn) {
