@@ -149,7 +149,7 @@ PopCount(BitBoard x)
 bool
 PositionOccupied(BitBoard bitBoard, Position pos)
 {
-  return (bitBoard & POSBOARD(pos)) != 0;
+  return (bitBoard & POSBOARD(pos)) != EmptyBoard;
 }
 
 // Rotate bitboard 90 degrees anticlockwise.
