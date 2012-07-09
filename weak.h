@@ -330,6 +330,9 @@ Move      PopMove(MoveSlice*);
 // movehistory.c
 MoveHistory NewMoveHistory(void);
 
+// parser.c
+Game ParseFen(char*);
+
 // pawn.c
 BitBoard AllPawnCaptureSources(ChessSet*, Side);
 BitBoard AllPawnCaptureTargets(ChessSet*, Side);
