@@ -522,7 +522,7 @@ castleMoves(Game *game, MoveSlice *ret)
   }
 }
 
-void
+static void
 pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
 {
   int k;
@@ -629,7 +629,7 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
   }
 }
 
-void
+static void
 pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
 {
   BitBoard captureTargets, moveTargets, pieceBoard;
