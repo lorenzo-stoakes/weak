@@ -161,6 +161,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
   BitBoard king;
   ChessSet clone;
   Piece piece;
+  Position kingPos;
   Side side = game->WhosTurn;
 
   switch(move->Type) {
@@ -176,6 +177,12 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
     Unmove(game);
     return ret;
   case Normal:
+    // Are we moving the king?
+    if(move->Piece == King) {
+      // Then it has to be to a square that is not attacked.
+      return (POSBOARD(move->To) & kingThreats) != EmptyBoard;
+    }
+    break;
   case PromoteKnight:
   case PromoteBishop:
   case PromoteRook:
@@ -184,13 +191,6 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
   }
 
   king = game->ChessSet.Sets[side].Boards[King];
-
-  // Are we moving the king?
-  if(move->Piece == King) {
-    // Then it has to be to a square that is not attacked.
-    return (POSBOARD(move->To) & kingThreats) != EmptyBoard;
-  }
-
   checked = (kingThreats & king) != EmptyBoard;
 
   if(!checked) {
@@ -199,13 +199,13 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
       return false;
     }
 
-    // Not checked and piece being moved *is* being attacked.
+    // Not checked and non-king piece being moved *is* being attacked.
 
+    kingPos = BitScanForward(king);
     // If piece can't possibly result in revealed check, then can't expose check.
     if(!CanSlideAttack[move->From][kingPos]) {
       return false;
     }
-
   } else {
     // Is checked and piece being moved is not a king.
 
@@ -281,6 +281,7 @@ Legal(Game *game, Move *move)
     return false;
   }
 
+  kingThreats = KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
 
   return (move->Piece == Pawn ? pawnLegal(game, move) : pieceLegal(move->Piece, game, move)) &&
     !ExposesCheck(game, kingThreats, move);
