@@ -48,3 +48,16 @@ NewChessSet()
 
   return ret;
 }
+
+ChessSet
+NewEmptyChessSet()
+{
+  ChessSet ret;
+
+  ret.Sets[White] = NewEmptySet();
+  ret.Sets[Black] = NewEmptySet();
+  ret.Occupancy = EmptyBoard;
+  ret.EmptySquares = EmptyBoard;
+
+  return ret;
+}

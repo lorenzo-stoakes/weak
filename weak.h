@@ -288,6 +288,7 @@ bool     Checked(ChessSet*, Side);
 void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
 ChessSet NewChessSet(void);
+ChessSet NewEmptyChessSet(void);
 
 // game.c
 void AllMoves(MoveSlice*, Game*);
@@ -297,6 +298,7 @@ void DoCastleQueenSide(Game*);
 bool ExposesCheck(Game*, BitBoard, BitBoard, Move*);
 bool Legal(Game*, Move*);
 void DoMove(Game*, Move*);
+Game NewEmptyGame(bool, Side);
 Game NewGame(bool, Side);
 bool Stalemated(Game*);
 void ToggleTurn(Game*);
@@ -377,6 +379,7 @@ BitBoard RookThreats(BitBoard, BitBoard);
 
 // set.c
 Set   NewBlackSet(void);
+Set   NewEmptySet(void);
 Set   NewWhiteSet(void);
 Piece PieceAt(Set*, Position);
 void  SetPlacePiece(Set*, Piece, Position);

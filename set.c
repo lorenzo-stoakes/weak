@@ -19,6 +19,22 @@ NewBlackSet()
 }
 
 Set
+NewEmptySet()
+{
+  Piece piece;
+  Set ret;
+
+  for(piece = Pawn; piece <= King; piece++) {
+    ret.Boards[piece] = EmptyBoard;
+  }
+
+  ret.Occupancy = EmptyBoard;
+  ret.EmptySquares = EmptyBoard;  
+
+  return ret;
+}
+
+Set
 NewWhiteSet()
 {
   Set ret;

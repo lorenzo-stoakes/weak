@@ -202,6 +202,9 @@ Legal(Game *game, Move *move)
 // Attempt to move piece.
 void
 DoMove(Game *game, Move *move)
+// Create a new game with an empty board.
+Game
+NewEmptyGame(bool debug, Side humanSide)
 {
   Piece piece;
   Position enPassant;
@@ -287,11 +290,19 @@ DoMove(Game *game, Move *move)
 
     break;
   }
+  Game ret;
 
   AppendCastleEvent(&game->History.CastleEvents, updateCastlingRights(game, move));
   AppendMove(&game->History.Moves, *move);
+  ret = NewGame(debug, humanSide);
+  ret.CastleKingSideWhite = false;
+  ret.CastleQueenSideWhite = false;
+  ret.CastleKingSideBlack = false;
+  ret.CastleQueenSideBlack = false;
+  ret.ChessSet = NewEmptyChessSet();
 
   ToggleTurn(game);
+  return ret;
 }
 
 // Create new game with specified human side and white + black's pieces in standard initial
