@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <strings.h>
-#include "../weak.h"
 #include "test.h"
 
 #if defined(QUICK_TEST)
@@ -9,17 +8,11 @@
 #define MAX_DEPTH 7
 #endif
 
-#define POSITION_COUNT 5
-static char *fens[POSITION_COUNT] = {
-  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-  "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
-  "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -",
-  "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
-  "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"
-};
+#define PERFT_COUNT 5
+static char *fens[PERFT_COUNT] = { FEN1, FEN2, FEN3, FEN4, FEN4_REVERSED };
 
-static int expectedDepthCounts[POSITION_COUNT] = { 6, 5, 7, 6, 6 };
-static PerftStats expecteds[POSITION_COUNT][7] = {
+static int expectedDepthCounts[PERFT_COUNT] = { 6, 5, 7, 6, 6 };
+static PerftStats expecteds[PERFT_COUNT][7] = {
   {
     {20, 0, 0, 0, 0, 0, 0 },
     {400, 0, 0, 0, 0, 0, 0},
