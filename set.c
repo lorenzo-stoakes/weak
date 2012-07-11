@@ -74,7 +74,7 @@ SetPlacePiece(Set *set, Piece piece, Position pos)
 {
   BitBoard bitBoard = POSBOARD(pos);
 
-  set->Occupancy ^= bitBoard;
+  set->Occupancy |= bitBoard;
   set->EmptySquares = ~set->Occupancy;
 
   set->Boards[piece] |= bitBoard;
