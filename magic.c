@@ -77,7 +77,7 @@ InitMagics()
               index,
               StringBitBoard(threats),
               StringBitBoard(currThreats),
-              StringBitBoard(bitBoard));      
+              StringBitBoard(bitBoard));
       }
 
       RookThreatBase[from][index] = threats;

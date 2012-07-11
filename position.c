@@ -123,7 +123,7 @@ BitBoard NoEaRay(Position pos)
 
 BitBoard NoWeRay(Position pos)
 {
-  return noweRays[pos]; 
+  return noweRays[pos];
 }
 
 BitBoard SoEaRay(Position pos)
@@ -133,5 +133,5 @@ BitBoard SoEaRay(Position pos)
 
 BitBoard SoWeRay(Position pos)
 {
-  return soweRays[pos];  
+  return soweRays[pos];
 }

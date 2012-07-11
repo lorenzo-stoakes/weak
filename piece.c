@@ -21,7 +21,7 @@ PopPiece(PieceSlice *slice)
   Piece ret;
 
   if(slice->Len <= 0) {
-    panic("Invaild slice length %d on PopPiece().", slice->Len);    
+    panic("Invaild slice length %d on PopPiece().", slice->Len);
   }
 
   ret = slice->Vals[slice->Len-1];

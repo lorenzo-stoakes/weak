@@ -51,7 +51,7 @@ PawnKingThreats(ChessSet *chessSet, Side side)
   }
 
   panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;  
+  return EmptyBoard;
 }
 
 // Get BitBoard encoding specified pawns which are able to capture.

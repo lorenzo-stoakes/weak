@@ -53,7 +53,7 @@ RookMoveTargets(ChessSet *chessSet, Side side, BitBoard rooks)
   Position rook;
 
   while(rooks) {
-    rook = PopForward(&rooks);  
+    rook = PopForward(&rooks);
 
     ret |= magicSquareThreats(rook, chessSet->Occupancy);
   }

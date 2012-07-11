@@ -51,7 +51,7 @@ PopMove(MoveSlice *slice)
 static uint64_t
 expand(MoveSlice *slice)
 {
-  Move *buffer;  
+  Move *buffer;
 
   slice->Cap *= 2;
   buffer = (Move*)allocate(sizeof(Move), slice->Cap);
