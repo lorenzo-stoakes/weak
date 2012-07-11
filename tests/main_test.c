@@ -1,11 +1,21 @@
 #include <stdio.h>
+#include <strings.h>
 #include "test.h"
+
+static void
+init()
+{
+  TestFunctions[0] = &TestPerft;
+  TestNames[0] = strdup("Perft Test");
+}
 
 int main()
 {
   int failed = 0;
   int i;
   char *msg;
+
+  init();
 
   InitEngine();
 
