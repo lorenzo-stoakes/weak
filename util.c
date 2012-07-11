@@ -19,7 +19,6 @@ allocateZero(size_t size, size_t num)
   return calloc(num, size);
 }
 
-
 void
 panic(char *msg, ...)
 {
