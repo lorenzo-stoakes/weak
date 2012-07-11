@@ -853,14 +853,29 @@ updateCastlingRights(Game *game, Move *move)
     break;
   case CastleKingSide:
   case CastleQueenSide:
-    game->CastlingRights[side][QueenSide] = false;
-    game->CastlingRights[side][KingSide] = false;
-
     switch(side) {
     case White:
-      return LostKingSideWhite | LostQueenSideWhite;
+      if(game->CastlingRights[White][KingSide]) {
+        game->CastlingRights[White][KingSide] = false;
+        ret = LostKingSideWhite;
+      }
+      if(game->CastlingRights[White][QueenSide]) {
+        game->CastlingRights[White][QueenSide] = false;
+        ret |= LostQueenSideWhite;
+      }
+
+      return ret;
     case Black:
-      return LostKingSideBlack | LostQueenSideBlack;
+      if(game->CastlingRights[Black][KingSide]) {
+        game->CastlingRights[Black][KingSide] = false;
+        ret = LostKingSideBlack;
+      }
+      if(game->CastlingRights[Black][QueenSide]) {
+        game->CastlingRights[Black][QueenSide] = false;
+        ret |= LostQueenSideBlack;
+      }
+
+      return ret;
     default:
       panic("Unrecognised side %d.", game->WhosTurn);
     }
