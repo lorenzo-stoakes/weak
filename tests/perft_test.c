@@ -74,20 +74,44 @@ TestPerft()
       actual = Perft(&game, j);
 
       if(actual.Count != expected.Count) {
-        sprintf(tmp, "Perft Position %d Depth %d: Expected Count of %llu, got %llu.\n",
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu nodes, got %llu.\n",
                 i+1, j, expected.Count, actual.Count);
         AppendString(&builder, tmp);
       }
 
       if(actual.Captures != expected.Captures) {
-        sprintf(tmp, "Perft Position %d Depth %d: Expected Captures of %llu, got %llu.\n",
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu captures, got %llu.\n",
                 i+1, j, expected.Captures, actual.Captures);
         AppendString(&builder, tmp);
       }
 
       if(actual.EnPassants != expected.EnPassants) {
-        sprintf(tmp, "Perft Position %d Depth %d: Expected EnPassants of %llu, got %llu.\n",
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu en passants, got %llu.\n",
                 i+1, j, expected.EnPassants, actual.EnPassants);
+        AppendString(&builder, tmp);
+      }
+
+      if(actual.Castles != expected.Castles) {
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu castles, got %llu.\n",
+                i+1, j, expected.Castles, actual.Castles);
+        AppendString(&builder, tmp);
+      }
+
+      if(actual.Promotions != expected.Promotions) {
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu pawn promotions, got %llu.\n",
+                i+1, j, expected.Promotions, actual.Promotions);
+        AppendString(&builder, tmp);
+      }
+
+      if(actual.Checks != expected.Checks) {
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu checks, got %llu.\n",
+                i+1, j, expected.Checks, actual.Checks);
+        AppendString(&builder, tmp);
+      }
+
+      if(actual.Checkmates != expected.Checkmates) {
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu checkmates, got %llu.\n",
+                i+1, j, expected.Checkmates, actual.Checkmates);
         AppendString(&builder, tmp);
       }
 
