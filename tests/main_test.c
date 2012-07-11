@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "test.h"
-#include "../weak.h"
 
 int main()
 {

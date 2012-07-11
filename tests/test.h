@@ -1,8 +1,14 @@
-// perft_test.c
-char* TestPerft(void);
+#ifndef TEST_HEADER
+#define TEST_HEADER
+
+#include "../weak.h"
 
 #define TEST_COUNT 1
 
-char* (*TestFunctions[TEST_COUNT])(void) = { &TestPerft };
+// perft_test.c
+char* TestPerft(void);
 
-char *TestNames[TEST_COUNT] = { "Perft Test" };
+char* (*TestFunctions[TEST_COUNT])(void);
+char *TestNames[TEST_COUNT];
+
+#endif
