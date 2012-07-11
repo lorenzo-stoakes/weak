@@ -119,7 +119,7 @@ struct CastleEventSlice {
 };
 
 struct MoveSlice {
-  uint64_t Len, Cap;
+  int Len, Cap;
   Move *Vals;
 };
 
