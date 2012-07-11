@@ -1,6 +1,6 @@
 #include "weak.h"
 
-static bool        castleLegal(Game*, bool);
+static bool        castleLegal(Game*, CastleSide);
 static bool        pawnLegal(Game*, Move*);
 static bool        pieceLegal(Piece, Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
@@ -62,6 +62,7 @@ DoCastleQueenSide(Game *game)
 void
 DoMove(Game *game, Move *move)
 {
+  CastleEvent castleEvent;
   Piece piece;
   Position enPassant;
   Rank offset;
@@ -147,7 +148,9 @@ DoMove(Game *game, Move *move)
     break;
   }
 
-  AppendCastleEvent(&game->History.CastleEvents, updateCastlingRights(game, move));
+  castleEvent = updateCastlingRights(game, move);
+  AppendCastleEvent(&game->History.CastleEvents, castleEvent);
+
   AppendMove(&game->History.Moves, *move);
 
   ToggleTurn(game);
@@ -257,16 +260,19 @@ Legal(Game *game, Move *move)
     panic("Move type %d not yet implemented.", move->Type);
     break;
   case CastleQueenSide:
-    return castleLegal(game, true);
+    return castleLegal(game, QueenSide);
   case CastleKingSide:
-    return castleLegal(game, false);
+    return castleLegal(game, KingSide);
   case EnPassant:
+    if(move->Piece != Pawn || !move->Capture) {
+      return false;
+    }
   case PromoteKnight:
   case PromoteBishop:
   case PromoteRook:
   case PromoteQueen:
   case Normal:
-    ;
+    break;
   }
 
   // Moves which accomplish nothing are illegal.
@@ -291,13 +297,18 @@ Legal(Game *game, Move *move)
 Game
 NewEmptyGame(bool debug, Side humanSide)
 {
+  CastleSide castleSide;
   Game ret;
+  Side side;
 
   ret = NewGame(debug, humanSide);
-  ret.CastleKingSideWhite = false;
-  ret.CastleQueenSideWhite = false;
-  ret.CastleKingSideBlack = false;
-  ret.CastleQueenSideBlack = false;
+
+  for(side = White; side <= Black; side++) {
+    for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
+      ret.CastlingRights[side][castleSide] = false;
+    }
+  }
+
   ret.ChessSet = NewEmptyChessSet();
 
   return ret;
@@ -308,12 +319,16 @@ NewEmptyGame(bool debug, Side humanSide)
 Game
 NewGame(bool debug, Side humanSide)
 {
+  CastleSide castleSide;
   Game ret;
+  Side side;
 
-  ret.CastleKingSideWhite = true;
-  ret.CastleQueenSideWhite = true;
-  ret.CastleKingSideBlack = true;
-  ret.CastleQueenSideBlack = true;
+  for(side = White; side <= Black; side++) {
+    for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
+      ret.CastlingRights[side][castleSide] = true;
+    }
+  }
+
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
   ret.WhosTurn = White;
@@ -376,7 +391,7 @@ Unmove(Game *game)
     break;
   case CastleQueenSide:
   case CastleKingSide:
-    ;
+    break;
   }
 
   switch(move.Type) {
@@ -401,36 +416,25 @@ Unmove(Game *game)
           ChessSetPlacePiece(&game->ChessSet, opposite, captured, move.To);
         }
     }
+
     break;
   case CastleQueenSide:
-    if(game->WhosTurn == White) {
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, D1);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, A1);
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, C1);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1);
-    } else if(game->WhosTurn == Black) {
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, D8);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, A8);
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, C8);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E8);
-    } else {
-      panic("Invalid side %d.", game->WhosTurn);
-    }
+    offset = game->WhosTurn == White ? 0 : 8*7;
+
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, C1+offset);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, D1+offset);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, A1+offset);
+
     break;
   case CastleKingSide:
-    if(game->WhosTurn == White) {
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, F1);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, H1);
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, G1);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1);
-    } else if(game->WhosTurn == Black) {
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, F8);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, H8);
-      ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, G8);
-      ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E8);
-    } else {
-      panic("Invalid side %d.", game->WhosTurn);
-    }
+    offset = game->WhosTurn == White ? 0 : 8*7;
+
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, G1+offset);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
+    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, F1+offset);
+    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, H1+offset);
+
     break;
   default:
     panic("Unrecognised move type %d.", move.Type);
@@ -438,60 +442,59 @@ Unmove(Game *game)
 
   castleEvent = PopCastleEvent(&game->History.CastleEvents);
 
-  switch(game->WhosTurn) {
-  case White:
-    if((castleEvent&LostQueenSideWhite) == LostQueenSideWhite) {
-      game->CastleQueenSideWhite = true;
-    }
-    if((castleEvent&LostKingSideWhite) == LostKingSideWhite) {
-      game->CastleKingSideWhite = true;
-    }
-    break;
-  case Black:
-    if((castleEvent&LostQueenSideBlack) == LostQueenSideBlack) {
-      game->CastleQueenSideBlack = true;
-    }
-    if((castleEvent&LostKingSideBlack) == LostKingSideBlack) {
-      game->CastleKingSideBlack = true;
-    }
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
+  if(castleEvent == NoCastleEvent) {
+    return;
+  }
+
+  if(castleEvent&LostKingSideWhite) {
+    game->CastlingRights[White][KingSide] = true;
+  }
+  if(castleEvent&LostQueenSideWhite) {
+    game->CastlingRights[White][QueenSide] = true;
+  }
+
+  if(castleEvent&LostKingSideBlack) {
+    game->CastlingRights[Black][KingSide] = true;
+  }
+  if(castleEvent&LostQueenSideBlack) {
+    game->CastlingRights[Black][QueenSide] = true;
   }
 }
 
 static void
 castleMoves(Game *game, MoveSlice *ret)
 {
-  Move kingSide, queenSide;
-  BitBoard kingSideMask, queenSideMask, initKing, initRooks;
+  BitBoard initKing, initRooks;
   bool doQueenSide = true, doKingSide = true;
-  bool queenSideRights, kingSideRights;
-
+  Move kingSide, queenSide;
+  Position king;
+  Side side = game->WhosTurn;
   // TODO: Add further checks, reduce duplication between this + castleLegal.
 
-  kingSide.Capture = false;
-  kingSide.Type = CastleKingSide;
-  queenSide.Capture = false;  
-  queenSide.Type = CastleQueenSide;
+  king = E1 + side*8*7;
 
-  switch(game->WhosTurn) {
+  // Add unneeded fields to prevent garbage in unassigned fields. TODO: Review
+  kingSide.Capture = false;
+  kingSide.From = king;
+  kingSide.Piece = King;
+  kingSide.Type = CastleKingSide;
+  kingSide.To = king + 2;
+
+  queenSide.Capture = false;
+  queenSide.From = king;
+  queenSide.Piece = King;
+  queenSide.Type = CastleQueenSide;
+  queenSide.To = king - 2;
+
+  switch(side) {
   case White:
-    kingSideMask = CastleKingSideWhiteMask;
-    queenSideMask = CastleQueenSideWhiteMask;
     initKing = InitWhiteKing;
     initRooks = InitWhiteRooks;
-    kingSideRights = game->CastleKingSideWhite;
-    queenSideRights = game->CastleQueenSideWhite;
 
     break;
   case Black:
-    kingSideMask = CastleKingSideBlackMask;
-    queenSideMask = CastleQueenSideBlackMask;
     initKing = InitBlackKing;
     initRooks = InitBlackRooks;
-    kingSideRights = game->CastleKingSideBlack;
-    queenSideRights = game->CastleQueenSideBlack;
 
     break;
   default:
@@ -501,16 +504,19 @@ castleMoves(Game *game, MoveSlice *ret)
   // Some simple checks, before taking the expensive route.
 
   // If the king has moved, or both rooks aren't present, we can't castle.
+  // TODO: Ridiculously coarse test, improve!
   if((game->ChessSet.Occupancy & initKing) == EmptyBoard ||
      (game->ChessSet.Occupancy & initRooks) == EmptyBoard) {
     return;
   }
 
   // If we are obstructed, or don't have appropriate rights, can't castle.
-  if((game->ChessSet.Occupancy & kingSideMask) != EmptyBoard || !kingSideRights) {
+  if((game->ChessSet.Occupancy & CastlingMasks[side][KingSide]) != EmptyBoard ||
+     !game->CastlingRights[side][KingSide]) {
     doKingSide = false;
   }
-  if((game->ChessSet.Occupancy & queenSideMask) != EmptyBoard || !queenSideRights) {
+  if((game->ChessSet.Occupancy & CastlingMasks[side][QueenSide]) != EmptyBoard ||
+     !game->CastlingRights[side][QueenSide]) {
     doQueenSide = false;
   }
 
@@ -675,91 +681,41 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
 }
 
 static bool
-castleLegal(Game *game, bool queenSide)
+castleLegal(Game *game, CastleSide castleSide)
 {
   BitBoard attackMask, mask;
-  Piece piece;
+  int offset;
+  Position rook;
 
   if(Checked(&game->ChessSet, game->WhosTurn)) {
     return false;
   }
-
-  switch(game->WhosTurn) {
-  case White:
-    piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], E1);
-    if(piece != King) {
-      return false;
-    }
-
-    break;
-  case Black:
-    piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], E8);
-    if(piece != King) {
-      return false;
-    }
-
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
+  if(!game->CastlingRights[game->WhosTurn][castleSide]) {
+    return false;
   }
 
-  if(game->WhosTurn == White) {
-    if(queenSide) {
-      if(!game->CastleQueenSideWhite) {
-        return false;
-      }
-      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], A1);
-      if(piece != Rook) {
-        return false;
-      }
+  offset = game->WhosTurn*7*8;
 
-      mask = CastleQueenSideWhiteMask;
-      attackMask = CastleQueenSideWhiteAttackMask;
-    } else {
-      if(!game->CastleKingSideWhite) {
-        return false;
-      }
-      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], H1);
-      if(piece != Rook) {
-        return false;
-      }
+  if((game->ChessSet.Sets[game->WhosTurn].Boards[King]&POSBOARD(E1+offset)) == EmptyBoard) {
+    return false;
+  }
 
-      mask = CastleKingSideWhiteMask;
-      attackMask = mask;
-    }
-  } else {
-    if(queenSide) {
-      if(!game->CastleQueenSideBlack) {
-        return false;
-      }
-      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], A8);
-      if(piece != Rook) {
-        return false;
-      }
+  rook = castleSide == QueenSide ? A1 : H1;
+  rook += offset;
 
-      mask = CastleQueenSideBlackMask;
-      attackMask = CastleQueenSideBlackAttackMask;
-    } else {
-      if(!game->CastleKingSideBlack) {
-        return false;
-      }
-      piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], H8);
-      if(piece != Rook) {
-        return false;
-      }
-
-      mask = CastleKingSideBlackMask;
-      attackMask = mask;
-    }
+  if((game->ChessSet.Sets[game->WhosTurn].Boards[Rook]&POSBOARD(rook)) == EmptyBoard) {
+    return false;
   }
 
   // Obstructions clearly prevent castling.
+  mask = CastlingMasks[game->WhosTurn][castleSide];
   if((mask&game->ChessSet.Occupancy) != EmptyBoard) {
     return false;
   }
 
   // If any of the squares the king passes through are threatened by the opponent then
   // castling is prevented.
+  attackMask = CastlingAttackMasks[game->WhosTurn][castleSide];
   if((attackMask&KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn))) != EmptyBoard) {
     return false;
   }
@@ -883,7 +839,9 @@ pieceLegal(Piece piece, Game *game, Move *move)
 static CastleEvent
 updateCastlingRights(Game *game, Move *move)
 {
+  int offset;
   CastleEvent ret = NoCastleEvent;
+  Side side = game->WhosTurn;
 
   switch(move->Type) {
   default:
@@ -895,54 +853,38 @@ updateCastlingRights(Game *game, Move *move)
     break;
   case CastleKingSide:
   case CastleQueenSide:
-    if(game->WhosTurn == White) {
-        return LostKingSideWhite | LostQueenSideWhite;
-    } else if(game->WhosTurn == Black) {
-        return LostKingSideBlack | LostQueenSideBlack;
-    } else {
+    game->CastlingRights[side][QueenSide] = false;
+    game->CastlingRights[side][KingSide] = false;
+
+    switch(side) {
+    case White:
+      return LostKingSideWhite | LostQueenSideWhite;
+    case Black:
+      return LostKingSideBlack | LostQueenSideBlack;
+    default:
       panic("Unrecognised side %d.", game->WhosTurn);
     }
   }
 
-  switch(game->WhosTurn) {
-  case White:
-    if(move->Piece == King && move->From == E1) {
-      if(game->CastleQueenSideWhite) {
-        ret = LostQueenSideWhite;
-        game->CastleQueenSideWhite = false;
-      }
-      if(game->CastleKingSideWhite) {
-        ret |= LostKingSideWhite;
-        game->CastleKingSideWhite = false;
-      }
-    } else if(game->CastleQueenSideWhite && move->Piece == Rook && move->From == A1) {
-      ret = LostQueenSideWhite;
-      game->CastleQueenSideWhite = false;
-    } else if(game->CastleKingSideWhite && move->Piece == Rook && move->From == H1) {
-      ret = LostKingSideWhite;
-      game->CastleKingSideWhite = false;
+  offset = game->WhosTurn*8*7;
+
+  if(move->Piece == King && move->From == E1+offset) {
+    if(game->CastlingRights[side][QueenSide]) {
+      ret = game->WhosTurn == White ? LostQueenSideWhite : LostQueenSideBlack;
+      game->CastlingRights[side][QueenSide] = false;
     }
-    break;
-  case Black:
-    if(move->Piece == King && move->From == E8) {
-      if(game->CastleQueenSideBlack) {
-        ret = LostQueenSideBlack;
-        game->CastleQueenSideBlack = false;
-      }
-      if(game->CastleKingSideBlack) {
-        ret |= LostKingSideBlack;
-        game->CastleKingSideBlack = false;
-      }
-    } else if(game->CastleQueenSideBlack && move->Piece == Rook && move->From == A8) {
-      ret = LostQueenSideBlack;
-      game->CastleQueenSideBlack = false;
-    } else if(game->CastleKingSideBlack && move->Piece == Rook && move->From == H8) {
-      ret = LostKingSideBlack;
-      game->CastleKingSideBlack = false;
+    if(game->CastlingRights[side][KingSide]) {
+      ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
+      game->CastlingRights[side][KingSide] = false;
     }
-    break;
-  default:
-    panic("Invalid side %d.", game->WhosTurn);
+  } else if(game->CastlingRights[side][QueenSide] && move->Piece == Rook &&
+            move->From == A1+offset) {
+    ret = side == White ? LostQueenSideWhite : LostQueenSideBlack;
+    game->CastlingRights[side][QueenSide] = false;
+  } else if(game->CastlingRights[side][KingSide] && move->Piece == Rook &&
+            move->From == H1+offset) {
+    ret = side == White ? LostKingSideWhite : LostKingSideBlack;
+    game->CastlingRights[side][KingSide] = false;
   }
 
   return ret;

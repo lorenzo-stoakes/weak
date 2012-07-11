@@ -21,11 +21,12 @@
 #define INIT_MOVE_LEN 100
 
 enum CastleEvent {
-  NoCastleEvent = 1 << 0,
-  LostKingSideWhite = 1 << 1,
-  LostQueenSideWhite = 1 << 2,
-  LostKingSideBlack = 1 << 3,
-  LostQueenSideBlack = 1 << 4
+  NoCastleEvent = 0,
+  LostKingSideWhite = 1 << 0,
+  LostQueenSideWhite = 1 << 1,
+  LostKingSideBlack = 1 << 2,
+  LostQueenSideBlack = 1 << 3
+};
 };
 
 enum File {
