@@ -11,32 +11,6 @@
 #define FEN4a "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"
 #define FEN4b "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"
 
-// Initialise lookup tables, etc.
-static void
-init()
-{
-  GetMoveTargets[Pawn] = NULL;
-  GetMoveTargets[Knight] = &KnightMoveTargets;
-  GetMoveTargets[Bishop] = &BishopMoveTargets;
-  GetMoveTargets[Rook] = &RookMoveTargets;
-  GetMoveTargets[Queen] = &QueenMoveTargets;
-  GetMoveTargets[King] = &KingMoveTargets;
-
-  GetCaptureTargets[Pawn] = NULL;
-  GetCaptureTargets[Knight] = &KnightCaptureTargets;
-  GetCaptureTargets[Bishop] = &BishopCaptureTargets;
-  GetCaptureTargets[Rook] = &RookCaptureTargets;
-  GetCaptureTargets[Queen] = &QueenCaptureTargets;
-  GetCaptureTargets[King] = &KingCaptureTargets;
-
-  InitKnight();
-  InitRays();
-
-  // Relies on above.
-  InitMagics();
-  InitCanSlideAttacks();
-}
-
 int
 main(int argc, char **argv)
 {
@@ -67,7 +41,7 @@ main(int argc, char **argv)
   puts("WeakC v0.0.dev.\n");
 
   printf("Initialising... ");
-  init();
+  InitEngine();
   game = ParseFen(FEN1);
   puts("done.\n");
 
