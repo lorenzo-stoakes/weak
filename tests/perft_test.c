@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include "../weak.h"
+#include "test.h"
 
 #if defined(QUICK_TEST)
 #define MAX_DEPTH 4
