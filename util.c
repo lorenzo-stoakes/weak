@@ -19,12 +19,6 @@ allocateZero(size_t size, size_t num)
   return calloc(num, size);
 }
 
-// Wrapper for free. We might change the implementation later.
-void
-release(void *ptr)
-{
-  free(ptr);
-}
 
 void
 panic(char *msg, ...)
@@ -45,3 +39,11 @@ panic(char *msg, ...)
 
   abort();
 }
+
+// Wrapper for free. We might change the implementation later.
+void
+release(void *ptr)
+{
+  free(ptr);
+}
+
