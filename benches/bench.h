@@ -4,7 +4,8 @@
 #include "../weak.h"
 
 #define BENCH_COUNT 1
-#define MIN_ELAPSED 100
+// Minimum elapsed time to take a measurement from, in ms.
+#define MIN_ELAPSED 1000
 
 // perft_bench.c
 void BenchPerft(void);
