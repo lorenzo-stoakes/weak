@@ -4,6 +4,8 @@
 #include <strings.h>
 #include "weak.h"
 
+// We violate naming convention here for familiarity-with-go's sake. :-) TODO: Fix.
+
 // Wrapper for malloc. We might change the implementation later.
 void*
 allocate(size_t size, size_t num)
