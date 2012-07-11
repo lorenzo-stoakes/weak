@@ -95,7 +95,7 @@ TestPerft()
         sprintf(tmp, "Perft Position %d: Expected EnPassants of %llu, got %llu.\n",
                 i+1, expected.EnPassants, actual.EnPassants);
         AppendString(&builder, tmp);
-      }      
+      }
 
     }
   }
