@@ -30,7 +30,9 @@ ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 void
 ChessSetRemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
-  chessSet->Occupancy ^= POSBOARD(pos);
+  BitBoard complement = ~POSBOARD(pos);
+
+  chessSet->Occupancy &= complement;
   chessSet->EmptySquares = ~chessSet->Occupancy;
 
   SetRemovePiece(&chessSet->Sets[side], piece, pos);
