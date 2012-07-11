@@ -12,4 +12,4 @@ analysis
 # Binaries.
 
 weak
-test/test
+tests/test
