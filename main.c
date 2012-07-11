@@ -46,7 +46,7 @@ main(int argc, char **argv)
   count = QuickPerft(&game, plies);
 #endif
   ticks = clock() - ticks;
-  elapsed = ((double)ticks)/CLOCKS_PER_SEC;
+  elapsed = 1000*((double)ticks)/CLOCKS_PER_SEC;
 
   printf("%d plies.\n", plies);
 
@@ -54,10 +54,10 @@ main(int argc, char **argv)
   puts(StringPerft(&stats));
 #else
   printf("%llu moves.\n", count);
-  printf("%llu nps.\n\n", (uint64_t)(count/elapsed));
+  printf("%f nps.\n\n", 1000*count/elapsed);
 #endif
 
-  printf("%f ms elapsed.\n", 1000*elapsed);
+  printf("%f ms elapsed.\n", elapsed);
 
   return 0;
 }
