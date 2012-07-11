@@ -21,8 +21,7 @@ allocateZero(size_t size, size_t num)
 void
 release(void *ptr)
 {
-  // For now this doesn't want to work properly. TODO: Revisit.
-  //  free(ptr);
+  free(ptr);
 }
 
 void
