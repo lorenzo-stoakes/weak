@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <sys/time.h>
+#include <time.h>
 #include "weak.h"
 
 //#define GET_FULL_PERFT
@@ -14,7 +14,6 @@
 int
 main(int argc, char **argv)
 {
-  double elapsed;
   Game game;
   int plies;
 #if defined(GET_FULL_PERFT)
@@ -22,7 +21,8 @@ main(int argc, char **argv)
 #else
   uint64_t count;
 #endif
-  struct timeval start, end;
+  clock_t ticks;
+  double elapsed;
 
   // Use unbuffered output.
   setbuf(stdout, NULL);
@@ -47,16 +47,14 @@ main(int argc, char **argv)
 
   puts(StringChessSet(&game.ChessSet));
 
-  gettimeofday(&start, NULL);
+  ticks = clock();
 #if defined(GET_FULL_PERFT)
   stats = Perft(&game, plies);
 #else
   count = QuickPerft(&game, plies);
 #endif
-  gettimeofday(&end, NULL);
-
-  elapsed = (end.tv_sec - start.tv_sec) * 1000.0;
-  elapsed += (end.tv_usec - start.tv_usec) / 1000.0;
+  ticks = clock() - ticks;
+  elapsed = ((double)ticks)/CLOCKS_PER_SEC;
 
   printf("%d plies.\n", plies);
 
@@ -64,10 +62,10 @@ main(int argc, char **argv)
   puts(StringPerft(&stats));
 #else
   printf("%llu moves.\n", count);
-  printf("%llu nps.\n\n", (uint64_t)(1000*count/elapsed));
+  printf("%llu nps.\n\n", (uint64_t)(count/elapsed));
 #endif
 
-  printf("%f ms elapsed.\n", elapsed);
+  printf("%f ms elapsed.\n", 1000*elapsed);
 
   return 0;
 }
