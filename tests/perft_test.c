@@ -67,30 +67,31 @@ TestPerft()
   // We want an initial newline so perft test results appear on separate lines.
   AppendString(&builder, "\n");
 
-  for(i = 0; i < POSITION_COUNT; i++) {
+  for(i = 0; i < PERFT_COUNT; i++) {
     game = ParseFen(fens[i]);
-    for(j = 0; j < expectedDepthCounts[i] && j < MAX_DEPTH; j++) {
-      expected = expecteds[i][j];
-      actual = Perft(&game, j+1);
+    for(j = 1; j <= expectedDepthCounts[i] && j <= MAX_DEPTH; j++) {
+      expected = expecteds[i][j-1];
+      actual = Perft(&game, j);
 
       if(actual.Count != expected.Count) {
-        sprintf(tmp, "Perft Position %d: Expected Count of %llu, got %llu.\n",
-                i+1, expected.Count, actual.Count);
+        sprintf(tmp, "Perft Position %d Depth %d: Expected Count of %llu, got %llu.\n",
+                i+1, j, expected.Count, actual.Count);
         AppendString(&builder, tmp);
       }
 
       if(actual.Captures != expected.Captures) {
-        sprintf(tmp, "Perft Position %d: Expected Captures of %llu, got %llu.\n",
-                i+1, expected.Captures, actual.Captures);
+        sprintf(tmp, "Perft Position %d Depth %d: Expected Captures of %llu, got %llu.\n",
+                i+1, j, expected.Captures, actual.Captures);
         AppendString(&builder, tmp);
       }
 
       if(actual.EnPassants != expected.EnPassants) {
-        sprintf(tmp, "Perft Position %d: Expected EnPassants of %llu, got %llu.\n",
-                i+1, expected.EnPassants, actual.EnPassants);
+        sprintf(tmp, "Perft Position %d Depth %d: Expected EnPassants of %llu, got %llu.\n",
+                i+1, j, expected.EnPassants, actual.EnPassants);
         AppendString(&builder, tmp);
       }
 
+      // TODO: Other fields
     }
   }
 
