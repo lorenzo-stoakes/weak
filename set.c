@@ -29,7 +29,7 @@ NewEmptySet()
   }
 
   ret.Occupancy = EmptyBoard;
-  ret.EmptySquares = EmptyBoard;  
+  ret.EmptySquares = FullyOccupied;
 
   return ret;
 }

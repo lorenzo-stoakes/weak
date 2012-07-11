@@ -57,7 +57,7 @@ NewEmptyChessSet()
   ret.Sets[White] = NewEmptySet();
   ret.Sets[Black] = NewEmptySet();
   ret.Occupancy = EmptyBoard;
-  ret.EmptySquares = EmptyBoard;
+  ret.EmptySquares = FullyOccupied;
 
   return ret;
 }
