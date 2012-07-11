@@ -17,8 +17,7 @@ main(int argc, char **argv)
   clock_t ticks;
   double elapsed;
 
-  // Use unbuffered output.
-  setbuf(stdout, NULL);
+  SetUnbufferedOutput();
 
   if(argc <= 1) {
     printf("Usage: %s [perft plies]\n", argv[0]);

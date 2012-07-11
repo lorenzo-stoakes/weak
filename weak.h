@@ -436,6 +436,7 @@ void* allocate(size_t, size_t);
 void* allocateZero(size_t, size_t);
 void  release(void*);
 void  panic(char*, ...);
+void  SetUnbufferedOutput(void);
 
 BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
 BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);

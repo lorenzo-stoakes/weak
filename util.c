@@ -47,3 +47,10 @@ release(void *ptr)
   free(ptr);
 }
 
+// Set stdout output unbuffered.
+void
+SetUnbufferedOutput()
+{
+  // Use unbuffered output.
+  setbuf(stdout, NULL);
+}
