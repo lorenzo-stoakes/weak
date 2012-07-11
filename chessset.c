@@ -21,7 +21,7 @@ Checked(ChessSet *chessSet, Side side)
 void
 ChessSetPlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
-  chessSet->Occupancy ^= POSBOARD(pos);
+  chessSet->Occupancy |= POSBOARD(pos);
   chessSet->EmptySquares = ~chessSet->Occupancy;
 
   SetPlacePiece(&chessSet->Sets[side], piece, pos);
