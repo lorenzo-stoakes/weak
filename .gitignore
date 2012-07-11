@@ -6,6 +6,10 @@
 .#*
 
 # I often output profile files to this name.
+
 analysis
-# Binary.
+
+# Binaries.
+
 weak
+test/test
