@@ -15,14 +15,14 @@
 static void
 init()
 {
-  GetMoveTargets[Pawn] = &PawnPushTargets;
+  GetMoveTargets[Pawn] = NULL;
   GetMoveTargets[Knight] = &KnightMoveTargets;
   GetMoveTargets[Bishop] = &BishopMoveTargets;
   GetMoveTargets[Rook] = &RookMoveTargets;
   GetMoveTargets[Queen] = &QueenMoveTargets;
   GetMoveTargets[King] = &KingMoveTargets;
 
-  GetCaptureTargets[Pawn] = &PawnCaptureTargets;
+  GetCaptureTargets[Pawn] = NULL;
   GetCaptureTargets[Knight] = &KnightCaptureTargets;
   GetCaptureTargets[Bishop] = &BishopCaptureTargets;
   GetCaptureTargets[Rook] = &RookCaptureTargets;
