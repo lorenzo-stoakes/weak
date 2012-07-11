@@ -9,7 +9,7 @@ AppendCastleEvent(CastleEventSlice *slice, CastleEvent event)
 {
   CastleEvent *buffer;
 
-  // TODO: Avoid duplication :-)  
+  // TODO: Avoid duplication :-)
 
   if(slice->Len > slice->Cap) {
     panic("CastleEventSlice->Len %d > CastleEventSlice->Cap %d - Impossible!", slice->Len,
@@ -47,7 +47,7 @@ PopCastleEvent(CastleEventSlice *slice)
   CastleEvent ret;
 
   if(slice->Len <= 0) {
-    panic("Invaild slice length %d on PopCastleEvent().", slice->Len);    
+    panic("Invaild slice length %d on PopCastleEvent().", slice->Len);
   }
 
   ret = slice->Vals[slice->Len-1];
