@@ -12,7 +12,7 @@ AppendPiece(PieceSlice *slice, Piece piece)
   }
 
   slice->Vals[slice->Len] = piece;
-  slice->Len = slice->Len+1;
+  slice->Len++;
 }
 
 Piece
