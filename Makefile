@@ -15,7 +15,8 @@ FILTER_FILES=Makefile %.h
 all: weak
 
 weak: $(CODE_FILES)
-	$(CC) $(CFLAGS) $(filter-out %.h, $^) -o $@
+    # Remove trailing whitespace in all .c, .h files.
+	find . -name '*.h' -or -name '*.c' -or -name 'Makefile' -print0 | xargs -0 -I _ sed -i '' 's/[ ]*$$//' _
 	$(CC) $(CFLAGS) $(filter-out $(FILTER_FILES), $^) -o $@
 
 # Typically, we don't want to run long-running benchmarks. Default to QUICK_BENCH.
