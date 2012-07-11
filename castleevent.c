@@ -1,7 +1,7 @@
 #include <string.h>
 #include "weak.h"
 
-static const int INIT_CASTLE_EVENT_COUNT = 4;
+static const int INIT_CASTLE_EVENT_COUNT = 10;
 
 // Append CastleEvent to specified CastleEvent slice.
 void
