@@ -112,6 +112,7 @@ typedef enum Rank               Rank;
 typedef enum File               File;
 typedef struct Set              Set;
 typedef enum Side               Side;
+typedef struct StringBuilder    StringBuilder;
 
 struct CastleEventSlice {
   int Len, Cap;
@@ -161,6 +162,14 @@ struct Move {
 
 struct PerftStats {
   uint64_t Count, Captures, EnPassants, Castles, Promotions, Checks, Checkmates;
+};
+
+struct StringBuilder {
+  // Length is the total number of characters in the builder.
+  int Length;
+  // cap, len refer to the capacity/length of individual string elements in the builder.
+  int cap, len;
+  char **strings;
 };
 
 static const BitBoard
@@ -271,6 +280,13 @@ PopForward(BitBoard *bitBoard)
 
   return ret;
 }
+
+// builder.c
+void          AppendString(StringBuilder *, char*);
+char*         BuildString(StringBuilder*, bool);
+StringBuilder NewStringBuilder(void);
+void          ReleaseStringBuilder(StringBuilder*);
+
 
 bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
