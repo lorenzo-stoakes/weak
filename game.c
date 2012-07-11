@@ -42,7 +42,7 @@ DoCastleKingSide(Game *game)
   int offset = game->WhosTurn*8*7;
 
   ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
-  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G1 + offset);  
+  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G1 + offset);
   ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1 + offset);
   ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1 + offset);
 }
@@ -53,7 +53,7 @@ DoCastleQueenSide(Game *game)
   int offset = game->WhosTurn*8*7;
 
   ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
-  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);  
+  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);
   ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1 + offset);
   ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1 + offset);
 }
