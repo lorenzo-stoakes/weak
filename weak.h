@@ -145,8 +145,7 @@ struct ChessSet {
 };
 
 struct Game {
-  bool        CastleKingSideWhite, CastleQueenSideWhite;
-  bool        CastleKingSideBlack, CastleQueenSideBlack;
+  bool        CastlingRights[2][2];
   ChessSet    ChessSet;
   bool        Debug;
   MoveHistory History;
@@ -165,12 +164,10 @@ struct PerftStats {
 };
 
 static const BitBoard
-  CastleKingSideBlackMask        =  C64(0x6000000000000000),
-  CastleKingSideWhiteMask        =  C64(0x0000000000000060),
-  CastleQueenSideWhiteMask       =  C64(0x000000000000000e),
-  CastleQueenSideWhiteAttackMask =  C64(0x000000000000000c),
-  CastleQueenSideBlackMask       =  C64(0x0e00000000000000),
-  CastleQueenSideBlackAttackMask =  C64(0x0c00000000000000),
+  CastlingAttackMasks[2][2]      = {{ C64(0x0000000000000060), C64(0x000000000000000c) },
+                                    { C64(0x6000000000000000), C64(0x0c00000000000000) }},
+  CastlingMasks[2][2]            = {{ C64(0x0000000000000060), C64(0x000000000000000e) },
+                                    { C64(0x6000000000000000), C64(0x0e00000000000000) }},
   CentralSquaresMask             =  C64(0x0000003c3c000000),
   EdgeMask                       =  C64(0xff818181818181ff),
   EmptyBoard                     =  C64(0x0000000000000000),

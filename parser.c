@@ -111,16 +111,16 @@ ParseFen(char *fen)
 
       switch(chr) {
       case 'K':
-        ret.CastleKingSideWhite = true;
+        ret.CastlingRights[White][KingSide] = true;
         break;
       case 'k':
-        ret.CastleKingSideBlack = true;
+        ret.CastlingRights[Black][KingSide] = true;
         break;
       case 'Q':
-        ret.CastleQueenSideWhite = true;
+        ret.CastlingRights[White][QueenSide] = true;
         break;
       case 'q':
-        ret.CastleQueenSideBlack = true;
+        ret.CastlingRights[Black][QueenSide] = true;
         break;
       case ' ':
         goto done;
