@@ -27,6 +27,10 @@ enum CastleEvent {
   LostKingSideBlack = 1 << 2,
   LostQueenSideBlack = 1 << 3
 };
+
+enum CastleSide {
+  KingSide,  
+  QueenSide
 };
 
 enum File {
@@ -93,6 +97,7 @@ enum Side {
 typedef uint64_t                BitBoard;
 typedef enum CastleEvent        CastleEvent;
 typedef struct CastleEventSlice CastleEventSlice;
+typedef enum CastleSide         CastleSide;
 typedef struct ChessSet         ChessSet;
 typedef struct Game             Game;
 typedef struct Move             Move;
