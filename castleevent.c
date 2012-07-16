@@ -3,12 +3,12 @@
 
 static const int INIT_CASTLE_EVENT_COUNT = 100;
 
+static void expand(CastleEventSlice *slice);
+
 // Append CastleEvent to specified CastleEvent slice.
 void
 AppendCastleEvent(CastleEventSlice *slice, CastleEvent event)
 {
-  CastleEvent *buffer;
-
   // TODO: Avoid duplication :-)
 
   if(slice->Len > slice->Cap) {
@@ -16,13 +16,8 @@ AppendCastleEvent(CastleEventSlice *slice, CastleEvent event)
           slice->Cap);
   }
 
-  // Expand.
   if(slice->Len == slice->Cap) {
-    slice->Cap *= 2;
-    buffer = (CastleEvent*)allocate(sizeof(CastleEvent), slice->Cap);
-    memcpy(buffer, slice->Vals, slice->Len);
-    release(slice->Vals);
-    slice->Vals = buffer;
+    expand(slice);
   }
 
   slice->Vals[slice->Len] = event;
@@ -54,4 +49,16 @@ PopCastleEvent(CastleEventSlice *slice)
   slice->Len--;
 
   return ret;
+}
+
+static void
+expand(CastleEventSlice *slice)
+{
+  CastleEvent *buffer;  
+
+  slice->Cap *= 2;
+  buffer = (CastleEvent*)allocate(sizeof(CastleEvent), slice->Cap);
+  memcpy(buffer, slice->Vals, slice->Len*sizeof(CastleEvent*));
+  release(slice->Vals);
+  slice->Vals = buffer;  
 }
