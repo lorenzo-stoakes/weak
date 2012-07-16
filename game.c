@@ -31,6 +31,8 @@ Checkmated(Game *game)
   Move buffer[INIT_MOVE_LEN];
   MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
 
+  // TODO: When *first* move returned, return false.
+
   AllMoves(&slice, game);
 
   return slice.Len == 0 && Checked(&game->ChessSet, game->WhosTurn);
@@ -67,6 +69,12 @@ DoMove(Game *game, Move *move)
   Position enPassant;
   Rank offset;
   Side opposite = OPPOSITE(game->WhosTurn);
+
+  // Store previous en passant square.
+  AppendEnpassantSquare(&game->History.EnPassantSquares, game->EnPassantSquare);
+
+  // Assume empty, change if necessary.
+  game->EnPassantSquare = EmptyPosition;
 
   switch(move->Type) {
   default:
@@ -137,6 +145,12 @@ DoMove(Game *game, Move *move)
       break;
     case Normal:
       piece = move->Piece;
+
+      if(piece == Pawn && RANK(move->From) == Rank2 + (game->WhosTurn*5) &&
+         RANK(move->To) == Rank4 + (game->WhosTurn*1)) {
+        game->EnPassantSquare = move->From + (game->WhosTurn == White ? 8 : -8);
+      }
+
       break;
     default:
       panic("Impossible.");
@@ -160,7 +174,7 @@ DoMove(Game *game, Move *move)
 bool
 ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
 {
-  bool checked, ret;
+  bool checked;
   BitBoard king;
   ChessSet clone;
   Piece piece;
@@ -173,12 +187,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
     // Castles are already checked for potential check scenarios.
     return false;
   case EnPassant:
-    // TODO: Find a cleaner means of testing this for en passant.
-
-    DoMove(game, move);
-    ret = Checked(&game->ChessSet, OPPOSITE(game->WhosTurn));
-    Unmove(game);
-    return ret;
+    break;
   case Normal:
     // Are we moving the king?
     if(move->Piece == King) {
@@ -198,7 +207,7 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
 
   if(!checked) {
     // If not checked and piece being moved is not attacked, can't expose check.
-    if((POSBOARD(move->From) & kingThreats) == EmptyBoard) {
+    if(move->Type != EnPassant && (POSBOARD(move->From) & kingThreats) == EmptyBoard) {
       return false;
     }
 
@@ -221,11 +230,17 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
   clone = game->ChessSet;
 
   ChessSetRemovePiece(&clone, side, move->Piece, move->From);
-  if(move->Capture) {
+
+  if(move->Type == EnPassant) {
+    ChessSetRemovePiece(&clone, OPPOSITE(side), Pawn,
+                        move->To + (game->WhosTurn == White ? -8 : 8));
+  } else if(move->Capture) {
     piece = PieceAt(&clone.Sets[OPPOSITE(side)], move->To);
     ChessSetRemovePiece(&clone, OPPOSITE(side), piece, move->To);
   }
+
   ChessSetPlacePiece(&clone, side, move->Piece, move->To);
+
   return Checked(&clone, side);
 }
 
@@ -347,6 +362,8 @@ Stalemated(Game *game)
   Move buffer[INIT_MOVE_LEN];
   MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
 
+  // TODO: When *first* move returned, return false.
+
   AllMoves(&slice, game);
 
   return slice.Len == 0 && !Checked(&game->ChessSet, game->WhosTurn);
@@ -441,6 +458,8 @@ Unmove(Game *game)
     panic("Unrecognised move type %d.", move.Type);
   }
 
+  game->EnPassantSquare = PopEnPassantSquare(&game->History.EnPassantSquares);
+
   castleEvent = PopCastleEvent(&game->History.CastleEvents);
 
   if(castleEvent == NoCastleEvent) {
@@ -534,8 +553,7 @@ static void
 pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
 {
   int k;
-  BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassants,
-    fromBoard, toBoard;
+  BitBoard pushSources, captureSources, pushTargets, captureTargets, fromBoard, toBoard;
   Move move;
   MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
   Position from, to;
@@ -543,9 +561,6 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
 
   pushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
   captureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
-
-  enPassants = game->ChessSet.Sets[game->WhosTurn].Boards[Pawn] &
-    (game->WhosTurn == White ? Rank5Mask : Rank4Mask);
 
   // Pushes.
   while(pushSources) {
@@ -606,33 +621,36 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
 
   // En passant.
 
-  while(enPassants) {
-    from = PopForward(&enPassants);
+  if(game->EnPassantSquare == EmptyPosition) {
+    return;
+  }
 
-    fromBoard = POSBOARD(from);
-    switch(game->WhosTurn) {
-    case White:
-      toBoard = NoWeOne(fromBoard) | NoEaOne(fromBoard);
-      break;
-    case Black:
-      toBoard = SoWeOne(fromBoard) | SoEaOne(fromBoard);
-      break;
-    default:
-      panic("Unrecognised side %d.", game->WhosTurn);
-      break;
-    }
+  toBoard = POSBOARD(game->EnPassantSquare);
 
-    while(toBoard) {
-      to = PopForward(&toBoard);
+  switch(game->WhosTurn) {
+  case White:
+    fromBoard = SoWeOne(toBoard) | SoEaOne(toBoard);
+    break;
+  case Black:
+    fromBoard = NoWeOne(toBoard) | NoEaOne(toBoard);
+    break;
+  default:
+    panic("Unrecognised side %d.", game->WhosTurn);
+  }
 
-      move.Piece = Pawn;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = EnPassant;
-      if(Legal(game, &move)) {
-        AppendMove(slice, move);
-      }
+  fromBoard &= game->ChessSet.Sets[game->WhosTurn].Boards[Pawn];
+
+  while(fromBoard) {
+    from = PopForward(&fromBoard);
+
+    move.Piece = Pawn;
+    move.From = from;
+    move.To = game->EnPassantSquare;
+    move.Capture = true;
+    move.Type = EnPassant;
+
+    if(!ExposesCheck(game, kingThreats, &move)) {
+      AppendMove(slice, move);
     }
   }
 }
@@ -728,13 +746,9 @@ castleLegal(Game *game, CastleSide castleSide)
 static bool
 pawnLegal(Game *game, Move *move)
 {
-  BitBoard expectedFromBoard, lastToBoard, sources, targets, validToRankMask;
+  BitBoard sources, targets, validToRankMask;
   BitBoard fromBoard = POSBOARD(move->From), toBoard = POSBOARD(move->To);
-  int dist;
-  MoveSlice hist;
-  Move lastMove;
-  Position expectedTo, lastFrom, lastTo;
-  Rank expectedRank, offset, rank;
+  Rank expectedRank, rank;
 
   switch(move->Type) {
   default:
@@ -745,43 +759,23 @@ pawnLegal(Game *game, Move *move)
       return false;
     }
 
-    // We have to check the last move to see whether en passant is valid.
-    hist = game->History.Moves;
-    if(hist.Len == 0) {
-      return false;
-    }
-    lastMove = hist.Vals[hist.Len-1];
-    lastFrom = lastMove.From;
-    lastTo = lastMove.To;
-    if(lastMove.Piece != Pawn) {
-      return false;
-    }
-    dist = RANK(lastFrom) - RANK(lastTo);
-    if(dist != 2 && dist != -2) {
+    // Has to be to the en passant square, of course!
+    if(move->To != game->EnPassantSquare) {
       return false;
     }
 
-    // En passant has to originate from either side of where the pawn has now moved.
-    lastToBoard = POSBOARD(lastTo);
-    expectedFromBoard = WestOne(lastToBoard) | EastOne(lastToBoard);
-    if((fromBoard&expectedFromBoard) != fromBoard) {
-      return false;
+    // From has to be from one of the two possible sources for an attack on the en passant
+    // square.
+    switch(game->WhosTurn) {
+    case White:
+      return ((SoWeOne(toBoard)|SoEaOne(toBoard))&fromBoard) != EmptyBoard;
+    case Black:
+      return ((NoWeOne(toBoard)|NoEaOne(toBoard))&fromBoard) != EmptyBoard;
+    default:
+      panic("Invalid side %d.", game->WhosTurn);
     }
 
-    // Have to capture into square immediately behind just moved opposing pawn.
-    if(game->WhosTurn == White) {
-      offset = -1;
-    } else if(game->WhosTurn == Black) {
-      offset = 1;
-    } else {
-      panic("Unrecognised side %d.", game->WhosTurn);
-    }
-    expectedTo = POSITION(RANK(lastFrom)+offset, FILE(lastFrom));
-    if(move->To != expectedTo) {
-      return false;
-    }
-
-    return true;
+    panic("Impossible.");
   case PromoteKnight:
   case PromoteBishop:
   case PromoteRook:

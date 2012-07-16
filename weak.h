@@ -110,6 +110,7 @@ typedef enum CastleEvent        CastleEvent;
 typedef struct CastleEventSlice CastleEventSlice;
 typedef enum CastleSide         CastleSide;
 typedef struct ChessSet         ChessSet;
+typedef struct EnPassantSlice   EnPassantSlice;
 typedef struct Game             Game;
 typedef struct Move             Move;
 typedef struct MoveHistory      MoveHistory;
@@ -130,6 +131,11 @@ struct CastleEventSlice {
   CastleEvent *Vals;
 };
 
+struct EnPassantSlice {
+  int Len, Cap;
+  Position *Vals;
+};
+
 struct MoveSlice {
   int Len, Cap;
   Move *Vals;
@@ -147,6 +153,7 @@ struct Set {
 
 struct MoveHistory {
   CastleEventSlice CastleEvents;
+  EnPassantSlice   EnPassantSquares;
   MoveSlice        Moves;
   PieceSlice       CapturedPieces;
 };
@@ -320,6 +327,11 @@ void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
+
+// enpassant.c
+void           AppendEnpassantSquare(EnPassantSlice*, Position);
+EnPassantSlice NewEnPassantSlice(void);
+Position       PopEnPassantSquare(EnPassantSlice*);
 
 // game.c
 void AllMoves(MoveSlice*, Game*);
