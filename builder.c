@@ -33,19 +33,24 @@ BuildString(StringBuilder *builder, bool releaseBuilder)
   char *ret;
   int i, j, k;
 
+  char *str;
+
   if(builder->Length <= 0) {
     return NULL;
   }
 
-  ret = (char*)allocate(sizeof(char), builder->Length);
+  ret = (char*)allocate(sizeof(char), builder->Length + 1);
 
   k = 0;
   for(i = 0; i < builder->len && k < builder->Length; i++) {
-    for(j = 0; builder->strings[i][j] != '\0'; j++) {
-      ret[k] = builder->strings[i][j];
+    str = builder->strings[i];
+    for(j = 0; str[j] != '\0'; j++) {
+      ret[k] = str[j];
       k++;
     }
   }
+
+  ret[k] = '\0';
 
   if(releaseBuilder) {
     ReleaseStringBuilder(builder);
