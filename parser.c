@@ -81,15 +81,19 @@ ParseFen(char *fen)
     if(file < 0) {
       panic("Too many pieces in the file at position %d.", i);
     }
-    for(side = White; side <= Black; side++) {
-      panic("No %s king.", StringSide(side));
-    }
 
     pos = POSITION(rank, file);
     ret.ChessSet.Sets[side].Boards[piece] |= POSBOARD(pos);
 
     file++;
   }
+
+  for(side = White; side <= Black; side++) {
+    if(!seenKing[side]) {
+      panic("No %s king.", StringSide(side));
+    }
+  }
+
   if(i+2 >= len) {
     panic("FEN string does not contain enough characters to determine position.");
   }
