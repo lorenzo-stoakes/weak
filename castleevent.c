@@ -54,11 +54,11 @@ PopCastleEvent(CastleEventSlice *slice)
 static void
 expand(CastleEventSlice *slice)
 {
-  CastleEvent *buffer;  
+  CastleEvent *buffer;
 
   slice->Cap *= 2;
   buffer = (CastleEvent*)allocate(sizeof(CastleEvent), slice->Cap);
   memcpy(buffer, slice->Vals, slice->Len*sizeof(CastleEvent*));
   release(slice->Vals);
-  slice->Vals = buffer;  
+  slice->Vals = buffer;
 }
