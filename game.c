@@ -331,6 +331,7 @@ NewGame(bool debug, Side humanSide)
 
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
+  ret.EnPassantSquare = EmptyPosition;
   ret.History = NewMoveHistory();
   ret.HumanSide = humanSide;
   ret.WhosTurn = White;
