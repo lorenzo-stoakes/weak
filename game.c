@@ -331,9 +331,9 @@ NewGame(bool debug, Side humanSide)
 
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
-  ret.WhosTurn = White;
-  ret.HumanSide = humanSide;
   ret.History = NewMoveHistory();
+  ret.HumanSide = humanSide;
+  ret.WhosTurn = White;
 
   return ret;
 }
