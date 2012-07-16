@@ -179,7 +179,7 @@ struct PerftStats {
 struct StringBuilder {
   // Length is the total number of characters in the builder.
   int Length;
-  // cap, len refer to the capacity/length of individual string elements in the builder.
+  // cap, len refer to the capacity/length of the number of strings in the builder.
   int cap, len;
   char **strings;
 };
