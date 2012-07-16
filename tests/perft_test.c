@@ -69,6 +69,7 @@ TestPerft()
 
   for(i = 0; i < PERFT_COUNT; i++) {
     game = ParseFen(fens[i]);
+
     for(j = 1; j <= expectedDepthCounts[i] && j <= MAX_DEPTH; j++) {
       expected = expecteds[i][j-1];
       actual = Perft(&game, j);
