@@ -90,7 +90,7 @@ expand(StringBuilder *builder)
 
   builder->cap *= 2;
   buffer = (char**)allocate(sizeof(char*), builder->cap);
-  memcpy(buffer, builder->strings, builder->len);
+  memcpy(buffer, builder->strings, builder->len*sizeof(char*));
   release(builder->strings);
   builder->strings = buffer;
 }
