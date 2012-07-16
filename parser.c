@@ -10,7 +10,8 @@ ParseFen(char *fen)
   bool seenKing[2] = { false, false };
   char chr;
   int i, len;
-  // Make file/rank integers so we can make them negative to detect errors. Both are unsigned. TODO: fix.
+  // Make file/rank integers so we can make them negative to detect errors. Both are unsigned.
+  // TODO: fix.
   int file, rank;
   Game ret = NewEmptyGame(false, White);
   Piece piece;
@@ -80,6 +81,9 @@ ParseFen(char *fen)
     if(file < 0) {
       panic("Too many pieces in the file at position %d.", i);
     }
+    for(side = White; side <= Black; side++) {
+      panic("No %s king.", StringSide(side));
+    }
 
     pos = POSITION(rank, file);
     ret.ChessSet.Sets[side].Boards[piece] |= POSBOARD(pos);
@@ -131,10 +135,30 @@ ParseFen(char *fen)
   }
 
   if(i == len) {
-    panic("FEN '%s' ended without en passant square or half/full clock times.", fen);
+    panic("FEN '%s' ended without en passant square.", fen);
   }
 
-  // TODO: Implement parsing of en passant square + clock times.
+  if(fen[i] != '-') {
+    if(len - i < 2) {
+      panic("Not enough space in fen string for non-empty en passant square.");
+    }
+
+    chr = fen[i];
+
+    if(chr < 'a' || chr > 'h') {
+      panic("Invalid file '%c'.", chr);
+    }
+    file = chr - 'a';
+
+    if(chr < '1' || chr > '8') {
+      panic("Invalid rank '%c'.", chr);
+    }
+    rank = chr - '1';
+
+    ret.EnPassantSquare = POSITION(file, rank);
+  }
+
+  // TODO: Implement parsing of clock times.
 
  done:
 
