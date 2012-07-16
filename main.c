@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "weak.h"
 
-//#define GET_FULL_PERFT
-
 int
 main(int argc, char **argv)
 {
