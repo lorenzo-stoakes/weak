@@ -334,7 +334,6 @@ EnPassantSlice NewEnPassantSlice(void);
 Position       PopEnPassantSquare(EnPassantSlice*);
 
 // game.c
-void AllMoves(MoveSlice*, Game*);
 bool Checkmated(Game*);
 void DoCastleKingSide(Game*);
 void DoCastleQueenSide(Game*);
@@ -372,6 +371,9 @@ void      AppendMove(MoveSlice*, Move);
 void      AppendMoves(MoveSlice*, MoveSlice*);
 MoveSlice NewMoveSlice(Move*, uint64_t);
 Move      PopMove(MoveSlice*);
+
+// movegen.c
+void AllMoves(MoveSlice*, Game*);
 
 // movehistory.c
 MoveHistory NewMoveHistory(void);
