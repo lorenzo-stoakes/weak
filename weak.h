@@ -282,14 +282,6 @@ Position BitScanBackward(BitBoard);
 Position BitScanForward(BitBoard);
 #endif
 
-BitBoard EastOne(BitBoard);
-BitBoard FlipDiagA1H8(BitBoard);
-BitBoard FlipVertical(BitBoard);
-BitBoard NoEaOne(BitBoard);
-BitBoard NortOne(BitBoard);
-BitBoard NoWeOne(BitBoard);
-int      PopCount(BitBoard);
-
 FORCE_INLINE Position
 PopForward(BitBoard *bitBoard)
 {
@@ -300,13 +292,31 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
+BitBoard FlipDiagA1H8(BitBoard);
+BitBoard FlipVertical(BitBoard);
+void     InitRays(void);
+int      PopCount(BitBoard);
 bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
-BitBoard SoEaOne(BitBoard);
+
+BitBoard NortOne(BitBoard);
+BitBoard NortRay(Position);
+BitBoard EastOne(BitBoard);
+BitBoard EastRay(Position);
 BitBoard SoutOne(BitBoard);
-BitBoard SoWeOne(BitBoard);
+BitBoard SoutRay(Position);
 BitBoard WestOne(BitBoard);
+BitBoard WestRay(Position);
+BitBoard NoEaOne(BitBoard);
+BitBoard NoEaRay(Position);
+BitBoard NoWeOne(BitBoard);
+BitBoard NoWeRay(Position);
+BitBoard SoEaOne(BitBoard);
+BitBoard SoEaRay(Position);
+BitBoard SoWeOne(BitBoard);
+BitBoard SoWeRay(Position);
+
 
 // chessset.c
 BitBoard KingThreats(ChessSet*, Side);
@@ -368,17 +378,6 @@ BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 // perft.c
 PerftStats Perft(Game*, int);
 uint64_t   QuickPerft(Game*, int);
-
-// position.c
-void     InitRays(void);
-BitBoard NortRay(Position);
-BitBoard EastRay(Position);
-BitBoard SoutRay(Position);
-BitBoard WestRay(Position);
-BitBoard NoEaRay(Position);
-BitBoard NoWeRay(Position);
-BitBoard SoEaRay(Position);
-BitBoard SoWeRay(Position);
 
 // queen.c
 BitBoard AllQueenCaptureTargets(ChessSet*, Side);
