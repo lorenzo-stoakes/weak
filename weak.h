@@ -322,6 +322,7 @@ void        DoCastleKingSide(Game*);
 void        DoCastleQueenSide(Game*);
 bool        ExposesCheck(Game*, BitBoard, Move*);
 void        InitCanSlideAttacks(void);
+void        InitEngine(void);
 bool        Legal(Game*, Move*);
 void        DoMove(Game*, Move*);
 Game        NewEmptyGame(bool, Side);
@@ -330,9 +331,6 @@ MoveHistory NewMoveHistory(void);
 bool        Stalemated(Game*);
 void        ToggleTurn(Game*);
 void        Unmove(Game*);
-
-// init.c
-void InitEngine(void);
 
 // king.c
 BitBoard KingKingThreats(ChessSet*, Side);
