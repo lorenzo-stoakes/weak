@@ -315,11 +315,6 @@ BitBoard SoutOne(BitBoard);
 BitBoard SoWeOne(BitBoard);
 BitBoard WestOne(BitBoard);
 
-// castleevent.c
-void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
-CastleEventSlice NewCastleEventSlice(void);
-CastleEvent      PopCastleEvent(CastleEventSlice*);
-
 // chessset.c
 BitBoard KingThreats(ChessSet*, Side);
 bool     Checked(ChessSet*, Side);
@@ -327,11 +322,6 @@ void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
 void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
-
-// enpassant.c
-void           AppendEnpassantSquare(EnPassantSlice*, Position);
-EnPassantSlice NewEnPassantSlice(void);
-Position       PopEnPassantSquare(EnPassantSlice*);
 
 // game.c
 bool Checkmated(Game*);
@@ -366,12 +356,6 @@ BitBoard KnightMoveTargets(ChessSet*, Side, BitBoard);
 // magic.c
 void InitMagics(void);
 
-// move.c
-void      AppendMove(MoveSlice*, Move);
-void      AppendMoves(MoveSlice*, MoveSlice*);
-MoveSlice NewMoveSlice(Move*, uint64_t);
-Move      PopMove(MoveSlice*);
-
 // movegen.c
 void AllMoves(MoveSlice*, Game*);
 
@@ -395,11 +379,6 @@ BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 // perft.c
 PerftStats Perft(Game*, int);
 uint64_t   QuickPerft(Game*, int);
-
-// piece.c
-void       AppendPiece(PieceSlice*, Piece);
-PieceSlice NewPieceSlice(void);
-Piece      PopPiece(PieceSlice*);
 
 // position.c
 void     InitRays(void);
@@ -436,6 +415,21 @@ Set   NewWhiteSet(void);
 Piece PieceAt(Set*, Position);
 void  SetPlacePiece(Set*, Piece, Position);
 void  SetRemovePiece(Set*, Piece, Position);
+
+// slices.c
+void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
+void             AppendEnpassantSquare(EnPassantSlice*, Position);
+void             AppendMove(MoveSlice*, Move);
+void             AppendMoves(MoveSlice*, MoveSlice*);
+void             AppendPiece(PieceSlice*, Piece);
+CastleEventSlice NewCastleEventSlice(void);
+EnPassantSlice   NewEnPassantSlice(void);
+MoveSlice        NewMoveSlice(Move*, uint64_t);
+PieceSlice       NewPieceSlice(void);
+CastleEvent      PopCastleEvent(CastleEventSlice*);
+Position         PopEnPassantSquare(EnPassantSlice*);
+Move             PopMove(MoveSlice*);
+Piece            PopPiece(PieceSlice*);
 
 // stringer.c
 char  CharPiece(Piece);
