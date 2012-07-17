@@ -644,11 +644,38 @@ updateCastlingRights(Game *game, Move *move)
   CastleEvent ret = NoCastleEvent;
   Side side = game->WhosTurn;
 
+  // TODO: Refactor.
+
   switch(move->Type) {
   default:
     return NoCastleEvent;
   case Normal:
-    if(move->Piece != King && move->Piece != Rook) {
+    if(move->Capture) {
+      switch(side) {
+      case White:
+        if(move->To == H8 && game->CastlingRights[Black][KingSide]) {
+          game->CastlingRights[Black][KingSide] = false;
+          ret |= LostKingSideBlack;
+        } else if(move->To == A8 && game->CastlingRights[Black][QueenSide]) {
+          game->CastlingRights[Black][QueenSide] = false;
+          ret |= LostQueenSideBlack;
+        }
+
+        break;
+      case Black:
+        if(move->To == H1 && game->CastlingRights[White][KingSide]) {
+          game->CastlingRights[White][KingSide] = false;
+          ret |= LostKingSideWhite;
+        } else if(move->To == A1 && game->CastlingRights[White][QueenSide]) {
+          game->CastlingRights[White][QueenSide] = false;
+          ret |= LostQueenSideWhite;
+        }
+
+        break;
+      default:
+        panic("Unrecognised side %d.", side);
+      }
+    } else if(move->Piece != King && move->Piece != Rook) {
       return NoCastleEvent;
     }
     break;
