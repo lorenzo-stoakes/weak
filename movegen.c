@@ -19,7 +19,6 @@ AllMoves(MoveSlice *slice, Game *game)
   castleMoves(game, slice);
 }
 
-
 static void
 castleMoves(Game *game, MoveSlice *ret)
 {
