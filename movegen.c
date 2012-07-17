@@ -1,6 +1,6 @@
 #include "weak.h"
 
-static void castleMoves(Game*, MoveSlice*);
+static void castleMoves(Game*, BitBoard, MoveSlice*);
 static void pawnMoves(Game*, BitBoard, MoveSlice*);
 static void pieceMoves(Piece, Game*, BitBoard, MoveSlice*);
 
@@ -16,74 +16,33 @@ AllMoves(MoveSlice *slice, Game *game)
   for(piece = Knight; piece <= King; piece++) {
     pieceMoves(piece, game, kingThreats, slice);
   }
-  castleMoves(game, slice);
+
+  castleMoves(game, kingThreats, slice);
 }
 
 static void
-castleMoves(Game *game, MoveSlice *ret)
+castleMoves(Game *game, BitBoard kingThreats, MoveSlice *ret)
 {
-  BitBoard initKing, initRooks;
-  bool doQueenSide = true, doKingSide = true;
-  Move kingSide, queenSide;
+  CastleSide castleSide;
+  Move move;
   Position king;
   Side side = game->WhosTurn;
-  // TODO: Add further checks, reduce duplication between this + castleLegal.
 
   king = E1 + side*8*7;
 
   // Add unneeded fields to prevent garbage in unassigned fields. TODO: Review
-  kingSide.Capture = false;
-  kingSide.From = king;
-  kingSide.Piece = King;
-  kingSide.Type = CastleKingSide;
-  kingSide.To = king + 2;
+  move.Capture = false;
+  move.From = king;
+  move.Piece = King;
+  move.To = king - 2;
 
-  queenSide.Capture = false;
-  queenSide.From = king;
-  queenSide.Piece = King;
-  queenSide.Type = CastleQueenSide;
-  queenSide.To = king - 2;
-
-  switch(side) {
-  case White:
-    initKing = InitWhiteKing;
-    initRooks = InitWhiteRooks;
-
-    break;
-  case Black:
-    initKing = InitBlackKing;
-    initRooks = InitBlackRooks;
-
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
-  }
-
-  // Some simple checks, before taking the expensive route.
-
-  // If the king has moved, or both rooks aren't present, we can't castle.
-  // TODO: Ridiculously coarse test, improve!
-  if((game->ChessSet.Occupancy & initKing) == EmptyBoard ||
-     (game->ChessSet.Occupancy & initRooks) == EmptyBoard) {
-    return;
-  }
-
-  // If we are obstructed, or don't have appropriate rights, can't castle.
-  if((game->ChessSet.Occupancy & CastlingMasks[side][KingSide]) != EmptyBoard ||
-     !game->CastlingRights[side][KingSide]) {
-    doKingSide = false;
-  }
-  if((game->ChessSet.Occupancy & CastlingMasks[side][QueenSide]) != EmptyBoard ||
-     !game->CastlingRights[side][QueenSide]) {
-    doQueenSide = false;
-  }
-
-  if(doKingSide && Legal(game, &kingSide)) {
-      AppendMove(ret, kingSide);
-  }
-
-  if(doQueenSide && Legal(game, &queenSide)) {
-    AppendMove(ret, queenSide);
+  for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
+    if(game->CastlingRights[side][castleSide] &&
+       (game->ChessSet.Occupancy&CastlingMasks[side][castleSide]) == EmptyBoard &&
+       (kingThreats&(POSBOARD(king)|CastlingAttackMasks[side][castleSide])) == EmptyBoard) {
+      move.Type = castleSide == KingSide ? CastleKingSide : CastleQueenSide;
+      AppendMove(ret, move);
+    }
   }
 }
 
