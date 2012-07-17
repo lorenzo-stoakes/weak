@@ -300,13 +300,6 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
-// builder.c
-void          AppendString(StringBuilder *, char*);
-char*         BuildString(StringBuilder*, bool);
-StringBuilder NewStringBuilder(void);
-void          ReleaseStringBuilder(StringBuilder*);
-
-
 bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
@@ -442,11 +435,15 @@ char* StringPosition(Position);
 char* StringSide(Side);
 
 // util.c
-void* allocate(size_t, size_t);
-void* allocateZero(size_t, size_t);
-void  release(void*);
-void  panic(char*, ...);
-void  SetUnbufferedOutput(void);
+void*         allocate(size_t, size_t);
+void*         allocateZero(size_t, size_t);
+void          release(void*);
+void          panic(char*, ...);
+void          AppendString(StringBuilder *, char*);
+char*         BuildString(StringBuilder*, bool);
+StringBuilder NewStringBuilder(void);
+void          ReleaseStringBuilder(StringBuilder*);
+void          SetUnbufferedOutput(void);
 
 BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
 BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);
