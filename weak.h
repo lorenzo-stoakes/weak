@@ -440,6 +440,8 @@ StringBuilder NewStringBuilder(void);
 void          ReleaseStringBuilder(StringBuilder*);
 void          SetUnbufferedOutput(void);
 
+// Move/Capture function arrays. Initialised in InitEngine() in game.c
+
 BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
 BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);
 
