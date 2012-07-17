@@ -317,18 +317,19 @@ ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
 
 // game.c
-bool Checkmated(Game*);
-void DoCastleKingSide(Game*);
-void DoCastleQueenSide(Game*);
-bool ExposesCheck(Game*, BitBoard, Move*);
-void InitCanSlideAttacks(void);
-bool Legal(Game*, Move*);
-void DoMove(Game*, Move*);
-Game NewEmptyGame(bool, Side);
-Game NewGame(bool, Side);
-bool Stalemated(Game*);
-void ToggleTurn(Game*);
-void Unmove(Game*);
+bool        Checkmated(Game*);
+void        DoCastleKingSide(Game*);
+void        DoCastleQueenSide(Game*);
+bool        ExposesCheck(Game*, BitBoard, Move*);
+void        InitCanSlideAttacks(void);
+bool        Legal(Game*, Move*);
+void        DoMove(Game*, Move*);
+Game        NewEmptyGame(bool, Side);
+Game        NewGame(bool, Side);
+MoveHistory NewMoveHistory(void);
+bool        Stalemated(Game*);
+void        ToggleTurn(Game*);
+void        Unmove(Game*);
 
 // init.c
 void InitEngine(void);
@@ -351,9 +352,6 @@ void InitMagics(void);
 
 // movegen.c
 void AllMoves(MoveSlice*, Game*);
-
-// movehistory.c
-MoveHistory NewMoveHistory(void);
 
 // parser.c
 Game ParseFen(char*);
