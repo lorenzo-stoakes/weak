@@ -317,14 +317,13 @@ BitBoard SoEaRay(Position);
 BitBoard SoWeOne(BitBoard);
 BitBoard SoWeRay(Position);
 
-
 // chessset.c
-BitBoard KingThreats(ChessSet*, Side);
 bool     Checked(ChessSet*, Side);
-void     ChessSetPlacePiece(ChessSet*, Side, Piece, Position);
-void     ChessSetRemovePiece(ChessSet*, Side, Piece, Position);
+BitBoard KingThreats(ChessSet*, Side);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
+void     RemovePiece(ChessSet*, Side, Piece, Position);
+void     PlacePiece(ChessSet*, Side, Piece, Position);
 
 // game.c
 bool        Checkmated(Game*);

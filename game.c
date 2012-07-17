@@ -24,10 +24,10 @@ DoCastleKingSide(Game *game)
 {
   int offset = game->WhosTurn*8*7;
 
-  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
-  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, G1 + offset);
-  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1 + offset);
-  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1 + offset);
+  RemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
+  PlacePiece(&game->ChessSet, game->WhosTurn, King, G1 + offset);
+  RemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1 + offset);
+  PlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1 + offset);
 }
 
 void
@@ -35,10 +35,10 @@ DoCastleQueenSide(Game *game)
 {
   int offset = game->WhosTurn*8*7;
 
-  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
-  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);
-  ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1 + offset);
-  ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1 + offset);
+  RemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
+  PlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);
+  RemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1 + offset);
+  PlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1 + offset);
 }
 
 // Attempt to move piece.
@@ -87,12 +87,12 @@ DoMove(Game *game, Move *move)
       if(piece != Pawn) {
         panic("Piece taken via en passant is %s, not pawn.", StringPiece(piece));
       }
-      ChessSetRemovePiece(&game->ChessSet, opposite, piece, enPassant);
+      RemovePiece(&game->ChessSet, opposite, piece, enPassant);
       AppendPiece(&game->History.CapturedPieces, piece);
     }
 
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);
+    RemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
+    PlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);
 
     break;
   case PromoteKnight:
@@ -106,7 +106,7 @@ DoMove(Game *game, Move *move)
         panic("No piece at %s when attempting capture %s.", StringPosition(move->To),
               StringMove(move));
       } else {
-        ChessSetRemovePiece(&game->ChessSet, opposite, piece, move->To);
+        RemovePiece(&game->ChessSet, opposite, piece, move->To);
         AppendPiece(&game->History.CapturedPieces, piece);
       }
     }
@@ -137,8 +137,8 @@ DoMove(Game *game, Move *move)
       panic("Impossible.");
     }
 
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
+    RemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
+    PlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
 
     break;
   }
@@ -210,17 +210,17 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
 
   clone = game->ChessSet;
 
-  ChessSetRemovePiece(&clone, side, move->Piece, move->From);
+  RemovePiece(&clone, side, move->Piece, move->From);
 
   if(move->Type == EnPassant) {
-    ChessSetRemovePiece(&clone, OPPOSITE(side), Pawn,
+    RemovePiece(&clone, OPPOSITE(side), Pawn,
                         move->To + (game->WhosTurn == White ? -8 : 8));
   } else if(move->Capture) {
     piece = PieceAt(&clone.Sets[OPPOSITE(side)], move->To);
-    ChessSetRemovePiece(&clone, OPPOSITE(side), piece, move->To);
+    RemovePiece(&clone, OPPOSITE(side), piece, move->To);
   }
 
-  ChessSetPlacePiece(&clone, side, move->Piece, move->To);
+  PlacePiece(&clone, side, move->Piece, move->To);
 
   return Checked(&clone, side);
 }
@@ -442,8 +442,8 @@ Unmove(Game *game)
   case PromoteRook:
   case PromoteQueen:
   case Normal:
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, piece, move.To);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.From);
+    RemovePiece(&game->ChessSet, game->WhosTurn, piece, move.To);
+    PlacePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.From);
 
     if(move.Capture) {
         captured = PopPiece(&game->History.CapturedPieces);
@@ -452,9 +452,9 @@ Unmove(Game *game)
         if(move.Type == EnPassant) {
           offset = -1 + game->WhosTurn*2;
           to = POSITION(RANK(move.To)+offset, FILE(move.To));
-          ChessSetPlacePiece(&game->ChessSet, opposite, captured, to);
+          PlacePiece(&game->ChessSet, opposite, captured, to);
         } else {
-          ChessSetPlacePiece(&game->ChessSet, opposite, captured, move.To);
+          PlacePiece(&game->ChessSet, opposite, captured, move.To);
         }
     }
 
@@ -462,19 +462,19 @@ Unmove(Game *game)
   case CastleQueenSide:
     offset = game->WhosTurn == White ? 0 : 8*7;
 
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, C1+offset);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, D1+offset);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, A1+offset);
+    RemovePiece(&game->ChessSet, game->WhosTurn, King, C1+offset);
+    PlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
+    RemovePiece(&game->ChessSet, game->WhosTurn, Rook, D1+offset);
+    PlacePiece(&game->ChessSet, game->WhosTurn, Rook, A1+offset);
 
     break;
   case CastleKingSide:
     offset = game->WhosTurn == White ? 0 : 8*7;
 
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, King, G1+offset);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
-    ChessSetRemovePiece(&game->ChessSet, game->WhosTurn, Rook, F1+offset);
-    ChessSetPlacePiece(&game->ChessSet, game->WhosTurn, Rook, H1+offset);
+    RemovePiece(&game->ChessSet, game->WhosTurn, King, G1+offset);
+    PlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
+    RemovePiece(&game->ChessSet, game->WhosTurn, Rook, F1+offset);
+    PlacePiece(&game->ChessSet, game->WhosTurn, Rook, H1+offset);
 
     break;
   default:
