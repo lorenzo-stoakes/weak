@@ -511,10 +511,11 @@ castleLegal(Game *game, CastleSide castleSide)
   int offset;
   Position rook;
 
-  if(Checked(&game->ChessSet, game->WhosTurn)) {
+  if(!game->CastlingRights[game->WhosTurn][castleSide]) {
     return false;
   }
-  if(!game->CastlingRights[game->WhosTurn][castleSide]) {
+
+  if(Checked(&game->ChessSet, game->WhosTurn)) {
     return false;
   }
 
