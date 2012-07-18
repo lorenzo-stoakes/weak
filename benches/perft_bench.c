@@ -55,5 +55,5 @@ BenchPerft()
     }
   }
 
-  printf("Median Perft Performance: %f n/s\n", 1000*nodes/elapsed);
+  printf("Median Perft Performance: %f n/s\n", 1000*totalNodes/totalElapsed);
 }
