@@ -29,7 +29,8 @@ BenchPerft()
   }
 
   for(i = 0; i < PERFT_COUNT; i++) {
-    for(j = 1; j <= depthCounts[i] && j <= MAX_DEPTH; j++) {
+    // Depth 1 tests are too short to be meaningful. Ignore.
+    for(j = 2; j <= depthCounts[i] && j <= MAX_DEPTH; j++) {
       elapsed = 0;
       iters = 1;
 
