@@ -7,7 +7,6 @@ static const int INIT_PIECE_COUNT        = 32;
 
 static void     expandCastleEventSlice(CastleEventSlice *slice);
 static void     expandEnPassantSlice(EnPassantSlice*);
-static uint64_t expandMoveSlice(MoveSlice*);
 
 void
 AppendCastleEvent(CastleEventSlice *slice, CastleEvent event)
@@ -46,23 +45,6 @@ AppendEnpassantSquare(EnPassantSlice *slice, Position pos)
 }
 
 void
-AppendMove(MoveSlice *slice, Move move)
-{
-  slice->Vals[slice->Len] = move;
-  slice->Len++;
-}
-
-void
-AppendMoves(MoveSlice *dst, MoveSlice *src)
-{
-  while(dst->Cap < dst->Len + src->Len) {
-    expandMoveSlice(dst);
-  }
-
-  memcpy(dst->Vals + dst->Len, src->Vals, src->Len);
-}
-
-void
 AppendPiece(PieceSlice *slice, Piece piece)
 {
   // Never need to expand slice, as there can never be more than 32 pieces on the board.
@@ -72,6 +54,12 @@ AppendPiece(PieceSlice *slice, Piece piece)
 
   slice->Vals[slice->Len] = piece;
   slice->Len++;
+}
+
+int
+LenMoves(MoveSlice *slice)
+{
+  return slice->Curr - slice->Vals;
 }
 
 CastleEventSlice
@@ -99,13 +87,13 @@ NewEnPassantSlice()
 }
 
 MoveSlice
-NewMoveSlice(Move *buffer, uint64_t cap)
+NewMoveSlice(Move *buffer)
 {
   MoveSlice ret;
 
-  ret.Cap = cap;
-  ret.Len = 0;
   ret.Vals = buffer;
+  ret.Curr = buffer;
+  ret.Len = 0;
 
   return ret;
 }
@@ -155,16 +143,9 @@ PopEnPassantSquare(EnPassantSlice *slice)
 Move
 PopMove(MoveSlice *slice)
 {
-  Move ret;
+  slice->Curr--;
 
-  if(slice->Len <= 0) {
-    panic("Invalid slice length %d on PopMove().", slice->Len);
-  }
-
-  ret = slice->Vals[slice->Len-1];
-  slice->Len--;
-
-  return ret;
+  return *slice->Curr;
 }
 
 Piece
@@ -204,18 +185,4 @@ expandEnPassantSlice(EnPassantSlice *slice)
   memcpy(buffer, slice->Vals, slice->Len*sizeof(Position*));
   release(slice->Vals);
   slice->Vals = buffer;
-}
-
-static uint64_t
-expandMoveSlice(MoveSlice *slice)
-{
-  Move *buffer;
-
-  slice->Cap *= 2;
-  buffer = (Move*)allocate(sizeof(Move), slice->Cap);
-  memcpy(buffer, slice->Vals, slice->Len*sizeof(Move*));
-  release(slice->Vals);
-  slice->Vals = buffer;
-
-  return slice->Cap;
 }

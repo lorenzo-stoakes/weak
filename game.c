@@ -10,13 +10,13 @@ bool
 Checkmated(Game *game)
 {
   Move buffer[INIT_MOVE_LEN];
-  MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
+  MoveSlice slice = NewMoveSlice(buffer);
 
   // TODO: When *first* move returned, return false.
 
   AllMoves(&slice, game);
 
-  return slice.Len == 0 && Checked(&game->ChessSet, game->WhosTurn);
+  return LenMoves(&slice) == 0 && Checked(&game->ChessSet, game->WhosTurn);
 }
 
 void
@@ -372,7 +372,7 @@ NewMoveHistory()
   ret.CapturedPieces = NewPieceSlice();
   ret.CastleEvents = NewCastleEventSlice();
   ret.EnPassantSquares = NewEnPassantSlice();
-  ret.Moves = NewMoveSlice(buffer, INIT_MOVE_LEN);
+  ret.Moves = NewMoveSlice(buffer);
 
   return ret;
 }
@@ -383,13 +383,13 @@ bool
 Stalemated(Game *game)
 {
   Move buffer[INIT_MOVE_LEN];
-  MoveSlice slice = NewMoveSlice(buffer, INIT_MOVE_LEN);
+  MoveSlice slice = NewMoveSlice(buffer);
 
   // TODO: When *first* move returned, return false.
 
   AllMoves(&slice, game);
 
-  return slice.Len == 0 && !Checked(&game->ChessSet, game->WhosTurn);
+  return LenMoves(&slice) == 0 && !Checked(&game->ChessSet, game->WhosTurn);
 }
 
 // Toggle whose turn it is.

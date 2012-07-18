@@ -137,8 +137,8 @@ struct EnPassantSlice {
 };
 
 struct MoveSlice {
-  int Len, Cap;
-  Move *Vals;
+  Move *Vals, *Curr;
+  int Len;
 };
 
 struct PieceSlice {
@@ -406,12 +406,18 @@ void  SetRemovePiece(Set*, Piece, Position);
 // slices.c
 void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
 void             AppendEnpassantSquare(EnPassantSlice*, Position);
-void             AppendMove(MoveSlice*, Move);
-void             AppendMoves(MoveSlice*, MoveSlice*);
+
+FORCE_INLINE void
+AppendMove(MoveSlice *slice, Move move)
+{
+  *slice->Curr++ = move;
+}
+
 void             AppendPiece(PieceSlice*, Piece);
+int              LenMoves(MoveSlice*);
 CastleEventSlice NewCastleEventSlice(void);
 EnPassantSlice   NewEnPassantSlice(void);
-MoveSlice        NewMoveSlice(Move*, uint64_t);
+MoveSlice        NewMoveSlice(Move*);
 PieceSlice       NewPieceSlice(void);
 CastleEvent      PopCastleEvent(CastleEventSlice*);
 Position         PopEnPassantSquare(EnPassantSlice*);
