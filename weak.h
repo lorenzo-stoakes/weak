@@ -388,6 +388,7 @@ BitBoard AllKnightMoveTargets(ChessSet*, Side);
 BitBoard KnightCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard KnightKingThreats(ChessSet*, Side);
 BitBoard KnightMoveTargets(ChessSet*, Side, BitBoard);
+BitBoard KnightThreats(BitBoard);
 
 // magic.c
 void InitMagics(void);

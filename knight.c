@@ -71,23 +71,6 @@ AllKnightMoveTargets(ChessSet *chessSet, Side side)
   return KnightMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Knight]);
 }
 
-// Get BitBoard encoding all squares threatened by knights.
-BitBoard
-KnightKingThreats(ChessSet *chessSet, Side side)
-{
-  BitBoard knights = chessSet->Sets[side].Boards[Knight];
-  BitBoard ret = EmptyBoard;
-  Position knight;
-
-  while(knights) {
-    knight = PopForward(&knights);
-
-    ret |= knightSquares[knight];
-  }
-
-  return ret;
-}
-
 BitBoard
 KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {
@@ -106,6 +89,13 @@ KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
   return ret;
 }
 
+// Get BitBoard encoding all squares threatened by knights.
+BitBoard
+KnightKingThreats(ChessSet *chessSet, Side side)
+{
+  return KnightThreats(chessSet->Sets[side].Boards[Knight]);
+}
+
 BitBoard
 KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {
@@ -121,4 +111,19 @@ KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
   }
 
   return ret & chessSet->EmptySquares;
+}
+
+BitBoard
+KnightThreats(BitBoard knights)
+{
+  BitBoard ret = EmptyBoard;
+  Position knight;
+
+  while(knights != EmptyBoard) {
+    knight = PopForward(&knights);
+
+    ret |= knightSquares[knight];
+  }
+
+  return ret;
 }
