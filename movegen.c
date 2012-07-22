@@ -1,23 +1,36 @@
 #include "weak.h"
 
 static void castleMoves(Game*, BitBoard, MoveSlice*);
-static void pawnMoves(Game*, BitBoard, MoveSlice*);
-static void pieceMoves(Piece, Game*, BitBoard, MoveSlice*);
+static void pawnMoves(Game*, MoveSlice*);
+static void pieceMoves(Piece, Game*, MoveSlice*);
 
 // Get all valid moves for the current player.
 void
 AllMoves(MoveSlice *slice, Game *game)
 {
   BitBoard kingThreats;
+  Move *curr;
   Piece piece;
 
-  kingThreats = KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
-  pawnMoves(game, kingThreats, slice);
-  for(piece = Knight; piece <= King; piece++) {
-    pieceMoves(piece, game, kingThreats, slice);
-  }
+  kingThreats = KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));  
 
+  // Get all psuedolegal moves.  
+
+  pawnMoves(game, slice);
+  for(piece = Knight; piece <= King; piece++) {
+    pieceMoves(piece, game, slice);
+  }
   castleMoves(game, kingThreats, slice);
+
+  // Filter out illegal moves.
+  for(curr = slice->Vals; curr < slice->Curr;) {
+    if(ExposesCheck(game, kingThreats, curr)) {
+      slice->Curr--;      
+      *curr = *slice->Curr;
+    } else {
+      curr++;
+    }
+  }
 }
 
 static void
@@ -39,7 +52,7 @@ castleMoves(Game *game, BitBoard kingThreats, MoveSlice *ret)
   for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
     if(game->CastlingRights[side][castleSide] &&
        (game->ChessSet.Occupancy&CastlingMasks[side][castleSide]) == EmptyBoard &&
-       (kingThreats&(POSBOARD(king)|CastlingAttackMasks[side][castleSide])) == EmptyBoard) {
+       (kingThreats&(POSBOARD(king)|CastlingAttackMasks[side][castleSide])) == EmptyBoard) {       
       move.Type = castleSide == KingSide ? CastleKingSide : CastleQueenSide;
       AppendMove(ret, move);
     }
@@ -47,7 +60,7 @@ castleMoves(Game *game, BitBoard kingThreats, MoveSlice *ret)
 }
 
 static void
-pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
+pawnMoves(Game *game, MoveSlice *slice)
 {
   int k;
   BitBoard pushSources, captureSources, pushTargets, captureTargets, fromBoard, toBoard;
@@ -77,11 +90,9 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
-          if(!ExposesCheck(game, kingThreats, &move)) {
-            AppendMove(slice, move);
-          }
+          AppendMove(slice, move);
         }
-      } else if(!ExposesCheck(game, kingThreats, &move)) {
+      } else {
         AppendMove(slice, move);
       }
     }
@@ -106,11 +117,9 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
       if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
-          if(!ExposesCheck(game, kingThreats, &move)) {
-            AppendMove(slice, move);
-          }
+          AppendMove(slice, move);
         }
-      } else if(!ExposesCheck(game, kingThreats, &move)) {
+      } else {
         AppendMove(slice, move);
       }
     }
@@ -146,14 +155,12 @@ pawnMoves(Game *game, BitBoard kingThreats, MoveSlice *slice)
     move.Capture = true;
     move.Type = EnPassant;
 
-    if(!ExposesCheck(game, kingThreats, &move)) {
-      AppendMove(slice, move);
-    }
+    AppendMove(slice, move);
   }
 }
 
 static void
-pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
+pieceMoves(Piece piece, Game *game, MoveSlice *ret)
 {
   BitBoard captureTargets, moveTargets, pieceBoard;
   Move move;
@@ -178,9 +185,7 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
       to = PopForward(&moveTargets);
       move.To = to;
 
-      if(!ExposesCheck(game, kingThreats, &move)) {
-        AppendMove(ret, move);
-      }
+      AppendMove(ret, move);
     }
 
     // Captures.
@@ -189,9 +194,7 @@ pieceMoves(Piece piece, Game *game, BitBoard kingThreats, MoveSlice *ret)
       to = PopForward(&captureTargets);
 
       move.To = to;
-      if(!ExposesCheck(game, kingThreats, &move)) {
-        AppendMove(ret, move);
-      }
+      AppendMove(ret, move);
     }
   }
 }
