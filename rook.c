@@ -108,11 +108,10 @@ RookSquareThreats(Position rook, BitBoard occupancy)
 BitBoard
 RookThreats(BitBoard rooks, BitBoard occupancy)
 {
-  BitBoard ret;
+  BitBoard ret = EmptyBoard;;
   Position rook;
 
-  ret = EmptyBoard;
-  while(rooks) {
+  while(rooks != EmptyBoard) {
     rook = PopForward(&rooks);
     ret |= magicSquareThreats(rook, occupancy);
   }

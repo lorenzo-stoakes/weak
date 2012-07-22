@@ -99,11 +99,10 @@ BishopSquareThreats(Position bishop, BitBoard occupancy)
 BitBoard
 BishopThreats(BitBoard bishops, BitBoard occupancy)
 {
-  BitBoard ret;
+  BitBoard ret = EmptyBoard;
   Position bishop;
 
-  ret = EmptyBoard;
-  while(bishops) {
+  while(bishops != EmptyBoard) {
     bishop = PopForward(&bishops);
 
     ret |= magicSquareThreats(bishop, occupancy);
