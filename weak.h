@@ -481,6 +481,7 @@ void          release(void*);
 void          panic(char*, ...);
 void          AppendString(StringBuilder *, char*);
 char*         BuildString(StringBuilder*, bool);
+int           Max(int, int);
 StringBuilder NewStringBuilder(void);
 void          ReleaseStringBuilder(StringBuilder*);
 void          SetUnbufferedOutput(void);

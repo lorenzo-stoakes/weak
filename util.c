@@ -105,6 +105,12 @@ BuildString(StringBuilder *builder, bool releaseBuilder)
   return ret;
 }
 
+int
+Max(int a, int b)
+{
+  return a >= b ? a : b;
+}
+
 StringBuilder
 NewStringBuilder()
 {
@@ -136,7 +142,6 @@ SetUnbufferedOutput()
   // Use unbuffered output.
   setbuf(stdout, NULL);
 }
-
 
 static void
 expandBuilder(StringBuilder *builder)
