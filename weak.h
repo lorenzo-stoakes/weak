@@ -279,6 +279,25 @@ BitScanForward(BitBoard bitBoard)
 }
 #endif
 
+FORCE_INLINE int
+FileDistance(Position from, Position to)
+{
+  return abs(FILE(from) - FILE(to));
+}
+
+FORCE_INLINE bool
+SingleBit(BitBoard bitBoard) {
+  // This is clever (not my idea!) - if there is only 1 bit, it'll be the msb. (n-1) gives you
+  // all the bits below the msb, so if there's anything set there there's more than 1 bit.
+  return (bitBoard & (bitBoard - 1)) == EmptyBoard;
+}
+
+FORCE_INLINE int
+RankDistance(Position from, Position to)
+{
+  return abs(RANK(from) - RANK(to));
+}
+
 FORCE_INLINE Position
 PopForward(BitBoard *bitBoard)
 {
