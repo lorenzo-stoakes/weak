@@ -37,21 +37,7 @@ AllPawnPushTargets(ChessSet *chessSet, Side side)
 BitBoard
 PawnKingThreats(ChessSet *chessSet, Side side)
 {
-  BitBoard pawns = chessSet->Sets[side].Boards[Pawn];
-
-  // TODO: Consider en passant.
-
-  switch(side) {
-  case White:
-    pawns = NoWeOne(pawns) | NoEaOne(pawns);
-    return pawns;
-  case Black:
-    pawns = SoWeOne(pawns) | SoEaOne(pawns);
-    return pawns;
-  }
-
-  panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;
+  return PawnThreats(chessSet->Sets[side].Boards[Pawn], side);
 }
 
 // Get BitBoard encoding specified pawns which are able to capture.
@@ -103,6 +89,24 @@ PawnPushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
   BitBoard singlePushes = singlePushTargets(chessSet, side, pawns);
 
   return singlePushes | doublePushTargets(chessSet, side, pawns, singlePushes);
+}
+
+BitBoard
+PawnThreats(BitBoard pawns, Side side)
+{
+  // TODO: Consider en passant.
+
+  switch(side) {
+  case White:
+    pawns = NoWeOne(pawns) | NoEaOne(pawns);
+    return pawns;
+  case Black:
+    pawns = SoWeOne(pawns) | SoEaOne(pawns);
+    return pawns;
+  }
+
+  panic("Invalid side %s.", StringSide(side));
+  return EmptyBoard;  
 }
 
 // Get BitBoard encoding which of specified pawns are able to single push.

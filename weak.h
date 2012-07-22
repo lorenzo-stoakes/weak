@@ -408,6 +408,7 @@ BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard PawnKingThreats(ChessSet*, Side);
 BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
 BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
+BitBoard PawnThreats(BitBoard, Side);
 
 // perft.c
 PerftStats Perft(Game*, int);
