@@ -109,6 +109,8 @@ typedef uint64_t                BitBoard;
 typedef enum CastleEvent        CastleEvent;
 typedef struct CastleEventSlice CastleEventSlice;
 typedef enum CastleSide         CastleSide;
+typedef struct CheckStats       CheckStats;
+typedef struct CheckStatsSlice  CheckStatsSlice;
 typedef struct ChessSet         ChessSet;
 typedef struct EnPassantSlice   EnPassantSlice;
 typedef struct Game             Game;
@@ -129,6 +131,15 @@ typedef struct StringBuilder    StringBuilder;
 struct CastleEventSlice {
   int Len, Cap;
   CastleEvent *Vals;
+};
+
+struct CheckStats {
+  BitBoard Checks, CheckSquares[5], Discovered, Pinned;
+};
+
+struct CheckStatsSlice {
+  int Len, Cap;
+  CheckStats *Vals;
 };
 
 struct EnPassantSlice {
@@ -153,6 +164,7 @@ struct Set {
 
 struct MoveHistory {
   CastleEventSlice CastleEvents;
+  CheckStatsSlice  CheckStats;
   EnPassantSlice   EnPassantSquares;
   MoveSlice        Moves;
   PieceSlice       CapturedPieces;
@@ -165,6 +177,7 @@ struct ChessSet {
 
 struct Game {
   bool        CastlingRights[2][2];
+  CheckStats  CheckStats;
   ChessSet    ChessSet;
   bool        Debug;
   MoveHistory History;
@@ -326,6 +339,7 @@ void     RemovePiece(ChessSet*, Side, Piece, Position);
 void     PlacePiece(ChessSet*, Side, Piece, Position);
 
 // game.c
+CheckStats  CalculateCheckStats(Game*);
 bool        Checkmated(Game*);
 void        DoCastleKingSide(Game*);
 void        DoCastleQueenSide(Game*);
@@ -334,6 +348,7 @@ void        InitCanSlideAttacks(void);
 void        InitEngine(void);
 bool        Legal(Game*, Move*);
 void        DoMove(Game*, Move*);
+CheckStats  NewCheckStats(void);
 Game        NewEmptyGame(bool, Side);
 Game        NewGame(bool, Side);
 MoveHistory NewMoveHistory(void);
@@ -413,13 +428,16 @@ AppendMove(MoveSlice *slice, Move move)
   *slice->Curr++ = move;
 }
 
+void             AppendCheckStats(CheckStatsSlice*, CheckStats);
 void             AppendPiece(PieceSlice*, Piece);
 int              LenMoves(MoveSlice*);
 CastleEventSlice NewCastleEventSlice(void);
+CheckStatsSlice  NewCheckStatsSlice(void);
 EnPassantSlice   NewEnPassantSlice(void);
 MoveSlice        NewMoveSlice(Move*);
 PieceSlice       NewPieceSlice(void);
 CastleEvent      PopCastleEvent(CastleEventSlice*);
+CheckStats       PopCheckStats(CheckStatsSlice*);
 Position         PopEnPassantSquare(EnPassantSlice*);
 Move             PopMove(MoveSlice*);
 Piece            PopPiece(PieceSlice*);

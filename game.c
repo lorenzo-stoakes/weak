@@ -5,6 +5,16 @@ static bool        pawnLegal(Game*, Move*);
 static bool        pieceLegal(Piece, Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
+CheckStats
+CalculateCheckStats(Game *game)
+{
+  // Not yet implemented. Just return empty check stats for now.
+
+  CheckStats ret = NewCheckStats();
+
+  return ret;
+}
+
 // Determine whether the current player is checkmated.
 bool
 Checkmated(Game *game)
@@ -144,8 +154,10 @@ DoMove(Game *game, Move *move)
   }
 
   castleEvent = updateCastlingRights(game, move);
-  AppendCastleEvent(&game->History.CastleEvents, castleEvent);
+  game->CheckStats = CalculateCheckStats(game);
 
+  AppendCastleEvent(&game->History.CastleEvents, castleEvent);
+  AppendCheckStats(&game->History.CheckStats, game->CheckStats);
   AppendMove(&game->History.Moves, *move);
 
   ToggleTurn(game);
@@ -314,6 +326,22 @@ Legal(Game *game, Move *move)
     !ExposesCheck(game, kingThreats, move);
 }
 
+CheckStats
+NewCheckStats()
+{
+  CheckStats ret;
+  Piece piece;
+
+  ret.Checks = EmptyBoard;
+  for(piece = Pawn; piece < King; piece++) {
+    ret.CheckSquares[piece] = EmptyBoard;
+  }
+  ret.Discovered = EmptyBoard;
+  ret.Pinned = EmptyBoard;
+
+  return ret;
+}
+
 // Create a new game with an empty board.
 Game
 NewEmptyGame(bool debug, Side humanSide)
@@ -350,6 +378,7 @@ NewGame(bool debug, Side humanSide)
     }
   }
 
+  ret.CheckStats = NewCheckStats();
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
   ret.EnPassantSquare = EmptyPosition;
@@ -371,6 +400,7 @@ NewMoveHistory()
 
   ret.CapturedPieces = NewPieceSlice();
   ret.CastleEvents = NewCastleEventSlice();
+  ret.CheckStats = NewCheckStatsSlice();
   ret.EnPassantSquares = NewEnPassantSlice();
   ret.Moves = NewMoveSlice(buffer);
 
@@ -481,6 +511,7 @@ Unmove(Game *game)
     panic("Unrecognised move type %d.", move.Type);
   }
 
+  game->CheckStats = PopCheckStats(&game->History.CheckStats);
   game->EnPassantSquare = PopEnPassantSquare(&game->History.EnPassantSquares);
 
   castleEvent = PopCastleEvent(&game->History.CastleEvents);

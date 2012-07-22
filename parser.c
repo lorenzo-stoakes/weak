@@ -176,5 +176,7 @@ ParseFen(char *fen)
   }
   ret.ChessSet.EmptySquares = ~ret.ChessSet.Occupancy;
 
+  ret.CheckStats = CalculateCheckStats(&ret);
+
   return ret;
 }
