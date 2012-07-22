@@ -261,19 +261,6 @@ static const BitBoard
   Rank7Mask                      =  C64(0x00ff000000000000),
   Rank8Mask                      =  C64(0xff00000000000000);
 
-// bishop.c
-BitBoard AllBishopCaptureTargets(ChessSet*, Side);
-BitBoard AllBishopMoveTargets(ChessSet*, Side);
-BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard BishopKingThreats(ChessSet*, Side);
-BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
-BitBoard BishopSquareThreats(Position, BitBoard);
-BitBoard BishopThreats(BitBoard, BitBoard);
-
-// bitboard.c
-
-// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
-
 #if defined(USE_BITSCAN_ASM)
 FORCE_INLINE Position
 BitScanBackward(BitBoard bitBoard)
@@ -290,9 +277,6 @@ BitScanForward(BitBoard bitBoard)
   __asm__("bsfq %1, %0": "=r"(posBoard): "rm"(bitBoard));
   return (Position)posBoard;
 }
-#else
-Position BitScanBackward(BitBoard);
-Position BitScanForward(BitBoard);
 #endif
 
 FORCE_INLINE Position
@@ -305,6 +289,23 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
+// bishop.c
+BitBoard AllBishopCaptureTargets(ChessSet*, Side);
+BitBoard AllBishopMoveTargets(ChessSet*, Side);
+BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
+BitBoard BishopKingThreats(ChessSet*, Side);
+BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
+BitBoard BishopSquareThreats(Position, BitBoard);
+BitBoard BishopThreats(BitBoard, BitBoard);
+
+// bitboard.c
+
+// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
+
+#ifndef USE_BITSCAN_ASM
+Position BitScanBackward(BitBoard);
+Position BitScanForward(BitBoard);
+#endif
 BitBoard FlipDiagA1H8(BitBoard);
 BitBoard FlipVertical(BitBoard);
 void     InitRays(void);
