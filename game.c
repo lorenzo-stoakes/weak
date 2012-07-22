@@ -9,9 +9,28 @@ static CastleEvent updateCastlingRights(Game*, Move*);
 CheckStats
 CalculateCheckStats(Game *game)
 {
-  // Not yet implemented. Just return empty check stats for now.
+  BitBoard kingBoard;
+  BitBoard occupancy = game->ChessSet.Occupancy;
+  CheckStats ret;
+  Position king;
+  Side opposition = OPPOSITE(game->WhosTurn);
 
-  CheckStats ret = NewCheckStats();
+  kingBoard = game->ChessSet.Sets[opposition].Boards[King];
+
+  king = BitScanForward(kingBoard);
+
+  ret.AttackedKing = king;
+
+  // Pieces *we* pin are potential discovered checks.
+  ret.Discovered = PinnedPieces(&game->ChessSet, OPPOSITE(game->WhosTurn));
+  ret.Pinned = PinnedPieces(&game->ChessSet, game->WhosTurn);
+
+  // Attacks *from* king are equivalent to positions attacking *to* the king.
+  ret.CheckSquares[Pawn] = PawnThreats(kingBoard, opposition);
+  ret.CheckSquares[Knight] = KnightThreats(kingBoard);
+  ret.CheckSquares[Bishop] = BishopThreats(kingBoard, occupancy);
+  ret.CheckSquares[Rook] = RookThreats(kingBoard, occupancy);
+  ret.CheckSquares[Queen] = ret.CheckSquares[Rook] | ret.CheckSquares[Bishop];
 
   return ret;
 }
@@ -155,11 +174,12 @@ DoMove(Game *game, Move *move)
   }
 
   castleEvent = updateCastlingRights(game, move);
-  game->CheckStats = CalculateCheckStats(game);
 
   AppendCastleEvent(&game->History.CastleEvents, castleEvent);
-  AppendCheckStats(&game->History.CheckStats, game->CheckStats);
+  AppendCheckStats(&game->History.CheckStats, game->CheckStats);    
   AppendMove(&game->History.Moves, *move);
+
+  game->CheckStats = CalculateCheckStats(game);
 
   ToggleTurn(game);
 }
@@ -314,6 +334,7 @@ NewCheckStats()
   CheckStats ret;
   Piece piece;
 
+  ret.AttackedKing = EmptyPosition;  
   ret.Checks = EmptyBoard;
   for(piece = Pawn; piece < King; piece++) {
     ret.CheckSquares[piece] = EmptyBoard;
@@ -333,6 +354,8 @@ NewEmptyGame(bool debug, Side humanSide)
   Side side;
 
   ret = NewGame(debug, humanSide);
+
+  ret.CheckStats.AttackedKing = EmptyPosition;
 
   for(side = White; side <= Black; side++) {
     for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
@@ -361,6 +384,7 @@ NewGame(bool debug, Side humanSide)
   }
 
   ret.CheckStats = NewCheckStats();
+  ret.CheckStats.AttackedKing = E1;
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
   ret.EnPassantSquare = EmptyPosition;

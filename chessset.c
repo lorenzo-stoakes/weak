@@ -53,6 +53,46 @@ PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   SetPlacePiece(&chessSet->Sets[side], piece, pos);
 }
 
+BitBoard
+PinnedPieces(ChessSet *chessSet, Side side)
+{
+  BitBoard attackers, bitBoard;
+  BitBoard ret = EmptyBoard;
+
+  BitBoard kingBoard  = chessSet->Sets[side].Boards[King];
+  Position attacker;
+  Position king       = BitScanForward(kingBoard);
+  Side     opposition = OPPOSITE(side);
+
+  if(kingBoard == EmptyBoard) {
+    panic("Empty king board!");
+  }
+
+  // If we consider opponents attacks *from* the king's square, this is equivalent to
+  // positions in which the pieces in question can attack *to* the king.
+
+  attackers = (chessSet->Sets[opposition].Boards[Rook] |
+               chessSet->Sets[opposition].Boards[Queen]) &
+    EmptyAttacks[Rook][king];
+
+  attackers |= (chessSet->Sets[opposition].Boards[Bishop] |
+               chessSet->Sets[opposition].Boards[Queen]) &
+    EmptyAttacks[Bishop][king];
+
+  // If it's just not possible for there to be a pin, we give up here.
+  while(attackers != EmptyBoard) {
+    attacker = PopForward(&attackers);
+
+    bitBoard = Between[king][attacker] & chessSet->Sets[side].Occupancy;
+
+    if(bitBoard != EmptyBoard && SingleBit(bitBoard)) {
+      ret |= bitBoard;
+    }
+  }
+
+  return ret;
+}
+
 void
 RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {

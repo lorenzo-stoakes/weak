@@ -135,6 +135,7 @@ struct CastleEventSlice {
 
 struct CheckStats {
   BitBoard Checks, CheckSquares[5], Discovered, Pinned;
+  Position AttackedKing;
 };
 
 struct CheckStatsSlice {
@@ -356,6 +357,7 @@ BitBoard KingThreats(ChessSet*, Side);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
 void     RemovePiece(ChessSet*, Side, Piece, Position);
+BitBoard PinnedPieces(ChessSet*, Side);
 void     PlacePiece(ChessSet*, Side, Piece, Position);
 
 // game.c
