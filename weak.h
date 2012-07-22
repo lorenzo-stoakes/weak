@@ -364,7 +364,6 @@ bool        Checkmated(Game*);
 void        DoCastleKingSide(Game*);
 void        DoCastleQueenSide(Game*);
 bool        ExposesCheck(Game*, BitBoard, Move*);
-void        InitCanSlideAttacks(void);
 void        InitEngine(void);
 bool        Legal(Game*, Move*);
 void        DoMove(Game*, Move*);
@@ -491,8 +490,19 @@ void          SetUnbufferedOutput(void);
 BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
 BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);
 
+// Array containing BitBoard of positions between two specified squares, as long as
+// they are on the same rank/file/diagonal. This is exclusive of the from and to squares.
+BitBoard Between[64][64];
+
 // Array containing lookups determining whether any sliding attack is possible
 // between the two positions.
 bool CanSlideAttack[64][64];
+
+// Array containing distances between positions on the board.
+int Distance[64][64];
+
+// Array containing attacks for a specified piece and position on an empty BitBoard.
+// We only calculate this for sliding pieces.
+BitBoard EmptyAttacks[5][64];
 
 #endif

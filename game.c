@@ -1,6 +1,7 @@
 #include "weak.h"
 
 static bool        castleLegal(Game*, CastleSide);
+static void        initArrays(void);
 static bool        pawnLegal(Game*, Move*);
 static bool        pieceLegal(Piece, Game*, Move*);
 static CastleEvent updateCastlingRights(Game*, Move*);
@@ -238,25 +239,6 @@ ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
 }
 
 void
-InitCanSlideAttacks()
-{
-  BitBoard queenThreats;
-  Position from, to;
-
-  for(from = A1; from <= H8; from++) {
-    for(to = A1; to <= H8; to++) {
-      CanSlideAttack[from][to] = false;
-    }
-
-    queenThreats = QueenThreats(POSBOARD(from), EmptyBoard);
-    while(queenThreats) {
-      to = PopForward(&queenThreats);
-      CanSlideAttack[from][to] = true;
-    }
-  }
-}
-
-void
 InitEngine()
 {
   GetMoveTargets[Pawn] = NULL;
@@ -278,7 +260,7 @@ InitEngine()
 
   // Relies on above.
   InitMagics();
-  InitCanSlideAttacks();
+  initArrays();
 }
 
 // Is the proposed move legal in this game?
@@ -577,6 +559,51 @@ castleLegal(Game *game, CastleSide castleSide)
   }
 
   return true;
+}
+
+static void
+initArrays()
+{
+  BitBoard queenThreats;
+  int delta;
+  Position from, pos, to;
+
+  for(from = A1; from <= H8; from++) {
+    for(to = A1; to <= H8; to++) {
+      Distance[from][to] = Max(FileDistance(from, to), RankDistance(from, to));
+    }
+  }
+
+  for(from = A1; from <= H8; from++) {
+    EmptyAttacks[Bishop][from] = BishopThreats(POSBOARD(from), EmptyBoard);
+    EmptyAttacks[Rook][from] = RookThreats(POSBOARD(from), EmptyBoard);
+    EmptyAttacks[Queen][from] = EmptyAttacks[Bishop][from] | EmptyAttacks[Rook][from];
+
+    queenThreats = EmptyAttacks[Queen][from];
+
+    for(to = A1; to <= H8; to++) {
+      CanSlideAttack[from][to] = false;
+
+      if((queenThreats&POSBOARD(to)) == EmptyBoard) {
+        Between[from][to] = EmptyBoard;
+      } else {
+        // We determine step size in two parts - sign and amount. The sign is determined by
+        // whether the target square (to) is larger than the source square(from) or not. We
+        // get that from (to - from), and additionally the bit distance between the
+        // positions. We then divide by the number of squares between the two and thus we get
+        // the delta we need to apply.
+        delta = (to - from) / Distance[from][to];
+        for(pos = from + delta; pos < to; pos += delta) {
+          Between[from][to] |= POSBOARD(pos);
+        }
+      }
+    }
+
+    while(queenThreats) {
+      to = PopForward(&queenThreats);
+      CanSlideAttack[from][to] = true;
+    }
+  }
 }
 
 // Is this pawn move legal?
