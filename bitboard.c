@@ -36,6 +36,14 @@ const int bitBackward8[256] = {
 static BitBoard nortRays[64], eastRays[64], soutRays[64], westRays[64],
   noeaRays[64], soweRays[64], noweRays[64], soeaRays[64];
 
+// Are all the positions along the same line?
+bool
+Aligned(Position pos1, Position pos2, Position pos3)
+{
+  return ((Between[pos1][pos2] | Between[pos1][pos3] | Between[pos2][pos3]) &
+          (POSBOARD(pos1) | POSBOARD(pos2) | POSBOARD(pos3))) != EmptyBoard;
+}
+
 #ifndef USE_BITSCAN_ASM
 Position
 BitScanBackward(BitBoard bitBoard)

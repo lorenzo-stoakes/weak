@@ -323,6 +323,7 @@ BitBoard BishopThreats(BitBoard, BitBoard);
 
 // See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
 
+bool Aligned(Position, Position, Position);
 #ifndef USE_BITSCAN_ASM
 Position BitScanBackward(BitBoard);
 Position BitScanForward(BitBoard);
