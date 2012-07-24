@@ -114,7 +114,7 @@ PawnThreats(BitBoard pawns, Side side)
   }
 
   panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;  
+  return EmptyBoard;
 }
 
 // Get BitBoard encoding which of specified pawns are able to single push.
