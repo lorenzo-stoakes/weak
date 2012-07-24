@@ -82,11 +82,18 @@ DoCastleQueenSide(Game *game)
 void
 DoMove(Game *game, Move *move)
 {
+  BitBoard checks;
+  bool givesCheck;
   CastleEvent castleEvent;
+  CheckStats checkStats;
   Piece piece;
-  Position enPassant;
+  Position enPassant, king;
   Rank offset;
-  Side opposite = OPPOSITE(game->WhosTurn);
+  Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
+
+  checkStats = game->CheckStats;
+  givesCheck = GivesCheck(game, move);
 
   // Store previous en passant square.
   AppendEnpassantSquare(&game->History.EnPassantSquares, game->EnPassantSquare);
