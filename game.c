@@ -120,7 +120,7 @@ DoMove(Game *game, Move *move)
       panic("En passant move, but not capture.");
     }
 
-    offset = -1 + 2*game->WhosTurn;
+    offset = -1 + 2*side;
 
     enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
 
@@ -135,8 +135,8 @@ DoMove(Game *game, Move *move)
       AppendPiece(&game->History.CapturedPieces, piece);
     }
 
-    RemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    PlacePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->To);
+    RemovePiece(&game->ChessSet, side, move->Piece, move->From);
+    PlacePiece(&game->ChessSet, side, move->Piece, move->To);
 
     break;
   case PromoteKnight:
@@ -171,9 +171,9 @@ DoMove(Game *game, Move *move)
     case Normal:
       piece = move->Piece;
 
-      if(piece == Pawn && RANK(move->From) == Rank2 + (game->WhosTurn*5) &&
-         RANK(move->To) == Rank4 + (game->WhosTurn*1)) {
-        game->EnPassantSquare = move->From + (game->WhosTurn == White ? 8 : -8);
+      if(piece == Pawn && RANK(move->From) == Rank2 + (side*5) &&
+         RANK(move->To) == Rank4 + (side*1)) {
+        game->EnPassantSquare = move->From + (side == White ? 8 : -8);
       }
 
       break;
@@ -181,8 +181,8 @@ DoMove(Game *game, Move *move)
       panic("Impossible.");
     }
 
-    RemovePiece(&game->ChessSet, game->WhosTurn, move->Piece, move->From);
-    PlacePiece(&game->ChessSet, game->WhosTurn, piece, move->To);
+    RemovePiece(&game->ChessSet, side, move->Piece, move->From);
+    PlacePiece(&game->ChessSet, side, piece, move->To);
 
     break;
   }
