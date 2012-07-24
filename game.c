@@ -237,7 +237,6 @@ DoMove(Game *game, Move *move)
   game->CheckStats.CheckSources = checks;
 }
 
-// Determine whether the specified move places the current player into check.
 bool
 GivesCheck(Game *game, Move *move)
 {
