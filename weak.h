@@ -365,7 +365,7 @@ CheckStats  CalculateCheckStats(Game*);
 bool        Checkmated(Game*);
 void        DoCastleKingSide(Game*);
 void        DoCastleQueenSide(Game*);
-bool        ExposesCheck(Game*, BitBoard, Move*);
+bool        GivesCheck(Game*, Move*);
 void        InitEngine(void);
 bool        Legal(Game*, Move*);
 void        DoMove(Game*, Move*);
