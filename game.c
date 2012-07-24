@@ -53,7 +53,7 @@ Checkmated(Game *game)
 
   AllMoves(&slice, game);
 
-  return LenMoves(&slice) == 0 && Checked(&game->ChessSet, game->WhosTurn);
+  return LenMoves(&slice) == 0 && game->CheckStats.CheckSources != EmptyBoard;
 }
 
 void
