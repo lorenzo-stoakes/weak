@@ -26,8 +26,9 @@ CalculateCheckStats(Game *game)
   ret.DefendedKing = ourKing;
 
   // Pieces *we* pin are potential discovered checks.
-  ret.Discovered = PinnedPieces(&game->ChessSet, OPPOSITE(game->WhosTurn));
-  ret.Pinned = PinnedPieces(&game->ChessSet, game->WhosTurn);
+  ret.Discovered = PinnedPieces(&game->ChessSet, side, false);
+
+  ret.Pinned = PinnedPieces(&game->ChessSet, side, true);
 
   // Attacks *from* king are equivalent to positions attacking *to* the king.
   ret.CheckSquares[Pawn] = PawnAttacksFrom(king, opposite);
