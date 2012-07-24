@@ -21,6 +21,17 @@ AllRookMoveTargets(ChessSet *chessSet, Side side)
 BitBoard
 RookAttacksFrom(Position rook, BitBoard occupancy)
 {
+  return magicSquareThreats(rook, occupancy);
+}
+
+BitBoard
+RookQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
+{
+  return (chessSet->Sets[White].Boards[Rook] |
+    chessSet->Sets[Black].Boards[Rook] |
+    chessSet->Sets[White].Boards[Queen] |
+    chessSet->Sets[Black].Boards[Queen]) &
+    magicSquareThreats(to, occupancy);
 }
 
 // Get BitBoard encoding capture targets for specified rooks without using magic BitBoards.

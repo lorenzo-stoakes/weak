@@ -72,6 +72,12 @@ AllKnightMoveTargets(ChessSet *chessSet, Side side)
 }
 
 BitBoard
+KnightAttackersTo(ChessSet *chessSet, Position to)
+{
+  return (chessSet->Sets[White].Boards[Knight] |
+          chessSet->Sets[Black].Boards[Knight]) &
+    knightSquares[to];
+}
 
 BitBoard
 KnightAttacksFrom(Position knight)

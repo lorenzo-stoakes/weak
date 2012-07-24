@@ -23,6 +23,14 @@ BishopAttacksFrom(Position bishop, BitBoard occupancy)
   return magicSquareThreats(bishop, occupancy);
 }
 
+BitBoard
+BishopQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
+{
+  return (chessSet->Sets[White].Boards[Bishop] |
+    chessSet->Sets[Black].Boards[Bishop] |
+    chessSet->Sets[White].Boards[Queen] |
+    chessSet->Sets[Black].Boards[Queen]) &
+    magicSquareThreats(to, occupancy);
 }
 
 BitBoard

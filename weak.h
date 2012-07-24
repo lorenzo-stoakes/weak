@@ -354,7 +354,7 @@ BitBoard SoWeRay(Position);
 
 // chessset.c
 bool     Checked(ChessSet*, Side);
-BitBoard KingThreats(ChessSet*, Side);
+BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
 void     RemovePiece(ChessSet*, Side, Piece, Position);

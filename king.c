@@ -5,13 +5,14 @@ static BitBoard kingsSquares(BitBoard);
 // We don't need to provide king sources, or to consider subsets of kings on the board as there
 // is always one king on each board for each side, and it is never removed from the board.
 
-// Get BitBoard encoding all squares threatened by king. Doesn't take into account threats of
-// moves which would put the king into check.
 BitBoard
-KingKingThreats(ChessSet *chessSet, Side side)
+KingAttackersTo(ChessSet *chessSet, Position to)
 {
-  // King capture and movement threats happen to be the same.
-  return kingsSquares(chessSet, side);
+  return (chessSet->Sets[White].Boards[King] |
+          chessSet->Sets[Black].Boards[King]) &
+    kingsSquares(POSBOARD(to));
+}
+
 BitBoard
 KingAttacksFrom(Position king)
 {

@@ -11,11 +11,12 @@ Checked(ChessSet *chessSet, Side side)
 // Get the bitboard which encodes a mask of all squares threatened by the specified side in the
 // chess set.
 BitBoard
-KingThreats(ChessSet *chessSet, Side side)
+AllAttackersTo(ChessSet *chessSet, Position pos, BitBoard occupancy)
 {
-  return PawnKingThreats(chessSet, side) | RookKingThreats(chessSet, side) |
-    KnightKingThreats(chessSet, side) | BishopKingThreats(chessSet, side) |
-    QueenKingThreats(chessSet, side) | KingKingThreats(chessSet, side);
+  return PawnAttackersTo(chessSet, pos) | KnightAttackersTo(chessSet, pos) |
+    BishopQueenAttackersTo(chessSet, pos, occupancy) |
+    RookQueenAttackersTo(chessSet, pos, occupancy) |
+    KingAttackersTo(chessSet, pos);
 }
 
 ChessSet
