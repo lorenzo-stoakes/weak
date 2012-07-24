@@ -41,7 +41,7 @@ castleMoves(Game *game, BitBoard kingThreats, MoveSlice *ret)
 
   king = E1 + side*8*7;
 
-  // Add unneeded fields to prevent garbage in unassigned fields. TODO: Review
+  // Add unneeded fields to prevent garbage in unassigned fields. TODO: Review.
   move.Capture = false;
   move.From = king;
   move.Piece = King;
