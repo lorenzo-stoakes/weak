@@ -1,8 +1,8 @@
 #include "weak.h"
 
-static void castleMoves(Game*, BitBoard, MoveSlice*);
-static void pawnMoves(Game*, MoveSlice*);
-static void pieceMoves(Piece, Game*, MoveSlice*);
+static void castleMoves(Game*, MoveSlice*);
+static void pawnMoves(Game*, MoveSlice*, BitBoard);
+static void pieceMoves(Piece, Game*, MoveSlice*, BitBoard);
 
 // Get all valid moves for the current player.
 void
