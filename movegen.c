@@ -196,3 +196,108 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
     }
   }
 }
+
+static void
+evasions(MoveSlice *slice, Game *game)
+{
+  BitBoard attacks, captures, moves, targets;
+  BitBoard checks = game->CheckStats.CheckSources;
+  BitBoard slideAttacks = EmptyBoard;
+  int checkCount = 0;
+  Move move;
+  Piece piece;
+  Position check;
+  Position king = game->CheckStats.DefendedKing;
+  Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
+
+  while(checks != EmptyBoard) {
+    check = PopForward(&checks);
+
+    checkCount++;
+
+    piece = PieceAt(&game->ChessSet.Sets[opposite], check);
+
+    switch(piece) {
+    case Bishop:
+      slideAttacks |= EmptyAttacks[Bishop][check];
+
+      break;
+    case Rook:
+      slideAttacks |= EmptyAttacks[Rook][check];
+
+      break;
+    case Queen:
+      // If king and queen are far away, i.e. there are squares between them, or they are not
+      // on a diagonal, we can remove all squares in all directions as the king can't get to them.
+      if(Between[king][check] != EmptyBoard ||
+         (EmptyAttacks[Bishop][check] & POSBOARD(king)) == EmptyBoard) {
+        slideAttacks |= EmptyAttacks[Queen][check];
+      } else {
+        slideAttacks |= EmptyAttacks[Bishop][check] |
+          RookAttacksFrom(check, game->ChessSet.Occupancy);
+      }
+
+      break;
+    default:
+      break;
+    }
+  }
+
+  attacks = KingAttacksFrom(king) & ~slideAttacks;
+
+  move.Type = Normal;
+  move.Piece = King;
+  move.From = king;
+  move.Capture = false;
+
+  // King evasion moves.
+  moves = attacks & game->ChessSet.EmptySquares;
+
+  while(moves) {
+    move.To = PopForward(&moves);
+
+    AppendMove(slice, move);
+  }
+
+  move.Capture = true;
+
+  captures = attacks & game->ChessSet.Sets[opposite].Occupancy;
+
+  while(captures) {
+    move.To = PopForward(&captures);
+
+    AppendMove(slice, move);
+  }
+
+  // If there is more than 1 check, blocking won't achieve anything.
+  if(checkCount > 1) {
+    return;
+  }
+
+  // Blocking/capturing the checking piece.
+  // We use check from the loop above, since we have only 1 check this will
+  // be the sole checker.
+  targets = Between[check][king] | game->CheckStats.CheckSources;
+
+  pawnMoves(game, slice, targets);
+
+  // King already handled.
+  for(piece = Knight; piece < King; piece++) {
+    pieceMoves(piece, game, slice, targets);
+  }
+}
+
+static void
+nonEvasions(MoveSlice *slice, Game *game)
+{
+  Piece piece;
+
+  pawnMoves(game, slice, FullyOccupied);
+
+  for(piece = Knight; piece <= King; piece++) {
+    pieceMoves(piece, game, slice, FullyOccupied);
+  }
+
+  castleMoves(game, slice);
+}
