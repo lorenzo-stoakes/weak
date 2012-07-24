@@ -121,7 +121,6 @@ NewMoveSlice(Move *buffer)
 
   ret.Vals = buffer;
   ret.Curr = buffer;
-  ret.Len = 0;
 
   return ret;
 }
