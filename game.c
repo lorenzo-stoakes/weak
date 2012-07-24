@@ -21,6 +21,7 @@ CalculateCheckStats(Game *game)
 
   ourKingBoard = game->ChessSet.Sets[side].Boards[King];
   ourKing = BitScanForward(ourKingBoard);
+
   ret.AttackedKing = king;
   ret.DefendedKing = ourKing;
 
