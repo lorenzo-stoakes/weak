@@ -865,6 +865,10 @@ updateCastlingRights(Game *game, Move *move)
   default:
     return NoCastleEvent;
   case Normal:
+  case PromoteKnight:
+  case PromoteBishop:
+  case PromoteRook:
+  case PromoteQueen:
     if(move->Capture) {
       switch(side) {
       case White:
