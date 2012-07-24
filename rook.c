@@ -116,7 +116,7 @@ RookSquareThreats(Position rook, BitBoard occupancy)
 BitBoard
 RookThreats(BitBoard rooks, BitBoard occupancy)
 {
-  BitBoard ret = EmptyBoard;;
+  BitBoard ret = EmptyBoard;
   Position rook;
 
   while(rooks != EmptyBoard) {
