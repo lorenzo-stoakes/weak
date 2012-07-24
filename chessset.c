@@ -70,7 +70,6 @@ PinnedPieces(ChessSet *chessSet, Side side, bool pinned)
                chessSet->Sets[pinner].Boards[Queen]) &
     EmptyAttacks[Bishop][king];
 
-  // If it's just not possible for there to be a pin, we give up here.
   while(attackers != EmptyBoard) {
     attacker = PopForward(&attackers);
 
