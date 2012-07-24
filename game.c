@@ -365,7 +365,6 @@ InitEngine()
 bool
 Legal(Game *game, Move *move)
 {
-  BitBoard kingThreats;
   Piece piece;
 
   switch(move->Type) {
@@ -400,10 +399,7 @@ Legal(Game *game, Move *move)
     return false;
   }
 
-  kingThreats = KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));
-
-  return (move->Piece == Pawn ? pawnLegal(game, move) : pieceLegal(move->Piece, game, move)) &&
-    !ExposesCheck(game, kingThreats, move);
+  return move->Piece == Pawn ? pawnLegal(game, move) : pieceLegal(move->Piece, game, move);
 }
 
 CheckStats
