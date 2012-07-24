@@ -28,7 +28,7 @@ QuickPerft(Game *game, int depth)
     }
 #endif
 
-    return LenMoves(&allMoves);
+    return len;
   }
 
   len = LenMoves(&allMoves);
