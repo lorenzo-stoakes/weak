@@ -15,7 +15,7 @@ ParseFen(char *fen)
   int file, rank;
   Game ret = NewEmptyGame(false, White);
   Piece piece;
-  Position pos;
+  Position king, pos;
   Side side;
 
   if(fen == NULL) {
@@ -176,7 +176,10 @@ ParseFen(char *fen)
   }
   ret.ChessSet.EmptySquares = ~ret.ChessSet.Occupancy;
 
+  king = BitScanForward(ret.ChessSet.Sets[ret.WhosTurn].Boards[King]);
   ret.CheckStats = CalculateCheckStats(&ret);
+  ret.CheckStats.CheckSources = AllAttackersTo(&ret.ChessSet, king, ret.ChessSet.Occupancy) &
+    ret.ChessSet.Sets[OPPOSITE(ret.WhosTurn)].Occupancy;
 
   return ret;
 }
