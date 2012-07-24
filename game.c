@@ -193,76 +193,102 @@ DoMove(Game *game, Move *move)
 
 // Determine whether the specified move places the current player into check.
 bool
-ExposesCheck(Game *game, BitBoard kingThreats, Move *move)
+GivesCheck(Game *game, Move *move)
 {
-  bool checked;
-  BitBoard king;
-  ChessSet clone;
-  Piece piece;
-  Position kingPos;
-  Side side = game->WhosTurn;
+  BitBoard bishopish, kingBoard, occNoFrom, rookish;
+  BitBoard fromBoard = POSBOARD(move->From);
+  BitBoard toBoard = POSBOARD(move->To);
+  int offset;
+  Position captureSquare, king, kingFrom, kingTo, rookFrom, rookTo;
+  Side side;
 
-  switch(move->Type) {
-  case CastleQueenSide:
-  case CastleKingSide:
-    // Castles are already checked for potential check scenarios.
-    return false;
-  case EnPassant:
-    break;
-  case Normal:
-    // Are we moving the king?
-    if(move->Piece == King) {
-      // Then it has to be to a square that is not attacked.
-      return (POSBOARD(move->To) & kingThreats) != EmptyBoard;
-    }
-    break;
-  case PromoteKnight:
-  case PromoteBishop:
-  case PromoteRook:
-  case PromoteQueen:
-    break;
+  // Direct check.
+  if((game->CheckStats.CheckSquares[move->Piece] & toBoard) != EmptyBoard) {
+    return true;
   }
 
-  king = game->ChessSet.Sets[side].Boards[King];
-  checked = (kingThreats & king) != EmptyBoard;
+  // Discovered checks.
+  if(game->CheckStats.Discovered != EmptyBoard &&
+     (game->CheckStats.Discovered & fromBoard) != EmptyBoard) {
+    switch(move->Piece) {
+    case Pawn:
+    case King:
+      // If the piece blocking the discovered check is a rook, knight or bishop, then for it not to
+      // be a direct check (considered above), it must be blocking an attack in the direction
+      // it cannot move. Therefore any movement will 'discover' the check. Since a queen can
+      // attack in all directions, it can't be involved.
+      // A pawn or king, however, can move in the same direction as the attack the 'discoverer'
+      // threatens, meaning our check is not revealed. So make sure from, to and the king do
+      // not sit along the same line!
 
-  if(!checked) {
-    // If not checked and piece being moved is not attacked, can't expose check.
-    if(move->Type != EnPassant && (POSBOARD(move->From) & kingThreats) == EmptyBoard) {
-      return false;
-    }
+      if(Aligned(move->From, move->To, game->CheckStats.AttackedKing)) {
+        break;
+      }
 
-    // Not checked and non-king piece being moved *is* being attacked.
-
-    kingPos = BitScanForward(king);
-    // If piece can't possibly result in revealed check, then can't expose check.
-    if(!CanSlideAttack[move->From][kingPos]) {
-      return false;
-    }
-  } else {
-    // Is checked and piece being moved is not a king.
-
-    // If move does not block check, then it must leave the check in place.
-    if(!move->Capture && !CanSlideAttack[move->To][BitScanForward(king)]) {
+      return true;
+    default:
       return true;
     }
   }
 
-  clone = game->ChessSet;
-
-  RemovePiece(&clone, side, move->Piece, move->From);
-
-  if(move->Type == EnPassant) {
-    RemovePiece(&clone, OPPOSITE(side), Pawn,
-                        move->To + (game->WhosTurn == White ? -8 : 8));
-  } else if(move->Capture) {
-    piece = PieceAt(&clone.Sets[OPPOSITE(side)], move->To);
-    RemovePiece(&clone, OPPOSITE(side), piece, move->To);
+  // If this is simply a normal move and we're here, then it's definitely not a checking move.
+  if(move->Type == Normal) {
+    return false;
   }
 
-  PlacePiece(&clone, side, move->Piece, move->To);
+  // GivesCheck() is called before the move is executed, so these are valid.
+  king = game->CheckStats.AttackedKing;
+  kingBoard = POSBOARD(king);
+  occNoFrom = game->ChessSet.Occupancy ^ POSBOARD(move->From);
+  side = game->WhosTurn;
 
-  return Checked(&clone, side);
+  switch(move->Type) {
+  case PromoteKnight:
+    return (KnightAttacksFrom(move->To) & kingBoard) != EmptyBoard;
+  case PromoteRook:
+    return (RookAttacksFrom(move->To, occNoFrom) & kingBoard) != EmptyBoard;
+  case PromoteBishop:
+    return (BishopAttacksFrom(move->To, occNoFrom) & kingBoard) != EmptyBoard;
+  case PromoteQueen:
+    return ((RookAttacksFrom(move->To, occNoFrom) | BishopAttacksFrom(move->To, occNoFrom)) &
+            kingBoard) != EmptyBoard;
+  case EnPassant:
+    captureSquare = POSITION(RANK(move->From), FILE(move->To));
+    occNoFrom ^= POSBOARD(captureSquare);
+    occNoFrom |= POSBOARD(move->To);
+
+    rookish = game->ChessSet.Sets[side].Boards[Rook] |
+      game->ChessSet.Sets[side].Boards[Queen];
+
+    bishopish = game->ChessSet.Sets[side].Boards[Bishop] |
+      game->ChessSet.Sets[side].Boards[Queen];
+
+    return ((RookAttacksFrom(king, occNoFrom)&rookish) |
+            (BishopAttacksFrom(king, occNoFrom)&bishopish)) != EmptyBoard;
+  case CastleQueenSide:
+    offset = side*8*7;
+    rookFrom = A1 + offset;
+    rookTo = D1 + offset;
+    kingFrom = E1 + offset;
+    kingTo = C1 + offset;
+
+    occNoFrom = game->ChessSet.Occupancy ^ kingFrom ^ rookFrom | rookTo | kingTo;
+    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
+  case CastleKingSide:
+    offset = side*8*7;
+    rookFrom = H1 + offset;
+    rookTo = F1 + offset;
+    kingFrom = E1 + offset;
+    kingTo = G1 + offset;
+
+    occNoFrom = game->ChessSet.Occupancy ^ kingFrom ^ rookFrom | rookTo | kingTo;
+    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
+  default:
+    panic("Invalid move type %d at this point.", move->Type);
+
+  }
+
+  return false;
 }
 
 void
