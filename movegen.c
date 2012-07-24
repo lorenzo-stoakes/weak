@@ -210,7 +210,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
       to = PopForward(&moveTargets);
       move.To = to;
 
-      AppendMove(ret, move);
+      AppendMove(slice, move);
     }
 
     // Captures.
@@ -219,7 +219,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
       to = PopForward(&captureTargets);
 
       move.To = to;
-      AppendMove(ret, move);
+      AppendMove(slice, move);
     }
   }
 }
