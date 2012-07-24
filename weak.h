@@ -134,8 +134,8 @@ struct CastleEventSlice {
 };
 
 struct CheckStats {
-  BitBoard Checks, CheckSquares[5], Discovered, Pinned;
-  Position AttackedKing;
+  BitBoard CheckSquares[6], CheckSources, Discovered, Pinned;
+  Position DefendedKing, AttackedKing;
 };
 
 struct CheckStatsSlice {
