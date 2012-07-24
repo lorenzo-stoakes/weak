@@ -193,9 +193,48 @@ DoMove(Game *game, Move *move)
   AppendCheckStats(&game->History.CheckStats, game->CheckStats);
   AppendMove(&game->History.Moves, *move);
 
-  game->CheckStats = CalculateCheckStats(game);
+  checks = EmptyBoard;
+  if(givesCheck) {
+    king = game->CheckStats.AttackedKing;
+
+    switch(move->Type) {
+    case Normal:
+    case PromoteKnight:
+    case PromoteBishop:
+    case PromoteRook:
+    case PromoteQueen:
+      if((checkStats.CheckSquares[piece] & POSBOARD(move->To)) != EmptyBoard) {
+        checks |= POSBOARD(move->To);
+      }
+
+      if(checkStats.Discovered != EmptyBoard &&
+         (checkStats.Discovered & POSBOARD(move->From)) != EmptyBoard) {
+
+        if(move->Piece != Rook) {
+          checks |= RookAttacksFrom(king, game->ChessSet.Occupancy) &
+            (game->ChessSet.Sets[side].Boards[Rook] |
+             game->ChessSet.Sets[side].Boards[Queen]);
+        }
+        if(move->Piece != Bishop) {
+          checks |= BishopAttacksFrom(king, game->ChessSet.Occupancy) &
+            (game->ChessSet.Sets[side].Boards[Bishop] |
+             game->ChessSet.Sets[side].Boards[Queen]);
+        }
+      }
+
+      break;
+    default:
+      checks = AllAttackersTo(&game->ChessSet, king, game->ChessSet.Occupancy) &
+        game->ChessSet.Sets[side].Occupancy;
+
+      break;
+    }
+  }
 
   ToggleTurn(game);
+
+  game->CheckStats = CalculateCheckStats(game);
+  game->CheckStats.CheckSources = checks;
 }
 
 // Determine whether the specified move places the current player into check.
