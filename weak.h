@@ -150,7 +150,6 @@ struct EnPassantSlice {
 
 struct MoveSlice {
   Move *Vals, *Curr;
-  int Len;
 };
 
 struct PieceSlice {

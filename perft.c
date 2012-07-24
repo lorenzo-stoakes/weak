@@ -17,10 +17,13 @@ QuickPerft(Game *game, int depth)
   allMoves = NewMoveSlice(buffer);
   AllMoves(&allMoves, game);
 
+  len = LenMoves(&allMoves);
+
   if(depth <= 1) {
 #if defined(SHOW_MOVES)
-    for(i = 0; i < allMoves.Len; i++) {
+    for(i = 0; i < len; i++) {
       move = allMoves.Vals[i];
+
       puts(StringMove(&move));
     }
 #endif
