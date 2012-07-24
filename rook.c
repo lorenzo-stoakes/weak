@@ -18,12 +18,9 @@ AllRookMoveTargets(ChessSet *chessSet, Side side)
   return RookMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Rook]);
 }
 
-// Get BitBoard encoding all squares threatened by rooks, ignoring opposing king.
 BitBoard
-RookKingThreats(ChessSet *chessSet, Side side)
+RookAttacksFrom(Position rook, BitBoard occupancy)
 {
-  return RookThreats(chessSet->Sets[side].Boards[Rook],
-                     chessSet->Occupancy ^ chessSet->Sets[OPPOSITE(side)].Boards[King]);
 }
 
 // Get BitBoard encoding capture targets for specified rooks without using magic BitBoards.

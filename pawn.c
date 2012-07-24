@@ -38,6 +38,10 @@ BitBoard
 PawnKingThreats(ChessSet *chessSet, Side side)
 {
   return PawnThreats(chessSet->Sets[side].Boards[Pawn], side);
+BitBoard
+PawnAttacksFrom(Position pawn, Side side)
+{
+  return PawnThreats(POSBOARD(pawn), side);
 }
 
 // Get BitBoard encoding specified pawns which are able to capture.

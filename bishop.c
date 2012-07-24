@@ -18,9 +18,11 @@ AllBishopMoveTargets(ChessSet *chessSet, Side side)
 // Get BitBoard encoding all squares threatened by bishops, ignoring opposing king.
 BitBoard
 BishopKingThreats(ChessSet *chessSet, Side side)
+BishopAttacksFrom(Position bishop, BitBoard occupancy)
 {
-  return BishopThreats(chessSet->Sets[side].Boards[Bishop],
-                       chessSet->Occupancy ^ chessSet->Sets[OPPOSITE(side)].Boards[King]);
+  return magicSquareThreats(bishop, occupancy);
+}
+
 }
 
 BitBoard

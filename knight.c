@@ -72,6 +72,14 @@ AllKnightMoveTargets(ChessSet *chessSet, Side side)
 }
 
 BitBoard
+
+BitBoard
+KnightAttacksFrom(Position knight)
+{
+  return knightSquares[knight];
+}
+
+BitBoard
 KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {
   Position knight;
