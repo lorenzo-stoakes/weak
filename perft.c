@@ -96,6 +96,7 @@ Perft(Game *game, int depth)
       DoMove(game, &move);
       if(game->CheckStats.CheckSources != EmptyBoard) {
         ret.Checks++;
+
         if(Checkmated(game)) {
           ret.Checkmates++;
         }
