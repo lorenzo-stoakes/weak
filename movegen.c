@@ -185,7 +185,7 @@ pawnMoves(Game *game, MoveSlice *slice, BitBoard mask)
 }
 
 static void
-pieceMoves(Piece piece, Game *game, MoveSlice *ret)
+pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
 {
   BitBoard captureTargets, moveTargets, pieceBoard;
   Move move;
@@ -199,8 +199,8 @@ pieceMoves(Piece piece, Game *game, MoveSlice *ret)
   while(pieceBoard) {
     from = PopForward(&pieceBoard);
 
-    moveTargets = GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
-    captureTargets = GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    moveTargets = GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
+    captureTargets = GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
 
     move.From = from;
 
