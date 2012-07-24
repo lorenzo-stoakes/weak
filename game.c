@@ -504,6 +504,51 @@ Stalemated(Game *game)
 }
 
 
+bool
+PseudoLegal(Game *game, Move *move)
+{
+  BitBoard bitBoard, opposition, pinned;
+  Position king;
+  Side opposite;
+
+  switch(move->Type) {
+  case EnPassant:
+    opposite = OPPOSITE(game->WhosTurn);
+    king = game->CheckStats.DefendedKing;
+
+    // Occupancy after en passant.
+    bitBoard = (game->ChessSet.Occupancy ^ POSBOARD(move->From) ^
+                POSBOARD(move->To + 8*(1 - 2*opposite))) | POSBOARD(move->To);
+
+    return (RookAttacksFrom(king, bitBoard) &
+       (game->ChessSet.Sets[opposite].Boards[Queen] |
+        game->ChessSet.Sets[opposite].Boards[Rook])) == EmptyBoard &&
+      (BishopAttacksFrom(king, bitBoard) &
+       (game->ChessSet.Sets[opposite].Boards[Queen] |
+        game->ChessSet.Sets[opposite].Boards[Bishop])) == EmptyBoard;
+
+  case CastleKingSide:
+  case CastleQueenSide:
+    // Castle legality already checked.
+    return true;
+  default:
+    break;
+  }
+
+  if(move->Piece == King) {
+    opposite = OPPOSITE(game->WhosTurn);
+    opposition = game->ChessSet.Sets[opposite].Occupancy;
+
+    return
+      (AllAttackersTo(&game->ChessSet, move->To,
+                      game->ChessSet.Occupancy) & opposition) == EmptyBoard;
+  }
+
+  pinned = game->CheckStats.Pinned;
+
+  // A non-king move is legal if its not pinned or is moving in the ray between it and the king.
+  return pinned == EmptyBoard || (pinned & POSBOARD(move->From)) == EmptyBoard ||
+    Aligned(move->From, move->To, game->CheckStats.DefendedKing);
 }
 
 // Toggle whose turn it is.
