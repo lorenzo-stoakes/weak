@@ -311,6 +311,7 @@ PopForward(BitBoard *bitBoard)
 // bishop.c
 BitBoard AllBishopCaptureTargets(ChessSet*, Side);
 BitBoard AllBishopMoveTargets(ChessSet*, Side);
+BitBoard BishopQueenAttackersTo(ChessSet*, Position, BitBoard);
 BitBoard BishopAttacksFrom(Position, BitBoard);
 BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
