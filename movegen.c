@@ -4,28 +4,26 @@ static void castleMoves(Game*, MoveSlice*);
 static void pawnMoves(Game*, MoveSlice*, BitBoard);
 static void pieceMoves(Piece, Game*, MoveSlice*, BitBoard);
 
+static void evasions(MoveSlice*, Game*);
+static void nonEvasions(MoveSlice*, Game*);
+
 // Get all valid moves for the current player.
 void
 AllMoves(MoveSlice *slice, Game *game)
 {
-  BitBoard kingThreats;
   Move *curr;
-  Piece piece;
 
-  kingThreats = KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn));  
-
-  // Get all psuedolegal moves.  
-
-  pawnMoves(game, slice);
-  for(piece = Knight; piece <= King; piece++) {
-    pieceMoves(piece, game, slice);
+  if(game->CheckStats.CheckSources == EmptyBoard) {
+    nonEvasions(slice, game);
+  } else {
+    evasions(slice, game);
   }
-  castleMoves(game, kingThreats, slice);
 
   // Filter out illegal moves.
   for(curr = slice->Vals; curr < slice->Curr;) {
-    if(ExposesCheck(game, kingThreats, curr)) {
-      slice->Curr--;      
+    if(!PseudoLegal(game, curr)) {
+      // Switch last move with the one we are rejecting.
+      slice->Curr--;
       *curr = *slice->Curr;
     } else {
       curr++;
