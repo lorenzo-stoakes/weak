@@ -722,7 +722,7 @@ initArrays()
 {
   BitBoard queenThreats;
   int delta;
-  Position from, pos, to;
+  int from, pos, to;
 
   for(from = A1; from <= H8; from++) {
     for(to = A1; to <= H8; to++) {
