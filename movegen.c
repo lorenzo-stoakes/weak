@@ -32,12 +32,15 @@ AllMoves(MoveSlice *slice, Game *game)
 }
 
 static void
-castleMoves(Game *game, BitBoard kingThreats, MoveSlice *ret)
+castleMoves(Game *game, MoveSlice *ret)
 {
+  BitBoard attackMask, occupancy, opposition;
+  bool good;
   CastleSide castleSide;
   Move move;
-  Position king;
+  Position king, pos;
   Side side = game->WhosTurn;
+  Side opposite;
 
   king = E1 + side*8*7;
 
@@ -47,12 +50,30 @@ castleMoves(Game *game, BitBoard kingThreats, MoveSlice *ret)
   move.Piece = King;
   move.To = king - 2;
 
+  // If we have the rights and aren't obstructed...
   for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
     if(game->CastlingRights[side][castleSide] &&
-       (game->ChessSet.Occupancy&CastlingMasks[side][castleSide]) == EmptyBoard &&
-       (kingThreats&(POSBOARD(king)|CastlingAttackMasks[side][castleSide])) == EmptyBoard) {       
-      move.Type = castleSide == KingSide ? CastleKingSide : CastleQueenSide;
-      AppendMove(ret, move);
+       (game->ChessSet.Occupancy&CastlingMasks[side][castleSide]) == EmptyBoard) {
+      occupancy = game->ChessSet.Occupancy;
+      opposite = OPPOSITE(side);
+      opposition = game->ChessSet.Sets[opposite].Occupancy;
+
+      good = true;
+      // ...Determine whether we are attacked along the attack mask.
+      attackMask = CastlingAttackMasks[side][castleSide];
+      while(attackMask) {
+        pos = PopForward(&attackMask);
+
+        if((AllAttackersTo(&game->ChessSet, pos, occupancy) & opposition) != EmptyBoard) {
+          good = false;
+          break;
+        }
+      }
+
+      if(good) {
+        move.Type = castleSide == KingSide ? CastleKingSide : CastleQueenSide;
+        AppendMove(ret, move);
+      }
     }
   }
 }
