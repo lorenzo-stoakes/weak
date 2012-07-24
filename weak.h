@@ -353,7 +353,6 @@ BitBoard SoWeOne(BitBoard);
 BitBoard SoWeRay(Position);
 
 // chessset.c
-bool     Checked(ChessSet*, Side);
 BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);

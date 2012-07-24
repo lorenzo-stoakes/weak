@@ -1,15 +1,5 @@
 #include "weak.h"
 
-bool
-Checked(ChessSet *chessSet, Side side)
-{
-  BitBoard king = chessSet->Sets[side].Boards[King];
-
-  return (KingThreats(chessSet, OPPOSITE(side))&king) != EmptyBoard;
-}
-
-// Get the bitboard which encodes a mask of all squares threatened by the specified side in the
-// chess set.
 BitBoard
 AllAttackersTo(ChessSet *chessSet, Position pos, BitBoard occupancy)
 {
