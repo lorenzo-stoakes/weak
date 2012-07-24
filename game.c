@@ -26,10 +26,10 @@ CalculateCheckStats(Game *game)
   ret.Pinned = PinnedPieces(&game->ChessSet, game->WhosTurn);
 
   // Attacks *from* king are equivalent to positions attacking *to* the king.
-  ret.CheckSquares[Pawn] = PawnThreats(kingBoard, opposition);
-  ret.CheckSquares[Knight] = KnightThreats(kingBoard);
-  ret.CheckSquares[Bishop] = BishopThreats(kingBoard, occupancy);
-  ret.CheckSquares[Rook] = RookThreats(kingBoard, occupancy);
+  ret.CheckSquares[Pawn] = PawnAttacksFrom(king, opposite);
+  ret.CheckSquares[Knight] = KnightAttacksFrom(king);
+  ret.CheckSquares[Bishop] = BishopAttacksFrom(king, occupancy);
+  ret.CheckSquares[Rook] = RookAttacksFrom(king, occupancy);
   ret.CheckSquares[Queen] = ret.CheckSquares[Rook] | ret.CheckSquares[Bishop];
 
   return ret;
