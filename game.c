@@ -669,7 +669,9 @@ castleLegal(Game *game, CastleSide castleSide)
 {
   BitBoard attackMask, mask;
   int offset;
-  Position rook;
+  Position pos, rook;
+  Side opposite = OPPOSITE(game->WhosTurn);
+  BitBoard opposition = game->ChessSet.Sets[opposite].Occupancy;
 
   if(!game->CastlingRights[game->WhosTurn][castleSide]) {
     return false;
@@ -700,9 +702,16 @@ castleLegal(Game *game, CastleSide castleSide)
 
   // If any of the squares the king passes through are threatened by the opponent then
   // castling is prevented.
+
+  // TODO: Reduce duplication between here and movegen.c.
   attackMask = CastlingAttackMasks[game->WhosTurn][castleSide];
-  if((attackMask&KingThreats(&game->ChessSet, OPPOSITE(game->WhosTurn))) != EmptyBoard) {
-    return false;
+  while(attackMask) {
+    pos = PopForward(&attackMask);
+
+    if((AllAttackersTo(&game->ChessSet, pos,
+                       game->ChessSet.Occupancy) & opposition) != EmptyBoard) {
+      return false;
+    }
   }
 
   return true;
