@@ -79,10 +79,11 @@ castleMoves(Game *game, MoveSlice *ret)
 }
 
 static void
-pawnMoves(Game *game, MoveSlice *slice)
+pawnMoves(Game *game, MoveSlice *slice, BitBoard mask)
 {
   int k;
-  BitBoard pushSources, captureSources, pushTargets, captureTargets, fromBoard, toBoard;
+  BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassantMask, fromBoard,
+    toBoard;
   Move move;
   MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
   Position from, to;
@@ -95,7 +96,7 @@ pawnMoves(Game *game, MoveSlice *slice)
   while(pushSources) {
     from = PopForward(&pushSources);
 
-    pushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    pushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
 
     while(pushTargets) {
       to = PopForward(&pushTargets);
@@ -122,7 +123,7 @@ pawnMoves(Game *game, MoveSlice *slice)
   while(captureSources) {
     from = PopForward(&captureSources);
 
-    captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from));
+    captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
 
     while(captureTargets) {
       to = PopForward(&captureTargets);
@@ -151,6 +152,11 @@ pawnMoves(Game *game, MoveSlice *slice)
   }
 
   toBoard = POSBOARD(game->EnPassantSquare);
+  enPassantMask = POSBOARD(game->EnPassantSquare + 8*(-1 + 2*game->WhosTurn));
+
+  if(((toBoard | enPassantMask) & mask) == EmptyBoard) {
+    return;
+  }
 
   switch(game->WhosTurn) {
   case White:
