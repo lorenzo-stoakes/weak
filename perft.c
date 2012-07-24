@@ -94,7 +94,7 @@ Perft(Game *game, int depth)
       }
 
       DoMove(game, &move);
-      if(Checked(&game->ChessSet, game->WhosTurn)) {
+      if(game->CheckStats.CheckSources != EmptyBoard) {
         ret.Checks++;
         if(Checkmated(game)) {
           ret.Checkmates++;

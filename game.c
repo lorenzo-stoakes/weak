@@ -552,7 +552,7 @@ castleLegal(Game *game, CastleSide castleSide)
     return false;
   }
 
-  if(Checked(&game->ChessSet, game->WhosTurn)) {
+  if(game->CheckStats.CheckSources != EmptyBoard) {
     return false;
   }
 
