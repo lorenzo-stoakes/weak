@@ -408,9 +408,9 @@ NewCheckStats()
   CheckStats ret;
   Piece piece;
 
-  ret.AttackedKing = EmptyPosition;  
-  ret.Checks = EmptyBoard;
-  for(piece = Pawn; piece < King; piece++) {
+  ret.AttackedKing = EmptyPosition;
+  ret.DefendedKing = EmptyPosition;
+  for(piece = Pawn; piece <= King; piece++) {
     ret.CheckSquares[piece] = EmptyBoard;
   }
   ret.Discovered = EmptyBoard;
@@ -458,6 +458,7 @@ NewGame(bool debug, Side humanSide)
   }
 
   ret.CheckStats = NewCheckStats();
+  ret.CheckStats.CheckSources = EmptyBoard;
   ret.CheckStats.AttackedKing = E1;
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
