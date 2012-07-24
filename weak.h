@@ -357,7 +357,7 @@ BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
 void     RemovePiece(ChessSet*, Side, Piece, Position);
-BitBoard PinnedPieces(ChessSet*, Side);
+BitBoard PinnedPieces(ChessSet*, Side, bool);
 void     PlacePiece(ChessSet*, Side, Piece, Position);
 
 // game.c
