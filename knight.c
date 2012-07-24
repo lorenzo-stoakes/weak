@@ -103,13 +103,6 @@ KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
   return ret;
 }
 
-// Get BitBoard encoding all squares threatened by knights.
-BitBoard
-KnightKingThreats(ChessSet *chessSet, Side side)
-{
-  return KnightThreats(chessSet->Sets[side].Boards[Knight]);
-}
-
 BitBoard
 KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
 {

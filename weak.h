@@ -314,7 +314,6 @@ BitBoard AllBishopCaptureTargets(ChessSet*, Side);
 BitBoard AllBishopMoveTargets(ChessSet*, Side);
 BitBoard BishopAttacksFrom(Position, BitBoard);
 BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard BishopKingThreats(ChessSet*, Side);
 BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard BishopSquareThreats(Position, BitBoard);
 BitBoard BishopThreats(BitBoard, BitBoard);
@@ -380,7 +379,6 @@ void        ToggleTurn(Game*);
 void        Unmove(Game*);
 
 // king.c
-BitBoard KingKingThreats(ChessSet*, Side);
 BitBoard KingAttacksFrom(Position);
 BitBoard KingCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard KingMoveTargets(ChessSet*, Side, BitBoard);
@@ -391,7 +389,6 @@ BitBoard AllKnightCaptureTargets(ChessSet*, Side);
 BitBoard AllKnightMoveTargets(ChessSet*, Side);
 BitBoard KnightAttacksFrom(Position);
 BitBoard KnightCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard KnightKingThreats(ChessSet*, Side);
 BitBoard KnightMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard KnightThreats(BitBoard);
 
@@ -412,7 +409,6 @@ BitBoard AllPawnPushTargets(ChessSet*, Side);
 BitBoard PawnAttacksFrom(Position, Side);
 BitBoard PawnCaptureSources(ChessSet*, Side, BitBoard);
 BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard PawnKingThreats(ChessSet*, Side);
 BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
 BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 BitBoard PawnThreats(BitBoard, Side);
@@ -424,7 +420,6 @@ uint64_t   QuickPerft(Game*, int);
 // queen.c
 BitBoard AllQueenCaptureTargets(ChessSet*, Side);
 BitBoard AllQueenMoveTargets(ChessSet*, Side);
-BitBoard QueenKingThreats(ChessSet*, Side);
 BitBoard QueenCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard QueenMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard QueenThreats(BitBoard, BitBoard);
@@ -434,7 +429,6 @@ BitBoard AllRookCaptureTargets(ChessSet*, Side);
 BitBoard AllRookMoveTargets(ChessSet*, Side);
 BitBoard RookAttacksFrom(Position, BitBoard);
 BitBoard RookCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard RookKingThreats(ChessSet*, Side);
 BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard RookSquareThreats(Position, BitBoard);
 BitBoard RookThreats(BitBoard, BitBoard);
