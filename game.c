@@ -190,7 +190,7 @@ DoMove(Game *game, Move *move)
   castleEvent = updateCastlingRights(game, move);
 
   AppendCastleEvent(&game->History.CastleEvents, castleEvent);
-  AppendCheckStats(&game->History.CheckStats, game->CheckStats);    
+  AppendCheckStats(&game->History.CheckStats, game->CheckStats);
   AppendMove(&game->History.Moves, *move);
 
   game->CheckStats = CalculateCheckStats(game);
