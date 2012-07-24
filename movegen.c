@@ -206,7 +206,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
 
     // Moves.
     move.Capture = false;
-    while(moveTargets) {
+    while(moveTargets != EmptyBoard) {
       to = PopForward(&moveTargets);
       move.To = to;
 
@@ -215,7 +215,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
 
     // Captures.
     move.Capture = true;
-    while(captureTargets) {
+    while(captureTargets != EmptyBoard) {
       to = PopForward(&captureTargets);
 
       move.To = to;
