@@ -378,6 +378,7 @@ void        ToggleTurn(Game*);
 void        Unmove(Game*);
 
 // king.c
+BitBoard KingAttackersTo(ChessSet*, Position);
 BitBoard KingAttacksFrom(Position);
 BitBoard KingCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard KingMoveTargets(ChessSet*, Side, BitBoard);
@@ -387,6 +388,7 @@ void     InitKnight(void);
 BitBoard AllKnightCaptureTargets(ChessSet*, Side);
 BitBoard AllKnightMoveTargets(ChessSet*, Side);
 BitBoard KnightAttacksFrom(Position);
+BitBoard KnightAttackersTo(ChessSet *, Position);
 BitBoard KnightCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard KnightMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard KnightThreats(BitBoard);
@@ -405,6 +407,7 @@ BitBoard AllPawnCaptureSources(ChessSet*, Side);
 BitBoard AllPawnCaptureTargets(ChessSet*, Side);
 BitBoard AllPawnPushSources(ChessSet*, Side);
 BitBoard AllPawnPushTargets(ChessSet*, Side);
+BitBoard PawnAttackersTo(ChessSet*, Position);
 BitBoard PawnAttacksFrom(Position, Side);
 BitBoard PawnCaptureSources(ChessSet*, Side, BitBoard);
 BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
@@ -426,6 +429,7 @@ BitBoard QueenThreats(BitBoard, BitBoard);
 // rook.c
 BitBoard AllRookCaptureTargets(ChessSet*, Side);
 BitBoard AllRookMoveTargets(ChessSet*, Side);
+BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard RookAttacksFrom(Position, BitBoard);
 BitBoard RookCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
