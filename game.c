@@ -9,17 +9,20 @@ static CastleEvent updateCastlingRights(Game*, Move*);
 CheckStats
 CalculateCheckStats(Game *game)
 {
-  BitBoard kingBoard;
+  BitBoard kingBoard, ourKingBoard;
   BitBoard occupancy = game->ChessSet.Occupancy;
   CheckStats ret;
-  Position king;
-  Side opposition = OPPOSITE(game->WhosTurn);
+  Position king, ourKing;
+  Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
 
-  kingBoard = game->ChessSet.Sets[opposition].Boards[King];
-
+  kingBoard = game->ChessSet.Sets[opposite].Boards[King];
   king = BitScanForward(kingBoard);
 
+  ourKingBoard = game->ChessSet.Sets[side].Boards[King];
+  ourKing = BitScanForward(ourKingBoard);
   ret.AttackedKing = king;
+  ret.DefendedKing = ourKing;
 
   // Pieces *we* pin are potential discovered checks.
   ret.Discovered = PinnedPieces(&game->ChessSet, OPPOSITE(game->WhosTurn));
