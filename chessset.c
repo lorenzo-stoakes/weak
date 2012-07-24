@@ -45,15 +45,15 @@ PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 }
 
 BitBoard
-PinnedPieces(ChessSet *chessSet, Side side)
+PinnedPieces(ChessSet *chessSet, Side side, bool pinned)
 {
   BitBoard attackers, bitBoard;
-  BitBoard ret = EmptyBoard;
-
-  BitBoard kingBoard  = chessSet->Sets[side].Boards[King];
+  BitBoard ret        = EmptyBoard;
+  Side     opposite   = OPPOSITE(side);
+  Side     pinner     = pinned ? opposite : side;
+  BitBoard kingBoard  = chessSet->Sets[pinned ? side : opposite].Boards[King];
   Position attacker;
   Position king       = BitScanForward(kingBoard);
-  Side     opposition = OPPOSITE(side);
 
   if(kingBoard == EmptyBoard) {
     panic("Empty king board!");
@@ -62,12 +62,12 @@ PinnedPieces(ChessSet *chessSet, Side side)
   // If we consider opponents attacks *from* the king's square, this is equivalent to
   // positions in which the pieces in question can attack *to* the king.
 
-  attackers = (chessSet->Sets[opposition].Boards[Rook] |
-               chessSet->Sets[opposition].Boards[Queen]) &
+  attackers = (chessSet->Sets[pinner].Boards[Rook] |
+               chessSet->Sets[pinner].Boards[Queen]) &
     EmptyAttacks[Rook][king];
 
-  attackers |= (chessSet->Sets[opposition].Boards[Bishop] |
-               chessSet->Sets[opposition].Boards[Queen]) &
+  attackers |= (chessSet->Sets[pinner].Boards[Bishop] |
+               chessSet->Sets[pinner].Boards[Queen]) &
     EmptyAttacks[Bishop][king];
 
   // If it's just not possible for there to be a pin, we give up here.
