@@ -749,7 +749,8 @@ initArrays()
         // positions. We then divide by the number of squares between the two and thus we get
         // the delta we need to apply.
         delta = (to - from) / Distance[from][to];
-        for(pos = from + delta; pos < to; pos += delta) {
+
+        for(pos = from + delta; pos != to; pos += delta) {
           Between[from][to] |= POSBOARD(pos);
         }
       }
