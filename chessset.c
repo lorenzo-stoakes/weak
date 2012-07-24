@@ -84,9 +84,10 @@ PinnedPieces(ChessSet *chessSet, Side side)
   while(attackers != EmptyBoard) {
     attacker = PopForward(&attackers);
 
-    bitBoard = Between[king][attacker] & chessSet->Sets[side].Occupancy;
+    bitBoard = Between[king][attacker] & chessSet->Occupancy;
 
-    if(bitBoard != EmptyBoard && SingleBit(bitBoard)) {
+    if(bitBoard != EmptyBoard && SingleBit(bitBoard) &&
+       (bitBoard & chessSet->Sets[side].Occupancy) != EmptyBoard) {
       ret |= bitBoard;
     }
   }
