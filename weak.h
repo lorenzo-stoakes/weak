@@ -400,13 +400,11 @@ Game ParseFen(char*);
 BitBoard AllPawnCaptureSources(ChessSet*, Side);
 BitBoard AllPawnCaptureTargets(ChessSet*, Side);
 BitBoard AllPawnPushSources(ChessSet*, Side);
-BitBoard AllPawnPushTargets(ChessSet*, Side);
 BitBoard PawnAttackersTo(ChessSet*, Position);
 BitBoard PawnAttacksFrom(Position, Side);
 BitBoard PawnCaptureSources(ChessSet*, Side, BitBoard);
 BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
 BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
-BitBoard PawnPushTargets(ChessSet*, Side, BitBoard);
 BitBoard PawnThreats(BitBoard, Side);
 
 // perft.c

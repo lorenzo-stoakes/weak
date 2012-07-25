@@ -2,8 +2,6 @@
 
 static BitBoard singlePushSources(ChessSet*, Side, BitBoard);
 static BitBoard doublePushSources(ChessSet*, Side, BitBoard);
-static BitBoard singlePushTargets(ChessSet*, Side, BitBoard);
-static BitBoard doublePushTargets(ChessSet*, Side, BitBoard, BitBoard);
 
 // Get BitBoard encoding capture sources for *all* pawns on specified side.
 BitBoard
@@ -24,13 +22,6 @@ BitBoard
 AllPawnPushSources(ChessSet *chessSet, Side side)
 {
   return PawnPushSources(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
-}
-
-// Get BitBoard encoding push targets for *all* pawns on specified side.
-BitBoard
-AllPawnPushTargets(ChessSet *chessSet, Side side)
-{
-  return PawnPushTargets(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
 }
 
 BitBoard
@@ -90,19 +81,10 @@ PawnPushSources(ChessSet *chessSet, Side side, BitBoard pawns)
     doublePushSources(chessSet, side, pawns);
 }
 
-// Get BitBoard encoding push targets for specified pawns.
-BitBoard
-PawnPushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
-{
-  BitBoard singlePushes = singlePushTargets(chessSet, side, pawns);
-
-  return singlePushes | doublePushTargets(chessSet, side, pawns, singlePushes);
-}
-
 BitBoard
 PawnThreats(BitBoard pawns, Side side)
 {
-  // TODO: Consider en passant.
+  // En passant handled separately.
 
   switch(side) {
   case White:
@@ -158,41 +140,6 @@ doublePushSources(ChessSet *chessSet, Side side, BitBoard pawns)
     emptyRank5 = empty & Rank5Mask;
     emptyRank5And6 = empty & NortOne(emptyRank5);
     return NortOne(emptyRank5And6) & pawns;
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
-}
-
-// Get BitBoard encoding single push targets for specified pawns.
-static BitBoard
-singlePushTargets(ChessSet *chessSet, Side side, BitBoard pawns)
-{
-  // Take advantage of the fact that shifting off the end of the uint64 simply pushes the
-  // bits into oblivion, so we need not worry about pawns on the last rank (assuming this
-  // method is used before promotion concerns are applied).
-  switch(side) {
-  case White:
-    return NortOne(pawns) & chessSet->EmptySquares;
-  case Black:
-    return SoutOne(pawns) & chessSet->EmptySquares;
-  }
-
-  panic("Invalid side %d.", side);
-  return EmptyBoard;
-}
-
-// Get BitBoard encoding double push targets for specified pawns.
-static BitBoard
-doublePushTargets(ChessSet *chessSet, Side side, BitBoard pawns, BitBoard singlePushes)
-{
-  // We can only double-push pawns if they are on the 2nd rank and thus end up on the 4th
-  // rank (5th for black).
-  switch(side) {
-  case White:
-    return NortOne(singlePushes) & chessSet->EmptySquares & Rank4Mask;
-  case Black:
-    return SoutOne(singlePushes) & chessSet->EmptySquares & Rank5Mask;
   }
 
   panic("Invalid side %d.", side);

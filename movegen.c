@@ -81,65 +81,77 @@ castleMoves(Game *game, MoveSlice *ret)
 static void
 pawnMoves(Game *game, MoveSlice *slice, BitBoard mask)
 {
+  bool singleOk, doubleOk;
   int k;
-  BitBoard pushSources, captureSources, pushTargets, captureTargets, enPassantMask, fromBoard,
+  BitBoard pushSources, captureSources, captureTargets, enPassantMask, fromBoard,
     toBoard;
   Move move;
   MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
-  Position from, to;
-  Rank promotionRank = game->WhosTurn == White ? Rank8 : Rank1;
+  Rank fromRank;
+  Rank doublePushRank = game->WhosTurn == White ? Rank2 : Rank7;
+  Rank promotionRank = game->WhosTurn == White ? Rank7 : Rank2;
+  int offset = game->WhosTurn == White ? 8 : -8;
 
   pushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
   captureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
 
+  move.Piece = Pawn;
+  move.Capture = false;
+  move.Type = Normal;
+
   // Pushes.
   while(pushSources) {
-    from = PopForward(&pushSources);
+    move.From = PopForward(&pushSources);
+    fromRank = RANK(move.From);
 
-    pushTargets = PawnPushTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
+    move.To = move.From + offset;
 
-    while(pushTargets) {
-      to = PopForward(&pushTargets);
+    singleOk = (POSBOARD(move.To)&mask&game->ChessSet.EmptySquares) != EmptyBoard;
+    doubleOk = (POSBOARD(move.To+offset)&mask&game->ChessSet.EmptySquares) != EmptyBoard;
 
-      move.Piece = Pawn;
-      move.From = from;
-      move.To = to;
-      move.Capture = false;
-      move.Type = Normal;
-
-      if(RANK(to) == promotionRank) {
-        for(k = 0; k < 4; k++) {
-          move.Type = promotions[k];
-          AppendMove(slice, move);
-        }
-      } else {
+    if(fromRank == promotionRank && singleOk) {
+      for(k = 0; k < 4; k++) {
+        move.Type = promotions[k];
         AppendMove(slice, move);
       }
+      move.Type = Normal;
+    } else if(fromRank == doublePushRank) {
+      if(singleOk) {
+        AppendMove(slice, move);
+      }
+      if(doubleOk) {
+        move.To += offset;
+        AppendMove(slice, move);
+      }
+    } else if(singleOk) {
+      AppendMove(slice, move);
     }
   }
 
   // Captures.
 
+  move.Capture = true;
+
   while(captureSources) {
-    from = PopForward(&captureSources);
+    move.From = PopForward(&captureSources);
 
-    captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
+    captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn,
+                                        POSBOARD(move.From)) & mask;
 
-    while(captureTargets) {
-      to = PopForward(&captureTargets);
+    if(RANK(move.From) == promotionRank) {
+      while(captureTargets) {
+        move.To = PopForward(&captureTargets);
 
-      move.Piece = Pawn;
-      move.From = from;
-      move.To = to;
-      move.Capture = true;
-      move.Type = Normal;
-
-      if(RANK(to) == promotionRank) {
         for(k = 0; k < 4; k++) {
           move.Type = promotions[k];
           AppendMove(slice, move);
         }
-      } else {
+        move.Type = Normal;
+      }
+    } else {
+      while(captureTargets) {
+        move.To = PopForward(&captureTargets);
+
         AppendMove(slice, move);
       }
     }
@@ -171,14 +183,12 @@ pawnMoves(Game *game, MoveSlice *slice, BitBoard mask)
 
   fromBoard &= game->ChessSet.Sets[game->WhosTurn].Boards[Pawn];
 
-  while(fromBoard) {
-    from = PopForward(&fromBoard);
+  move.Type = EnPassant;
+  move.To = game->EnPassantSquare;
+  move.Capture = true;
 
-    move.Piece = Pawn;
-    move.From = from;
-    move.To = game->EnPassantSquare;
-    move.Capture = true;
-    move.Type = EnPassant;
+  while(fromBoard) {
+    move.From = PopForward(&fromBoard);
 
     AppendMove(slice, move);
   }
@@ -207,16 +217,16 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
     case Bishop:
       attacks = BishopAttacksFrom(from, game->ChessSet.Occupancy);
 
-      break;            
+      break;
     case Rook:
       attacks = RookAttacksFrom(from, game->ChessSet.Occupancy);
 
-      break;      
+      break;
     case Queen:
       attacks = RookAttacksFrom(from, game->ChessSet.Occupancy) |
         BishopAttacksFrom(from, game->ChessSet.Occupancy);
 
-      break;      
+      break;
     case King:
       attacks = KingAttacksFrom(from);
 
@@ -226,7 +236,7 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
     }
 
     moveTargets = (attacks & game->ChessSet.EmptySquares) & mask;
-    captureTargets = (attacks & game->ChessSet.Sets[OPPOSITE(game->WhosTurn)].Occupancy) & mask;          
+    captureTargets = (attacks & game->ChessSet.Sets[OPPOSITE(game->WhosTurn)].Occupancy) & mask;
 
     move.From = from;
 
