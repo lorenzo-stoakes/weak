@@ -102,8 +102,6 @@ DoMove(Game *game, Move *move)
   game->EnPassantSquare = EmptyPosition;
 
   switch(move->Type) {
-  default:
-    panic("Move type %d not recognised.", move->Type);
   case CastleKingSide:
     DoCastleKingSide(game);
     break;
@@ -185,6 +183,9 @@ DoMove(Game *game, Move *move)
     PlacePiece(&game->ChessSet, side, piece, move->To);
 
     break;
+
+  default:
+    panic("Move type %d not recognised.", move->Type);    
   }
 
   castleEvent = updateCastlingRights(game, move);
