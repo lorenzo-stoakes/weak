@@ -187,7 +187,7 @@ pawnMoves(Game *game, MoveSlice *slice, BitBoard mask)
 static void
 pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
 {
-  BitBoard captureTargets, moveTargets, pieceBoard;
+  BitBoard attacks, captureTargets, moveTargets, pieceBoard;
   Move move;
   Position from, to;
 
@@ -199,8 +199,34 @@ pieceMoves(Piece piece, Game *game, MoveSlice *slice, BitBoard mask)
   while(pieceBoard) {
     from = PopForward(&pieceBoard);
 
-    moveTargets = GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
-    captureTargets = GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, POSBOARD(from)) & mask;
+    switch(piece) {
+    case Knight:
+      attacks = KnightAttacksFrom(from);
+
+      break;
+    case Bishop:
+      attacks = BishopAttacksFrom(from, game->ChessSet.Occupancy);
+
+      break;            
+    case Rook:
+      attacks = RookAttacksFrom(from, game->ChessSet.Occupancy);
+
+      break;      
+    case Queen:
+      attacks = RookAttacksFrom(from, game->ChessSet.Occupancy) |
+        BishopAttacksFrom(from, game->ChessSet.Occupancy);
+
+      break;      
+    case King:
+      attacks = KingAttacksFrom(from);
+
+      break;
+    default:
+      panic("Impossible.");
+    }
+
+    moveTargets = (attacks & game->ChessSet.EmptySquares) & mask;
+    captureTargets = (attacks & game->ChessSet.Sets[OPPOSITE(game->WhosTurn)].Occupancy) & mask;          
 
     move.From = from;
 
