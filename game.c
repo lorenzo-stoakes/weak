@@ -182,7 +182,7 @@ DoMove(Game *game, Move *move)
     break;
 
   default:
-    panic("Move type %d not recognised.", move->Type);    
+    panic("Move type %d not recognised.", move->Type);
   }
 
   castleEvent = updateCastlingRights(game, move);
