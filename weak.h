@@ -467,11 +467,6 @@ StringBuilder NewStringBuilder(void);
 void          ReleaseStringBuilder(StringBuilder*);
 void          SetUnbufferedOutput(void);
 
-// Move/Capture function arrays. Initialised in InitEngine() in game.c
-
-BitBoard (*GetMoveTargets[6])(ChessSet*, Side, BitBoard);
-BitBoard (*GetCaptureTargets[6])(ChessSet*, Side, BitBoard);
-
 // Array containing BitBoard of positions between two specified squares, as long as
 // they are on the same rank/file/diagonal. This is exclusive of the from and to squares.
 BitBoard Between[64][64];
