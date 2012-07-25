@@ -309,14 +309,9 @@ PopForward(BitBoard *bitBoard)
 }
 
 // bishop.c
-BitBoard AllBishopCaptureTargets(ChessSet*, Side);
-BitBoard AllBishopMoveTargets(ChessSet*, Side);
 BitBoard BishopQueenAttackersTo(ChessSet*, Position, BitBoard);
 BitBoard BishopAttacksFrom(Position, BitBoard);
-BitBoard BishopCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard BishopMoveTargets(ChessSet*, Side, BitBoard);
 BitBoard BishopSquareThreats(Position, BitBoard);
-BitBoard BishopThreats(BitBoard, BitBoard);
 
 // bitboard.c
 
@@ -381,18 +376,11 @@ void        Unmove(Game*);
 // king.c
 BitBoard KingAttackersTo(ChessSet*, Position);
 BitBoard KingAttacksFrom(Position);
-BitBoard KingCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard KingMoveTargets(ChessSet*, Side, BitBoard);
 
 // knight.c
 void     InitKnight(void);
-BitBoard AllKnightCaptureTargets(ChessSet*, Side);
-BitBoard AllKnightMoveTargets(ChessSet*, Side);
 BitBoard KnightAttacksFrom(Position);
 BitBoard KnightAttackersTo(ChessSet *, Position);
-BitBoard KnightCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard KnightMoveTargets(ChessSet*, Side, BitBoard);
-BitBoard KnightThreats(BitBoard);
 
 // magic.c
 void InitMagics(void);
@@ -420,22 +408,10 @@ BitBoard PawnThreats(BitBoard, Side);
 PerftStats Perft(Game*, int);
 uint64_t   QuickPerft(Game*, int);
 
-// queen.c
-BitBoard AllQueenCaptureTargets(ChessSet*, Side);
-BitBoard AllQueenMoveTargets(ChessSet*, Side);
-BitBoard QueenCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard QueenMoveTargets(ChessSet*, Side, BitBoard);
-BitBoard QueenThreats(BitBoard, BitBoard);
-
 // rook.c
-BitBoard AllRookCaptureTargets(ChessSet*, Side);
-BitBoard AllRookMoveTargets(ChessSet*, Side);
-BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard RookAttacksFrom(Position, BitBoard);
-BitBoard RookCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard RookMoveTargets(ChessSet*, Side, BitBoard);
+BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard RookSquareThreats(Position, BitBoard);
-BitBoard RookThreats(BitBoard, BitBoard);
 
 // set.c
 Set   NewBlackSet(void);

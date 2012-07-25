@@ -57,20 +57,6 @@ InitKnight()
   }
 }
 
-// Get BitBoard encoding capture targets for *all* knights on specified side.
-BitBoard
-AllKnightCaptureTargets(ChessSet *chessSet, Side side)
-{
-  return KnightCaptureTargets(chessSet, side, chessSet->Sets[side].Boards[Knight]);
-}
-
-// Get BitBoard encoding move targets for *all* knights on specified side.
-BitBoard
-AllKnightMoveTargets(ChessSet *chessSet, Side side)
-{
-  return KnightMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Knight]);
-}
-
 BitBoard
 KnightAttackersTo(ChessSet *chessSet, Position to)
 {
@@ -83,54 +69,4 @@ BitBoard
 KnightAttacksFrom(Position knight)
 {
   return knightSquares[knight];
-}
-
-BitBoard
-KnightCaptureTargets(ChessSet *chessSet, Side side, BitBoard knights)
-{
-  Position knight;
-  BitBoard ret;
-  BitBoard opposition = chessSet->Sets[OPPOSITE(side)].Occupancy;
-
-  ret = EmptyBoard;
-
-  while(knights) {
-    knight = PopForward(&knights);
-
-    ret |= knightSquares[knight] & opposition;
-  }
-
-  return ret;
-}
-
-BitBoard
-KnightMoveTargets(ChessSet *chessSet, Side side, BitBoard knights)
-{
-  BitBoard ret;
-  Position knight;
-
-  ret = EmptyBoard;
-
-  while(knights) {
-    knight = PopForward(&knights);
-
-    ret |= knightSquares[knight];
-  }
-
-  return ret & chessSet->EmptySquares;
-}
-
-BitBoard
-KnightThreats(BitBoard knights)
-{
-  BitBoard ret = EmptyBoard;
-  Position knight;
-
-  while(knights != EmptyBoard) {
-    knight = PopForward(&knights);
-
-    ret |= knightSquares[knight];
-  }
-
-  return ret;
 }

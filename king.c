@@ -19,24 +19,6 @@ KingAttacksFrom(Position king)
   return kingsSquares(POSBOARD(king));
 }
 
-// Target squares for king movement. Doesn't take into account moves which put the king in
-// check.
-BitBoard
-KingCaptureTargets(ChessSet *chessSet, Side side, BitBoard _)
-{
-  return kingsSquares(chessSet->Sets[side].Boards[King]) &
-    chessSet->Sets[OPPOSITE(side)].Occupancy;
-}
-
-// Target squares for king movement. Doesn't take into account moves which put the king in
-// check.
-BitBoard
-KingMoveTargets(ChessSet *chessSet, Side side, BitBoard _)
-{
-  // Can't move into other pieces.
-  return kingsSquares(chessSet->Sets[side].Boards[King]) & chessSet->EmptySquares;
-}
-
 // Obtain bitboard encoding all squares where the king could move to or capture a piece in
 // theory, should those squares be valid for movement/capture.
 static BitBoard

@@ -4,18 +4,6 @@
 static FORCE_INLINE BitBoard magicSquareThreats(Position, BitBoard);
 
 BitBoard
-AllBishopCaptureTargets(ChessSet *chessSet, Side side)
-{
-  return BishopCaptureTargets(chessSet, side, chessSet->Sets[side].Boards[Bishop]);
-}
-
-BitBoard
-AllBishopMoveTargets(ChessSet *chessSet, Side side)
-{
-  return BishopMoveTargets(chessSet, side, chessSet->Sets[side].Boards[Bishop]);
-}
-
-BitBoard
 BishopAttacksFrom(Position bishop, BitBoard occupancy)
 {
   return magicSquareThreats(bishop, occupancy);
@@ -29,37 +17,6 @@ BishopQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
     chessSet->Sets[White].Boards[Queen] |
     chessSet->Sets[Black].Boards[Queen]) &
     magicSquareThreats(to, occupancy);
-}
-
-BitBoard
-BishopCaptureTargets(ChessSet *chessSet, Side side, BitBoard bishops)
-{
-  BitBoard opposition = chessSet->Sets[OPPOSITE(side)].Occupancy;
-  BitBoard ret = EmptyBoard;
-  Position bishop;
-
-  while(bishops) {
-    bishop = PopForward(&bishops);
-
-    ret |= magicSquareThreats(bishop, chessSet->Occupancy);
-  }
-
-  return ret & opposition;
-}
-
-BitBoard
-BishopMoveTargets(ChessSet *chessSet, Side side, BitBoard bishops)
-{
-  BitBoard ret = EmptyBoard;
-  Position bishop;
-
-  while(bishops) {
-    bishop = PopForward(&bishops);
-
-    ret |= magicSquareThreats(bishop, chessSet->Occupancy);
-  }
-
-  return ret & chessSet->EmptySquares;
 }
 
 BitBoard
@@ -100,21 +57,6 @@ BishopSquareThreats(Position bishop, BitBoard occupancy)
     sowe &= ~SoWeRay(blocker);
   }
   ret |= sowe;
-
-  return ret;
-}
-
-BitBoard
-BishopThreats(BitBoard bishops, BitBoard occupancy)
-{
-  BitBoard ret = EmptyBoard;
-  Position bishop;
-
-  while(bishops != EmptyBoard) {
-    bishop = PopForward(&bishops);
-
-    ret |= magicSquareThreats(bishop, occupancy);
-  }
 
   return ret;
 }
