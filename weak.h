@@ -283,6 +283,10 @@ BitScanForward(BitBoard bitBoard)
   __asm__("bsfq %1, %0": "=r"(posBoard): "rm"(bitBoard));
   return (Position)posBoard;
 }
+#else
+// bitboard.c
+Position BitScanBackward(BitBoard);
+Position BitScanForward(BitBoard);
 #endif
 
 FORCE_INLINE int
@@ -324,10 +328,6 @@ BitBoard BishopSquareThreats(Position, BitBoard);
 // See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
 
 bool Aligned(Position, Position, Position);
-#ifndef USE_BITSCAN_ASM
-Position BitScanBackward(BitBoard);
-Position BitScanForward(BitBoard);
-#endif
 BitBoard FlipDiagA1H8(BitBoard);
 BitBoard FlipVertical(BitBoard);
 void     InitRays(void);
@@ -335,7 +335,6 @@ int      PopCount(BitBoard);
 bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
-
 BitBoard NortOne(BitBoard);
 BitBoard NortRay(Position);
 BitBoard EastOne(BitBoard);
