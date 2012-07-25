@@ -261,6 +261,12 @@ static const BitBoard
   Rank7Mask                      =  C64(0x00ff000000000000),
   Rank8Mask                      =  C64(0xff00000000000000);
 
+FORCE_INLINE void
+AppendMove(MoveSlice *slice, Move move)
+{
+  *slice->Curr++ = move;
+}
+
 #if defined(USE_BITSCAN_ASM)
 FORCE_INLINE Position
 BitScanBackward(BitBoard bitBoard)
@@ -423,13 +429,6 @@ void  SetRemovePiece(Set*, Piece, Position);
 // slices.c
 void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
 void             AppendEnpassantSquare(EnPassantSlice*, Position);
-
-FORCE_INLINE void
-AppendMove(MoveSlice *slice, Move move)
-{
-  *slice->Curr++ = move;
-}
-
 void             AppendCheckStats(CheckStatsSlice*, CheckStats);
 void             AppendPiece(PieceSlice*, Piece);
 int              LenMoves(MoveSlice*);
