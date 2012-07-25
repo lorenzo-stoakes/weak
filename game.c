@@ -714,8 +714,8 @@ initArrays()
   }
 
   for(from = A1; from <= H8; from++) {
-    EmptyAttacks[Bishop][from] = BishopThreats(POSBOARD(from), EmptyBoard);
-    EmptyAttacks[Rook][from] = RookThreats(POSBOARD(from), EmptyBoard);
+    EmptyAttacks[Bishop][from] = BishopAttacksFrom(from, EmptyBoard);
+    EmptyAttacks[Rook][from] = RookAttacksFrom(from, EmptyBoard);
     EmptyAttacks[Queen][from] = EmptyAttacks[Bishop][from] | EmptyAttacks[Rook][from];
 
     queenThreats = EmptyAttacks[Queen][from];
