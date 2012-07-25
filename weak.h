@@ -362,7 +362,6 @@ void        DoCastleKingSide(Game*);
 void        DoCastleQueenSide(Game*);
 bool        GivesCheck(Game*, Move*);
 void        InitEngine(void);
-bool        Legal(Game*, Move*);
 void        DoMove(Game*, Move*);
 CheckStats  NewCheckStats(void);
 Game        NewEmptyGame(bool, Side);

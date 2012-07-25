@@ -1,10 +1,7 @@
 #include "weak.h"
 
-static bool        castleLegal(Game*, CastleSide);
-static void        initArrays(void);
-static bool        pawnLegal(Game*, Move*);
-static bool        pieceLegal(Piece, Game*, Move*);
-static CastleEvent updateCastlingRights(Game*, Move*);
+ void        initArrays(void);
+ CastleEvent updateCastlingRights(Game*, Move*);
 
 CheckStats
 CalculateCheckStats(Game *game)
@@ -109,7 +106,7 @@ DoMove(Game *game, Move *move)
     DoCastleQueenSide(game);
     break;
   case EnPassant:
-    // Panic, because in the usual course of the game .Legal() would have picked
+    // Panic, because in the usual course of the game .PseudoLegal() would have picked
     // these up, and the move makes no sense without these conditions being true.
     if(move->Piece != Pawn) {
       panic("Expected pawn, en passant performed on piece %s.", move->Piece);
@@ -346,47 +343,6 @@ InitEngine()
   // Relies on above.
   InitMagics();
   initArrays();
-}
-
-// Is the proposed move legal in this game?
-bool
-Legal(Game *game, Move *move)
-{
-  Piece piece;
-
-  switch(move->Type) {
-  default:
-    panic("Move type %d not yet implemented.", move->Type);
-    break;
-  case CastleQueenSide:
-    return castleLegal(game, QueenSide);
-  case CastleKingSide:
-    return castleLegal(game, KingSide);
-  case EnPassant:
-    if(move->Piece != Pawn || !move->Capture) {
-      return false;
-    }
-  case PromoteKnight:
-  case PromoteBishop:
-  case PromoteRook:
-  case PromoteQueen:
-  case Normal:
-    break;
-  }
-
-  // Moves which accomplish nothing are illegal.
-  if(move->From == move->To) {
-    return false;
-  }
-
-  // Have to move from an occupied square, and it has to be the piece the move purports
-  // it to be.
-  piece = PieceAt(&game->ChessSet.Sets[game->WhosTurn], move->From);
-  if(piece == MissingPiece || piece != move->Piece) {
-    return false;
-  }
-
-  return move->Piece == Pawn ? pawnLegal(game, move) : pieceLegal(move->Piece, game, move);
 }
 
 CheckStats
@@ -647,60 +603,7 @@ Unmove(Game *game)
   }
 }
 
-static bool
-castleLegal(Game *game, CastleSide castleSide)
-{
-  BitBoard attackMask, mask;
-  int offset;
-  Position pos, rook;
-  Side opposite = OPPOSITE(game->WhosTurn);
-  BitBoard opposition = game->ChessSet.Sets[opposite].Occupancy;
-
-  if(!game->CastlingRights[game->WhosTurn][castleSide]) {
-    return false;
-  }
-
-  if(game->CheckStats.CheckSources != EmptyBoard) {
-    return false;
-  }
-
-  offset = game->WhosTurn*7*8;
-
-  if((game->ChessSet.Sets[game->WhosTurn].Boards[King]&POSBOARD(E1+offset)) == EmptyBoard) {
-    return false;
-  }
-
-  rook = castleSide == QueenSide ? A1 : H1;
-  rook += offset;
-
-  if((game->ChessSet.Sets[game->WhosTurn].Boards[Rook]&POSBOARD(rook)) == EmptyBoard) {
-    return false;
-  }
-
-  // Obstructions clearly prevent castling.
-  mask = CastlingMasks[game->WhosTurn][castleSide];
-  if((mask&game->ChessSet.Occupancy) != EmptyBoard) {
-    return false;
-  }
-
-  // If any of the squares the king passes through are threatened by the opponent then
-  // castling is prevented.
-
-  // TODO: Reduce duplication between here and movegen.c.
-  attackMask = CastlingAttackMasks[game->WhosTurn][castleSide];
-  while(attackMask) {
-    pos = PopForward(&attackMask);
-
-    if((AllAttackersTo(&game->ChessSet, pos,
-                       game->ChessSet.Occupancy) & opposition) != EmptyBoard) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-static void
+void
 initArrays()
 {
   BitBoard queenThreats;
@@ -746,96 +649,7 @@ initArrays()
   }
 }
 
-// Is this pawn move legal?
-static bool
-pawnLegal(Game *game, Move *move)
-{
-  BitBoard sources, targets, validToRankMask;
-  BitBoard fromBoard = POSBOARD(move->From), toBoard = POSBOARD(move->To);
-  Rank expectedRank, rank;
-
-  switch(move->Type) {
-  default:
-    panic("Move type %d in pawnLegal.", move->Type);
-  case EnPassant:
-    // En passants are captures. Full stop.
-    if(!move->Capture) {
-      return false;
-    }
-
-    // Has to be to the en passant square, of course!
-    if(move->To != game->EnPassantSquare) {
-      return false;
-    }
-
-    // From has to be from one of the two possible sources for an attack on the en passant
-    // square.
-    switch(game->WhosTurn) {
-    case White:
-      return ((SoWeOne(toBoard)|SoEaOne(toBoard))&fromBoard) != EmptyBoard;
-    case Black:
-      return ((NoWeOne(toBoard)|NoEaOne(toBoard))&fromBoard) != EmptyBoard;
-    default:
-      panic("Invalid side %d.", game->WhosTurn);
-    }
-
-    panic("Impossible.");
-  case PromoteKnight:
-  case PromoteBishop:
-  case PromoteRook:
-  case PromoteQueen:
-    rank = RANK(move->To);
-    if(game->WhosTurn == White) {
-      expectedRank = Rank8;
-      validToRankMask = Rank8Mask;
-    } else if(game->WhosTurn == Black) {
-      expectedRank = Rank1;
-      validToRankMask = Rank1Mask;
-    } else {
-      panic("Unrecognised side %d.", game->WhosTurn);
-    }
-  if(rank != expectedRank) {
-    return false;
-  }
-  break;
-  case Normal:
-    if(game->WhosTurn == White) {
-      validToRankMask = NotRank8Mask;
-    } else if(game->WhosTurn == Black) {
-      validToRankMask = NotRank1Mask;
-    } else {
-      panic("Unrecognised side %d.", game->WhosTurn);
-    }
-    break;
-  }
-
-  if(move->Capture) {
-    sources = PawnCaptureSources(&game->ChessSet, game->WhosTurn, fromBoard);
-    targets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn, fromBoard);
-  } else {
-    sources = PawnPushSources(&game->ChessSet, game->WhosTurn, fromBoard);
-    targets = PawnPushTargets(&game->ChessSet, game->WhosTurn, fromBoard);
-  }
-
-  // Since sources are referenced against our single candidate pawn, their being non-empty
-  // means the pawn is able to move. If the pawn's valid targets and our 'to' position
-  // intersect, then the to position is valid.
-  return sources != EmptyBoard && (targets&toBoard&validToRankMask) != EmptyBoard;
-}
-
-static bool
-pieceLegal(Piece piece, Game *game, Move *move)
-{
-  BitBoard from = POSBOARD(move->From), to = POSBOARD(move->To);
-
-  if(move->Capture) {
-    return (to&GetCaptureTargets[piece](&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-  }
-
-  return (to&GetMoveTargets[piece](&game->ChessSet, game->WhosTurn, from)) != EmptyBoard;
-}
-
-static CastleEvent
+CastleEvent
 updateCastlingRights(Game *game, Move *move)
 {
   int offset;
