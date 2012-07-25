@@ -5,11 +5,13 @@
 //#define SHOW_PERFT_STATS
 
 #define FEN FEN1
-#define DEPTH 4
+#define DEPTH 6
+#define REPETITIONS 1
 
 int
 main(int argc, char **argv)
 {
+  int i;
   clock_t ticks;
   double elapsed;
   Game game;
@@ -31,18 +33,20 @@ main(int argc, char **argv)
   game = ParseFen(FEN);
 
   ticks = clock();
+  for(i = 0; i < REPETITIONS; i++) {
 #if defined(SHOW_PERFT_STATS)
-  ret = Perft(&game, DEPTH);
+    ret = Perft(&game, DEPTH);
 #else
-  ret = QuickPerft(&game, DEPTH);
+    ret = QuickPerft(&game, DEPTH);
 #endif
+  }
   ticks = clock() - ticks;
   // In ms.
-  elapsed = 1000*((double)ticks)/CLOCKS_PER_SEC;
+  elapsed = 1000*((double)ticks)/CLOCKS_PER_SEC/REPETITIONS;
 
 #if defined(SHOW_PERFT_STATS)
   puts(StringPerft(&ret));
-  printf("%f elapsed.\n", elapsed);
+  printf("%fms elapsed.\n", elapsed);
 #else
   printf("%llu - %f elapsed.\n", ret, elapsed);
 #endif
