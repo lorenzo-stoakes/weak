@@ -14,3 +14,7 @@ analysis
 weak
 tests/test
 benches/bench
+
+# Directory for handy utils that aren't worth saving to the repo.
+
+util/*
