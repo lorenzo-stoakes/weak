@@ -16,7 +16,7 @@ InitKing()
 
     bitBoard = EastOne(king) | WestOne(king);
     king |= bitBoard;
-    bitBoard |= NortOne(king) | SoutOne(king);    
+    bitBoard |= NortOne(king) | SoutOne(king);
 
     kingSquares[pos] = bitBoard;
   }

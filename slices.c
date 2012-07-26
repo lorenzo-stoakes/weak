@@ -92,7 +92,7 @@ PopCastleEvent(CastleEventSlice *slice)
 {
   slice->Curr--;
 
-  return *slice->Curr;  
+  return *slice->Curr;
 }
 
 CheckStats
