@@ -488,8 +488,8 @@ PseudoLegal(Game *game, Move *move, BitBoard pinned)
   }
 
   // A non-king move is legal if its not pinned or is moving in the ray between it and the king.
-  return game->CheckStats.Pinned == EmptyBoard ||
-    (game->CheckStats.Pinned & POSBOARD(move->From)) == EmptyBoard ||
+  return pinned == EmptyBoard ||
+    (pinned & POSBOARD(move->From)) == EmptyBoard ||
     Aligned(move->From, move->To, game->CheckStats.DefendedKing);
 }
 
