@@ -333,11 +333,6 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
-// bishop.c
-BitBoard BishopQueenAttackersTo(ChessSet*, Position, BitBoard);
-BitBoard BishopAttacksFrom(Position, BitBoard);
-BitBoard BishopSquareThreats(Position, BitBoard);
-
 // bitboard.c
 
 // See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
@@ -392,16 +387,6 @@ bool        Stalemated(Game*);
 void        ToggleTurn(Game*);
 void        Unmove(Game*);
 
-// king.c
-void     InitKing(void);
-BitBoard KingAttackersTo(ChessSet*, Position);
-BitBoard KingAttacksFrom(Position);
-
-// knight.c
-void     InitKnight(void);
-BitBoard KnightAttacksFrom(Position);
-BitBoard KnightAttackersTo(ChessSet *, Position);
-
 // magic.c
 void InitMagics(void);
 
@@ -411,16 +396,23 @@ void AllMoves(MoveSlice*, Game*);
 // parser.c
 Game ParseFen(char*);
 
-// pawn.c
-void     InitPawn(void);
-BitBoard PawnAttackersTo(ChessSet*, Position);
-BitBoard PawnAttacksFrom(Position, Side);
-
 // perft.c
 PerftStats Perft(Game*, int);
 uint64_t   QuickPerft(Game*, int);
 
-// rook.c
+// pieces.c
+BitBoard BishopAttacksFrom(Position, BitBoard);
+BitBoard BishopQueenAttackersTo(ChessSet*, Position, BitBoard);
+BitBoard BishopSquareThreats(Position, BitBoard);
+void     InitKing(void);
+void     InitKnight(void);
+void     InitPawn(void);
+BitBoard KingAttacksFrom(Position);
+BitBoard KingAttackersTo(ChessSet*, Position);
+BitBoard KnightAttacksFrom(Position);
+BitBoard KnightAttackersTo(ChessSet *, Position);
+BitBoard PawnAttackersTo(ChessSet*, Position);
+BitBoard PawnAttacksFrom(Position, Side);
 BitBoard RookAttacksFrom(Position, BitBoard);
 BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard RookSquareThreats(Position, BitBoard);
