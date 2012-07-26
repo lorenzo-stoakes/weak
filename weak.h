@@ -360,14 +360,6 @@ BitBoard SoEaRay(Position);
 BitBoard SoWeOne(BitBoard);
 BitBoard SoWeRay(Position);
 
-// chessset.c
-BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
-ChessSet NewChessSet(void);
-ChessSet NewEmptyChessSet(void);
-void     RemovePiece(ChessSet*, Side, Piece, Position);
-BitBoard PinnedPieces(ChessSet*, Side, bool);
-void     PlacePiece(ChessSet*, Side, Piece, Position);
-
 // game.c
 CheckStats  CalculateCheckStats(Game*);
 bool        Checkmated(Game*);
@@ -416,12 +408,18 @@ BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard RookSquareThreats(Position, BitBoard);
 
 // set.c
-Set   NewBlackSet(void);
-Set   NewEmptySet(void);
-Set   NewWhiteSet(void);
-Piece PieceAt(Set*, Position);
-void  SetPlacePiece(Set*, Piece, Position);
-void  SetRemovePiece(Set*, Piece, Position);
+BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
+Set      NewBlackSet(void);
+ChessSet NewChessSet(void);
+ChessSet NewEmptyChessSet(void);
+Set      NewEmptySet(void);
+Set      NewWhiteSet(void);
+Piece    PieceAt(Set*, Position);
+BitBoard PinnedPieces(ChessSet*, Side, bool);
+void     PlacePiece(ChessSet*, Side, Piece, Position);
+void     RemovePiece(ChessSet*, Side, Piece, Position);
+void     SetPlacePiece(Set*, Piece, Position);
+void     SetRemovePiece(Set*, Piece, Position);
 
 // slices.c
 void             AppendPiece(PieceSlice*, Piece);
