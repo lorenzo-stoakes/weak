@@ -448,7 +448,7 @@ Stalemated(Game *game)
 
 
 bool
-PseudoLegal(Game *game, Move *move)
+PseudoLegal(Game *game, Move *move, BitBoard pinned)
 {
   BitBoard bitBoard, opposition;
   Position king;

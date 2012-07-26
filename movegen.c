@@ -11,6 +11,7 @@ static void nonEvasions(MoveSlice*, Game*);
 void
 AllMoves(MoveSlice *slice, Game *game)
 {
+  BitBoard pinned;
   Move *curr;
 
   if(game->CheckStats.CheckSources == EmptyBoard) {
@@ -19,9 +20,11 @@ AllMoves(MoveSlice *slice, Game *game)
     evasions(slice, game);
   }
 
+  pinned = game->CheckStats.Pinned;
+
   // Filter out illegal moves.
   for(curr = slice->Vals; curr < slice->Curr;) {
-    if(!PseudoLegal(game, curr)) {
+    if(!PseudoLegal(game, curr, pinned)) {
       // Switch last move with the one we are rejecting.
       slice->Curr--;
       *curr = *slice->Curr;

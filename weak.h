@@ -372,7 +372,7 @@ CheckStats  NewCheckStats(void);
 Game        NewEmptyGame(bool, Side);
 Game        NewGame(bool, Side);
 MoveHistory NewMoveHistory(void);
-bool        PseudoLegal(Game*, Move*);
+bool        PseudoLegal(Game*, Move*, BitBoard);
 bool        Stalemated(Game*);
 void        ToggleTurn(Game*);
 void        Unmove(Game*);
