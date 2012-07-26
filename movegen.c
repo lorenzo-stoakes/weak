@@ -625,8 +625,8 @@ pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
   }
 
   // Promotions.
-  if(pawnsOn2 != EmptyBoard) {
-    bitBoard1 = SoutOne(pawnsOn2) & empty & mask;
+  if(pawnsOn2 != EmptyBoard && (mask & Rank1Mask) != EmptyBoard) {
+    bitBoard1 = SoutOne(pawnsOn2) & empty;
 
     while(bitBoard1) {
       to = PopForward(&bitBoard1);
@@ -649,9 +649,7 @@ pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
 
     move.Capture = true;
 
-    bitBoard1 = SoWeOne(pawnsOn2) & opposition & mask;
-    bitBoard2 = SoEaOne(pawnsOn2) & opposition & mask;
-
+    bitBoard1 = SoWeOne(pawnsOn2) & opposition;
     while(bitBoard1) {
       to = PopForward(&bitBoard1);
 
@@ -671,6 +669,7 @@ pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
       AppendMove(slice, move);
     }
 
+    bitBoard2 = SoEaOne(pawnsOn2) & opposition;
     while(bitBoard2) {
       to = PopForward(&bitBoard2);
 
@@ -696,8 +695,8 @@ pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
   move.Type = Normal;
   move.Capture = true;
 
-  bitBoard1 = SoWeOne(pawnsNotOn2) & opposition & mask;
-  bitBoard2 = SoEaOne(pawnsNotOn2) & opposition & mask;
+  bitBoard1 = SoWeOne(pawnsNotOn2) & opposition;
+  bitBoard2 = SoEaOne(pawnsNotOn2) & opposition;
 
   while(bitBoard1) {
     to = PopForward(&bitBoard1);
