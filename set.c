@@ -104,19 +104,13 @@ PieceAt(Set *set, Position pos)
 }
 
 BitBoard
-PinnedPieces(ChessSet *chessSet, Side side, bool pinned)
+PinnedPieces(ChessSet *chessSet, Side side, BitBoard king, bool pinned)
 {
   BitBoard attackers, bitBoard;
   BitBoard ret        = EmptyBoard;
   Side     opposite   = OPPOSITE(side);
   Side     pinner     = pinned ? opposite : side;
-  BitBoard kingBoard  = chessSet->Sets[pinned ? side : opposite].Boards[King];
   Position attacker;
-  Position king       = BitScanForward(kingBoard);
-
-  if(kingBoard == EmptyBoard) {
-    panic("Empty king board!");
-  }
 
   // If we consider opponents attacks *from* the king's square, this is equivalent to
   // positions in which the pieces in question can attack *to* the king.

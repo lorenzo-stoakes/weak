@@ -415,7 +415,7 @@ ChessSet NewEmptyChessSet(void);
 Set      NewEmptySet(void);
 Set      NewWhiteSet(void);
 Piece    PieceAt(Set*, Position);
-BitBoard PinnedPieces(ChessSet*, Side, bool);
+BitBoard PinnedPieces(ChessSet*, Side, BitBoard, bool);
 void     PlacePiece(ChessSet*, Side, Piece, Position);
 void     RemovePiece(ChessSet*, Side, Piece, Position);
 void     SetPlacePiece(Set*, Piece, Position);
