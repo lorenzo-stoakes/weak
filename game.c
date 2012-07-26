@@ -337,6 +337,7 @@ GivesCheck(Game *game, Move *move)
 void
 InitEngine()
 {
+  InitKing();
   InitKnight();
   InitRays();
 

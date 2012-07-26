@@ -378,6 +378,7 @@ void        ToggleTurn(Game*);
 void        Unmove(Game*);
 
 // king.c
+void     InitKing(void);
 BitBoard KingAttackersTo(ChessSet*, Position);
 BitBoard KingAttacksFrom(Position);
 
