@@ -6,12 +6,11 @@ static void evasions(MoveSlice*, Game*);
 static void kingMoves(Game *, MoveSlice *, BitBoard, BitBoard, BitBoard);
 static void knightMoves(Game*, MoveSlice*, BitBoard, BitBoard, BitBoard);
 static void nonEvasions(MoveSlice*, Game*);
-static void pawnMoves(Game*, MoveSlice*, BitBoard);
 static void queenMoves(Game*, MoveSlice*, BitBoard, BitBoard, BitBoard, BitBoard);
 static void rookMoves(Game*, MoveSlice*, BitBoard, BitBoard, BitBoard, BitBoard);
 
-static void pawnMovesBlackNonEvasion(Game*, MoveSlice*);
-static void pawnMovesWhiteNonEvasion(Game*, MoveSlice*);
+static void pawnMovesBlack(Game*, MoveSlice*, BitBoard);
+static void pawnMovesWhite(Game*, MoveSlice*, BitBoard);
 
 // Get all valid moves for the current player.
 void
@@ -218,7 +217,11 @@ evasions(MoveSlice *slice, Game *game)
   // be the sole checker.
   targets = Between[check][king] | game->CheckStats.CheckSources;
 
-  pawnMoves(game, slice, targets);
+  if(side == White) {
+    pawnMovesWhite(game, slice, targets);
+  } else {
+    pawnMovesBlack(game, slice, targets);
+  }
 
   // King already handled.
   knightMoves(game, slice, empty, opposition, targets);
@@ -312,15 +315,11 @@ nonEvasions(MoveSlice *slice, Game *game)
   BitBoard occupancy =  game->ChessSet.Occupancy;
   BitBoard opposition = game->ChessSet.Sets[opposite].Occupancy;
 
-  pawnMoves(game, slice, FullyOccupied);
-
-  /*
-  if(game->WhosTurn == White) {
-    pawnMovesWhiteNonEvasion(game, slice);
+  if(side == White) {
+    pawnMovesWhite(game, slice, FullyOccupied);
   } else {
-    pawnMovesBlackNonEvasion(game, slice);
+    pawnMovesBlack(game, slice, FullyOccupied);
   }
-  */
 
   knightMoves(game, slice, empty, opposition,            FullyOccupied);
   bishopMoves(game, slice, empty, opposition, occupancy, FullyOccupied);
@@ -329,124 +328,6 @@ nonEvasions(MoveSlice *slice, Game *game)
   kingMoves  (game, slice, empty, opposition,            FullyOccupied);
 
   castleMoves(game, slice);
-}
-
-static void
-pawnMoves(Game *game, MoveSlice *slice, BitBoard mask)
-{
-  bool singleOk, doubleOk;
-  int k;
-  BitBoard pushSources, captureSources, captureTargets, enPassantMask, fromBoard,
-    toBoard;
-  Move move;
-  MoveType promotions[] = {PromoteKnight, PromoteBishop, PromoteRook, PromoteQueen};
-  Rank fromRank;
-  Rank doublePushRank = game->WhosTurn == White ? Rank2 : Rank7;
-  Rank promotionRank = game->WhosTurn == White ? Rank7 : Rank2;
-  int offset = game->WhosTurn == White ? 8 : -8;
-
-  BitBoard empty = game->ChessSet.EmptySquares;
-
-  pushSources = AllPawnPushSources(&game->ChessSet, game->WhosTurn);
-  captureSources = AllPawnCaptureSources(&game->ChessSet, game->WhosTurn);
-
-  move.Piece = Pawn;
-  move.Capture = false;
-  move.Type = Normal;
-
-  // Pushes.
-  while(pushSources) {
-    move.From = PopForward(&pushSources);
-    fromRank = RANK(move.From);
-
-    move.To = move.From + offset;
-
-    singleOk = (POSBOARD(move.To)&mask&empty) != EmptyBoard;
-    doubleOk = (POSBOARD(move.To+offset)&mask&empty) != EmptyBoard;
-
-    if(fromRank == promotionRank && singleOk) {
-      for(k = 0; k < 4; k++) {
-        move.Type = promotions[k];
-        AppendMove(slice, move);
-      }
-      move.Type = Normal;
-    } else if(fromRank == doublePushRank) {
-      if(singleOk) {
-        AppendMove(slice, move);
-      }
-      if(doubleOk) {
-        move.To += offset;
-        AppendMove(slice, move);
-      }
-    } else if(singleOk) {
-      AppendMove(slice, move);
-    }
-  }
-
-  // Captures.
-
-  move.Capture = true;
-
-  while(captureSources) {
-    move.From = PopForward(&captureSources);
-
-    captureTargets = PawnCaptureTargets(&game->ChessSet, game->WhosTurn,
-                                        POSBOARD(move.From)) & mask;
-
-    if(RANK(move.From) == promotionRank) {
-      while(captureTargets) {
-        move.To = PopForward(&captureTargets);
-
-        for(k = 0; k < 4; k++) {
-          move.Type = promotions[k];
-          AppendMove(slice, move);
-        }
-        move.Type = Normal;
-      }
-    } else {
-      while(captureTargets) {
-        move.To = PopForward(&captureTargets);
-
-        AppendMove(slice, move);
-      }
-    }
-  }
-
-  // En passant.
-
-  if(game->EnPassantSquare == EmptyPosition) {
-    return;
-  }
-
-  toBoard = POSBOARD(game->EnPassantSquare);
-  enPassantMask = POSBOARD(game->EnPassantSquare + 8*(-1 + 2*game->WhosTurn));
-
-  if(((toBoard | enPassantMask) & mask) == EmptyBoard) {
-    return;
-  }
-
-  switch(game->WhosTurn) {
-  case White:
-    fromBoard = SoWeOne(toBoard) | SoEaOne(toBoard);
-    break;
-  case Black:
-    fromBoard = NoWeOne(toBoard) | NoEaOne(toBoard);
-    break;
-  default:
-    panic("Unrecognised side %d.", game->WhosTurn);
-  }
-
-  fromBoard &= game->ChessSet.Sets[game->WhosTurn].Boards[Pawn];
-
-  move.Type = EnPassant;
-  move.To = game->EnPassantSquare;
-  move.Capture = true;
-
-  while(fromBoard) {
-    move.From = PopForward(&fromBoard);
-
-    AppendMove(slice, move);
-  }
 }
 
 static void
@@ -542,12 +423,12 @@ rookMoves(Game *game, MoveSlice *slice, BitBoard empty, BitBoard opposition,
 
 
 static void
-pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
+pawnMovesWhite(Game *game, MoveSlice *slice, BitBoard mask)
 {
   BitBoard empty = game->ChessSet.EmptySquares;
-  BitBoard opposition = game->ChessSet.Sets[Black].Occupancy;
+  BitBoard opposition = game->ChessSet.Sets[Black].Occupancy & mask;
 
-  BitBoard b1, b2;
+  BitBoard bitBoard1, bitBoard2;
 
   BitBoard pawns = game->ChessSet.Sets[White].Boards[Pawn];
 
@@ -556,7 +437,7 @@ pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
 
   Move move;
 
-  Position to;
+  Position enPassant, to;
 
   move.Piece = Pawn;
   move.Type = Normal;
@@ -564,11 +445,14 @@ pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
 
   // Moves.
 
-  b1 = NortOne(pawnsNotOn7) & empty;
-  b2 = NortOne(b1 & Rank3Mask) & empty;
+  bitBoard1 = NortOne(pawnsNotOn7) & empty;
+  bitBoard2 = NortOne(bitBoard1 & Rank3Mask) & empty;
 
-  while(b1) {
-    to = PopForward(&b1);
+  bitBoard1 &= mask;
+  bitBoard2 &= mask;
+
+  while(bitBoard1) {
+    to = PopForward(&bitBoard1);
 
     move.From = to-8;
     move.To = to;
@@ -576,8 +460,8 @@ pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
     AppendMove(slice, move);
   }
 
-  while(b2) {
-    to = PopForward(&b2);
+  while(bitBoard2) {
+    to = PopForward(&bitBoard2);
 
     move.From = to-16;
     move.To = to;
@@ -586,19 +470,81 @@ pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
   }
 
   // Promotions.
-  if(pawnsOn7 != EmptyBoard) {
+  if(pawnsOn7 != EmptyBoard && (mask & Rank8Mask) != EmptyBoard) {
+    bitBoard1 = NortOne(pawnsOn7) & empty;
 
+    while(bitBoard1) {
+      to = PopForward(&bitBoard1);
+
+      move.From = to-8;
+      move.To = to;
+
+      move.Type = PromoteBishop;
+      AppendMove(slice, move);
+
+      move.Type = PromoteKnight;
+      AppendMove(slice, move);
+
+      move.Type = PromoteRook;
+      AppendMove(slice, move);
+
+      move.Type = PromoteQueen;
+      AppendMove(slice, move);
+    }
+
+    move.Capture = true;
+
+    bitBoard1 = NoWeOne(pawnsOn7) & opposition;
+    while(bitBoard1) {
+      to = PopForward(&bitBoard1);
+
+      move.From = to-7;
+      move.To = to;
+
+      move.Type = PromoteBishop;
+      AppendMove(slice, move);
+
+      move.Type = PromoteKnight;
+      AppendMove(slice, move);
+
+      move.Type = PromoteRook;
+      AppendMove(slice, move);
+
+      move.Type = PromoteQueen;
+      AppendMove(slice, move);
+    }
+
+    bitBoard2 = NoEaOne(pawnsOn7) & opposition;
+    while(bitBoard2) {
+      to = PopForward(&bitBoard2);
+
+      move.From = to-9;
+      move.To = to;
+
+      move.Type = PromoteBishop;
+      AppendMove(slice, move);
+
+      move.Type = PromoteKnight;
+      AppendMove(slice, move);
+
+      move.Type = PromoteRook;
+      AppendMove(slice, move);
+
+      move.Type = PromoteQueen;
+      AppendMove(slice, move);
+    }
   }
 
   // Captures.
 
   move.Capture = true;
+  move.Type = Normal;
 
-  b1 = NoWeOne(pawnsNotOn7) & opposition;
-  b2 = NoEaOne(pawnsNotOn7) & opposition;
+  bitBoard1 = NoWeOne(pawnsNotOn7) & opposition;
+  bitBoard2 = NoEaOne(pawnsNotOn7) & opposition;
 
-  while(b1) {
-    to = PopForward(&b1);
+  while(bitBoard1) {
+    to = PopForward(&bitBoard1);
 
     move.From = to-7;
     move.To = to;
@@ -606,8 +552,8 @@ pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
     AppendMove(slice, move);
   }
 
-  while(b2) {
-    to = PopForward(&b2);
+  while(bitBoard2) {
+    to = PopForward(&bitBoard2);
 
     move.From = to-9;
     move.To = to;
@@ -616,25 +562,41 @@ pawnMovesWhiteNonEvasion(Game *game, MoveSlice *slice)
   }
 
   // En passant.
+  enPassant = game->EnPassantSquare;
+  if(enPassant != EmptyPosition) {
+    if(mask != FullyOccupied && (mask & SoutOne(POSBOARD(enPassant))) != EmptyBoard) {
+      return;
+    }
 
+    bitBoard1 = pawnsNotOn7 & PawnAttacksFrom(enPassant, Black);
+
+    move.Type = EnPassant;
+
+    while(bitBoard1) {
+      move.From = PopForward(&bitBoard1);
+      move.To = enPassant;
+
+      AppendMove(slice, move);
+    }
+  }
 }
 
 static void
-pawnMovesBlackNonEvasion(Game *game, MoveSlice *slice)
+pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
 {
   BitBoard empty = game->ChessSet.EmptySquares;
-  BitBoard opposition = game->ChessSet.Sets[White].Occupancy;
+  BitBoard opposition = game->ChessSet.Sets[White].Occupancy & mask;
 
-  BitBoard b1, b2;
+  BitBoard bitBoard1, bitBoard2;
 
   BitBoard pawns = game->ChessSet.Sets[Black].Boards[Pawn];
 
-  BitBoard pawnsOn7 = pawns&Rank2Mask;
-  BitBoard pawnsNotOn7 = pawns&~Rank2Mask;
+  BitBoard pawnsOn2 = pawns&Rank2Mask;
+  BitBoard pawnsNotOn2 = pawns&~Rank2Mask;
 
   Move move;
 
-  Position to;
+  Position enPassant, to;
 
   move.Piece = Pawn;
   move.Type = Normal;
@@ -642,11 +604,14 @@ pawnMovesBlackNonEvasion(Game *game, MoveSlice *slice)
 
   // Moves.
 
-  b1 = SoutOne(pawnsNotOn7) & empty;
-  b2 = SoutOne(b1 & Rank6Mask) & empty;
+  bitBoard1 = SoutOne(pawnsNotOn2) & empty;
+  bitBoard2 = SoutOne(bitBoard1 & Rank6Mask) & empty;
 
-  while(b1) {
-    to = PopForward(&b1);
+  bitBoard1 &= mask;
+  bitBoard2 &= mask;
+
+  while(bitBoard1) {
+    to = PopForward(&bitBoard1);
 
     move.From = to+8;
     move.To = to;
@@ -654,8 +619,8 @@ pawnMovesBlackNonEvasion(Game *game, MoveSlice *slice)
     AppendMove(slice, move);
   }
 
-  while(b2) {
-    to = PopForward(&b2);
+  while(bitBoard2) {
+    to = PopForward(&bitBoard2);
 
     move.From = to+16;
     move.To = to;
@@ -664,19 +629,82 @@ pawnMovesBlackNonEvasion(Game *game, MoveSlice *slice)
   }
 
   // Promotions.
-  if(pawnsOn7 != EmptyBoard) {
+  if(pawnsOn2 != EmptyBoard) {
+    bitBoard1 = SoutOne(pawnsOn2) & empty & mask;
 
+    while(bitBoard1) {
+      to = PopForward(&bitBoard1);
+
+      move.From = to+8;
+      move.To = to;
+
+      move.Type = PromoteBishop;
+      AppendMove(slice, move);
+
+      move.Type = PromoteKnight;
+      AppendMove(slice, move);
+
+      move.Type = PromoteRook;
+      AppendMove(slice, move);
+
+      move.Type = PromoteQueen;
+      AppendMove(slice, move);
+    }
+
+    move.Capture = true;
+
+    bitBoard1 = SoWeOne(pawnsOn2) & opposition & mask;
+    bitBoard2 = SoEaOne(pawnsOn2) & opposition & mask;
+
+    while(bitBoard1) {
+      to = PopForward(&bitBoard1);
+
+      move.From = to+9;
+      move.To = to;
+
+      move.Type = PromoteBishop;
+      AppendMove(slice, move);
+
+      move.Type = PromoteKnight;
+      AppendMove(slice, move);
+
+      move.Type = PromoteRook;
+      AppendMove(slice, move);
+
+      move.Type = PromoteQueen;
+      AppendMove(slice, move);
+    }
+
+    while(bitBoard2) {
+      to = PopForward(&bitBoard2);
+
+      move.From = to+7;
+      move.To = to;
+
+      move.Type = PromoteBishop;
+      AppendMove(slice, move);
+
+      move.Type = PromoteKnight;
+      AppendMove(slice, move);
+
+      move.Type = PromoteRook;
+      AppendMove(slice, move);
+
+      move.Type = PromoteQueen;
+      AppendMove(slice, move);
+    }
   }
 
   // Captures.
 
+  move.Type = Normal;
   move.Capture = true;
 
-  b1 = SoWeOne(pawnsNotOn7) & opposition;
-  b2 = SoEaOne(pawnsNotOn7) & opposition;
+  bitBoard1 = SoWeOne(pawnsNotOn2) & opposition & mask;
+  bitBoard2 = SoEaOne(pawnsNotOn2) & opposition & mask;
 
-  while(b1) {
-    to = PopForward(&b1);
+  while(bitBoard1) {
+    to = PopForward(&bitBoard1);
 
     move.From = to+9;
     move.To = to;
@@ -684,8 +712,8 @@ pawnMovesBlackNonEvasion(Game *game, MoveSlice *slice)
     AppendMove(slice, move);
   }
 
-  while(b2) {
-    to = PopForward(&b2);
+  while(bitBoard2) {
+    to = PopForward(&bitBoard2);
 
     move.From = to+7;
     move.To = to;
@@ -694,5 +722,21 @@ pawnMovesBlackNonEvasion(Game *game, MoveSlice *slice)
   }
 
   // En passant.
+  enPassant = game->EnPassantSquare;
+  if(enPassant != EmptyPosition) {
+    if(mask != FullyOccupied && (mask & SoutOne(POSBOARD(enPassant))) != EmptyBoard) {
+      return;
+    }
 
+    bitBoard1 = pawnsNotOn2 & PawnAttacksFrom(enPassant, White);
+
+    move.Type = EnPassant;
+
+    while(bitBoard1) {
+      move.From = PopForward(&bitBoard1);
+      move.To = enPassant;
+
+      AppendMove(slice, move);
+    }
+  }
 }

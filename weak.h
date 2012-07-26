@@ -412,15 +412,9 @@ void AllMoves(MoveSlice*, Game*);
 Game ParseFen(char*);
 
 // pawn.c
-BitBoard AllPawnCaptureSources(ChessSet*, Side);
-BitBoard AllPawnCaptureTargets(ChessSet*, Side);
-BitBoard AllPawnPushSources(ChessSet*, Side);
 void     InitPawn(void);
 BitBoard PawnAttackersTo(ChessSet*, Position);
 BitBoard PawnAttacksFrom(Position, Side);
-BitBoard PawnCaptureSources(ChessSet*, Side, BitBoard);
-BitBoard PawnCaptureTargets(ChessSet*, Side, BitBoard);
-BitBoard PawnPushSources(ChessSet*, Side, BitBoard);
 
 // perft.c
 PerftStats Perft(Game*, int);
