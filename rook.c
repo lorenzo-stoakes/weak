@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "weak.h"
 #include "magic.h"
 
