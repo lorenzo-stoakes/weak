@@ -48,7 +48,7 @@ main(int argc, char **argv)
   puts(StringPerft(&ret));
   printf("%fms elapsed.\n", elapsed);
 #else
-  printf("%llu - %f elapsed.\n", ret, elapsed);
+  printf("%llu - %f elapsed, %f Mnps.\n", ret, elapsed, ret/elapsed/1000);
 #endif
 
   return 0;
