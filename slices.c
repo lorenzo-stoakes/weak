@@ -1,4 +1,3 @@
-#include <string.h>
 #include "weak.h"
 
 static const int INIT_CASTLE_EVENT_COUNT = 100;
@@ -6,59 +5,7 @@ static const int INIT_CHECK_STATS_COUNT  = 100;
 static const int INIT_ENPASSANT_COUNT    = 100;
 static const int INIT_PIECE_COUNT        = 32;
 
-static void expandCastleEventSlice(CastleEventSlice*);
-static void expandCheckStatsSlice(CheckStatsSlice*);
-static void expandEnPassantSlice(EnPassantSlice*);
-
 // TODO: Avoid duplication throughout.
-
-void
-AppendCastleEvent(CastleEventSlice *slice, CastleEvent event)
-{
-  if(slice->Len > slice->Cap) {
-    panic("CastleEventSlice->Len %d > CastleEventSlice->Cap %d - Impossible!", slice->Len,
-          slice->Cap);
-  }
-
-  if(slice->Len == slice->Cap) {
-    expandCastleEventSlice(slice);
-  }
-
-  slice->Vals[slice->Len] = event;
-  slice->Len++;
-}
-
-void
-AppendCheckStats(CheckStatsSlice *slice, CheckStats checkStats)
-{
-  if(slice->Len > slice->Cap) {
-    panic("CheckStatsSlice->Len %d > CheckStatsSlice->Cap %d - Impossible!", slice->Len,
-          slice->Cap);
-  }
-
-  if(slice->Len == slice->Cap) {
-    expandCheckStatsSlice(slice);
-  }
-
-  slice->Vals[slice->Len] = checkStats;
-  slice->Len++;
-}
-
-void
-AppendEnpassantSquare(EnPassantSlice *slice, Position pos)
-{
-  if(slice->Len > slice->Cap) {
-    panic("EnPassantSlice->Len %d > EnPassantSlice->Cap %d - Impossible!", slice->Len,
-          slice->Cap);
-  }
-
-  if(slice->Len == slice->Cap) {
-    expandEnPassantSlice(slice);
-  }
-
-  slice->Vals[slice->Len] = pos;
-  slice->Len++;
-}
 
 void
 AppendPiece(PieceSlice *slice, Piece piece)
@@ -73,6 +20,12 @@ AppendPiece(PieceSlice *slice, Piece piece)
 }
 
 int
+LenCastleEvents(CastleEventSlice *slice)
+{
+  return slice->Curr - slice->Vals;
+}
+
+int
 LenMoves(MoveSlice *slice)
 {
   return slice->Curr - slice->Vals;
@@ -83,9 +36,8 @@ NewCastleEventSlice()
 {
   CastleEventSlice ret;
 
-  ret.Len = 0;
-  ret.Cap = INIT_CASTLE_EVENT_COUNT;
   ret.Vals = (CastleEvent*)allocate(sizeof(CastleEvent), INIT_CASTLE_EVENT_COUNT);
+  ret.Curr = ret.Vals;
 
   return ret;
 }
@@ -95,9 +47,8 @@ NewCheckStatsSlice()
 {
   CheckStatsSlice ret;
 
-  ret.Len = 0;
-  ret.Cap = INIT_CHECK_STATS_COUNT;
   ret.Vals = (CheckStats*)allocate(sizeof(CheckStats), INIT_CHECK_STATS_COUNT);
+  ret.Curr = ret.Vals;
 
   return ret;
 }
@@ -107,9 +58,8 @@ NewEnPassantSlice()
 {
   EnPassantSlice ret;
 
-  ret.Len = 0;
-  ret.Cap = INIT_ENPASSANT_COUNT;
   ret.Vals = (Position*)allocate(sizeof(Position), INIT_ENPASSANT_COUNT);
+  ret.Curr = ret.Vals;
 
   return ret;
 }
@@ -140,46 +90,25 @@ NewPieceSlice()
 CastleEvent
 PopCastleEvent(CastleEventSlice *slice)
 {
-  CastleEvent ret;
+  slice->Curr--;
 
-  if(slice->Len <= 0) {
-    panic("Invaild slice length %d on PopCastleEvent().", slice->Len);
-  }
-
-  ret = slice->Vals[slice->Len-1];
-  slice->Len--;
-
-  return ret;
+  return *slice->Curr;  
 }
 
 CheckStats
 PopCheckStats(CheckStatsSlice *slice)
 {
-  CheckStats ret;
+  slice->Curr--;
 
-  if(slice->Len <= 0) {
-    panic("Invalid slice length %d on PopCheckStats().", slice->Len);
-  }
-
-  ret = slice->Vals[slice->Len-1];
-  slice->Len--;
-
-  return ret;
+  return *slice->Curr;
 }
 
 Position
 PopEnPassantSquare(EnPassantSlice *slice)
 {
-  Position ret;
+  slice->Curr--;
 
-  if(slice->Len <= 0) {
-    panic("Invaild slice length %d on PopEnPassantSquare().", slice->Len);
-  }
-
-  ret = slice->Vals[slice->Len-1];
-  slice->Len--;
-
-  return ret;
+  return *slice->Curr;
 }
 
 Move
@@ -203,40 +132,4 @@ PopPiece(PieceSlice *slice)
   slice->Len--;
 
   return ret;
-}
-
-static void
-expandCastleEventSlice(CastleEventSlice *slice)
-{
-  CastleEvent *buffer;
-
-  slice->Cap *= 2;
-  buffer = (CastleEvent*)allocate(sizeof(CastleEvent), slice->Cap);
-  memcpy(buffer, slice->Vals, slice->Len*sizeof(CastleEvent*));
-  release(slice->Vals);
-  slice->Vals = buffer;
-}
-
-static void
-expandCheckStatsSlice(CheckStatsSlice *slice)
-{
-  CheckStats *buffer;
-
-  slice->Cap *= 2;
-  buffer = (CheckStats*)allocate(sizeof(CheckStats), slice->Cap);
-  memcpy(buffer, slice->Vals, slice->Len*sizeof(CheckStats*));
-  release(slice->Vals);
-  slice->Vals = buffer;
-}
-
-static void
-expandEnPassantSlice(EnPassantSlice *slice)
-{
-  Position *buffer;
-
-  slice->Cap *= 2;
-  buffer = (Position*)allocate(sizeof(Position), slice->Cap);
-  memcpy(buffer, slice->Vals, slice->Len*sizeof(Position*));
-  release(slice->Vals);
-  slice->Vals = buffer;
 }

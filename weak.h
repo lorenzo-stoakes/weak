@@ -129,8 +129,7 @@ typedef enum Side               Side;
 typedef struct StringBuilder    StringBuilder;
 
 struct CastleEventSlice {
-  int Len, Cap;
-  CastleEvent *Vals;
+  CastleEvent *Vals, *Curr;
 };
 
 struct CheckStats {
@@ -139,13 +138,11 @@ struct CheckStats {
 };
 
 struct CheckStatsSlice {
-  int Len, Cap;
-  CheckStats *Vals;
+  CheckStats *Vals, *Curr;
 };
 
 struct EnPassantSlice {
-  int Len, Cap;
-  Position *Vals;
+  Position *Vals, *Curr;
 };
 
 struct MoveSlice {
@@ -260,6 +257,24 @@ static const BitBoard
   Rank6Mask                      =  C64(0x0000ff0000000000),
   Rank7Mask                      =  C64(0x00ff000000000000),
   Rank8Mask                      =  C64(0xff00000000000000);
+
+FORCE_INLINE void
+AppendCastleEvent(CastleEventSlice *slice, CastleEvent castleEvent)
+{
+  *slice->Curr++ = castleEvent;
+}
+
+FORCE_INLINE void
+AppendCheckStats(CheckStatsSlice* slice, CheckStats checkStats)
+{
+  *slice->Curr++ = checkStats;
+}
+
+FORCE_INLINE void
+AppendEnpassantSquare(EnPassantSlice* slice, Position pos)
+{
+  *slice->Curr++ = pos;
+}
 
 FORCE_INLINE void
 AppendMove(MoveSlice *slice, Move move)
@@ -425,10 +440,8 @@ void  SetPlacePiece(Set*, Piece, Position);
 void  SetRemovePiece(Set*, Piece, Position);
 
 // slices.c
-void             AppendCastleEvent(CastleEventSlice*, CastleEvent);
-void             AppendEnpassantSquare(EnPassantSlice*, Position);
-void             AppendCheckStats(CheckStatsSlice*, CheckStats);
 void             AppendPiece(PieceSlice*, Piece);
+int              LenCastleEvents(CastleEventSlice*);
 int              LenMoves(MoveSlice*);
 CastleEventSlice NewCastleEventSlice(void);
 CheckStatsSlice  NewCheckStatsSlice(void);
