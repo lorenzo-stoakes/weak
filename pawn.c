@@ -3,6 +3,8 @@
 static BitBoard singlePushSources(ChessSet*, Side, BitBoard);
 static BitBoard doublePushSources(ChessSet*, Side, BitBoard);
 
+static BitBoard pawnSquares[2][64];
+
 // Get BitBoard encoding capture sources for *all* pawns on specified side.
 BitBoard
 AllPawnCaptureSources(ChessSet *chessSet, Side side)
@@ -24,19 +26,31 @@ AllPawnPushSources(ChessSet *chessSet, Side side)
   return PawnPushSources(chessSet, side, chessSet->Sets[side].Boards[Pawn]);
 }
 
+void
+InitPawn()
+{
+  BitBoard bitBoard;
+  Position pos;
+
+  for(pos = A1; pos <= H8; pos++) {
+    bitBoard = POSBOARD(pos);
+    
+    pawnSquares[White][pos] = NoWeOne(bitBoard) | NoEaOne(bitBoard);
+    pawnSquares[Black][pos] = SoWeOne(bitBoard) | SoEaOne(bitBoard);
+  }
+}
+
 BitBoard
 PawnAttackersTo(ChessSet *chessSet, Position to)
 {
-  return (chessSet->Sets[White].Boards[Pawn] &
-          PawnAttacksFrom(to, Black)) |
-    (chessSet->Sets[Black].Boards[Pawn] &
-     PawnAttacksFrom(to, White));
+  return (chessSet->Sets[White].Boards[Pawn] & pawnSquares[Black][to]) |
+    (chessSet->Sets[Black].Boards[Pawn] & pawnSquares[White][to]);
 }
 
 BitBoard
 PawnAttacksFrom(Position pawn, Side side)
 {
-  return PawnThreats(POSBOARD(pawn), side);
+  return pawnSquares[side][pawn];
 }
 
 // Get BitBoard encoding specified pawns which are able to capture.
@@ -79,24 +93,6 @@ PawnPushSources(ChessSet *chessSet, Side side, BitBoard pawns)
 {
   return singlePushSources(chessSet, side, pawns) |
     doublePushSources(chessSet, side, pawns);
-}
-
-BitBoard
-PawnThreats(BitBoard pawns, Side side)
-{
-  // En passant handled separately.
-
-  switch(side) {
-  case White:
-    pawns = NoWeOne(pawns) | NoEaOne(pawns);
-    return pawns;
-  case Black:
-    pawns = SoWeOne(pawns) | SoEaOne(pawns);
-    return pawns;
-  }
-
-  panic("Invalid side %s.", StringSide(side));
-  return EmptyBoard;
 }
 
 // Get BitBoard encoding which of specified pawns are able to single push.

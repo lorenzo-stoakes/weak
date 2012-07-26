@@ -339,6 +339,7 @@ InitEngine()
 {
   InitKing();
   InitKnight();
+  InitPawn();
   InitRays();
 
   // Relies on above.
