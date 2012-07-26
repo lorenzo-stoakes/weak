@@ -4,7 +4,7 @@
 #include "bench.h"
 
 #if defined(QUICK_BENCH)
-#define MAX_DEPTH 4
+#define MAX_DEPTH 5
 #else
 #define MAX_DEPTH 7
 #endif
@@ -29,8 +29,8 @@ BenchPerft()
   }
 
   for(i = 0; i < PERFT_COUNT; i++) {
-    // Depth 1 tests are too short to be meaningful. Ignore.
-    for(j = 2; j <= depthCounts[i] && j <= MAX_DEPTH; j++) {
+    // Depth 1, 2 tests are too short to be meaningful. Ignore.
+    for(j = 3; j <= depthCounts[i] && j <= MAX_DEPTH; j++) {
       elapsed = 0;
       iters = 1;
 
