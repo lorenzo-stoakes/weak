@@ -282,6 +282,7 @@ AppendMove(MoveSlice *slice, Move move)
   *slice->Curr++ = move;
 }
 
+// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
 #if defined(USE_BITSCAN_ASM)
 FORCE_INLINE Position
 BitScanBackward(BitBoard bitBoard)
@@ -334,9 +335,6 @@ PopForward(BitBoard *bitBoard)
 }
 
 // bitboard.c
-
-// See http://chessprogramming.wikispaces.com/BitScan#bsfbsr
-
 bool Aligned(Position, Position, Position);
 BitBoard FlipDiagA1H8(BitBoard);
 BitBoard FlipVertical(BitBoard);
