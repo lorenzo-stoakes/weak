@@ -315,7 +315,7 @@ GivesCheck(Game *game, Move *move)
     kingFrom = E1 + offset;
     kingTo = C1 + offset;
 
-    occNoFrom = game->ChessSet.Occupancy ^ kingFrom ^ rookFrom | rookTo | kingTo;
+    occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
     return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
   case CastleKingSide:
     offset = side*8*7;
@@ -324,7 +324,7 @@ GivesCheck(Game *game, Move *move)
     kingFrom = E1 + offset;
     kingTo = G1 + offset;
 
-    occNoFrom = game->ChessSet.Occupancy ^ kingFrom ^ rookFrom | rookTo | kingTo;
+    occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
     return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
   default:
     panic("Invalid move type %d at this point.", move->Type);
