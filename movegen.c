@@ -418,10 +418,6 @@ rookMoves(Game *game, MoveSlice *slice, BitBoard empty, BitBoard opposition,
   }
 }
 
-
-// EXPERIMENTAL:-
-
-
 static void
 pawnMovesWhite(Game *game, MoveSlice *slice, BitBoard mask)
 {
