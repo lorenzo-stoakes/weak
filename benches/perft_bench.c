@@ -4,14 +4,14 @@
 #include "bench.h"
 
 #if defined(QUICK_BENCH)
-#define MAX_DEPTH 5
+#define MAX_DEPTH 6
 #else
 #define MAX_DEPTH 7
 #endif
 
 static char *fens[PERFT_COUNT] = { FEN1, FEN2, FEN3, FEN4, FEN4_REVERSED };
 static Game games[PERFT_COUNT];
-static int depthCounts[PERFT_COUNT] = { 6, 5, 7, 6, 6 };
+static int depthCounts[PERFT_COUNT] = { 6, 6, 7, 6, 6 };
 
 void
 BenchPerft()
@@ -29,14 +29,14 @@ BenchPerft()
   }
 
   for(i = 0; i < PERFT_COUNT; i++) {
-    // Depth 1, 2 tests are too short to be meaningful. Ignore.
-    for(j = 3; j <= depthCounts[i] && j <= MAX_DEPTH; j++) {
+    // Depth 1-3 tests are too short to be meaningful. Ignore.
+    for(j = 4; j <= depthCounts[i] && j <= MAX_DEPTH; j++) {
       elapsed = 0;
       iters = 1;
 
       while(elapsed < MIN_ELAPSED) {
-        ticks = clock();
         nodes = 0;
+        ticks = clock();
         for(k = 0; k < iters; k++) {
           nodes += (int64_t)QuickPerft(&games[i], j);
         }
