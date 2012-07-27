@@ -467,7 +467,7 @@ pawnMovesWhite(Game *game, MoveSlice *slice, BitBoard mask)
 
   // Promotions.
   if(pawnsOn7 != EmptyBoard && (mask & Rank8Mask) != EmptyBoard) {
-    bitBoard1 = NortOne(pawnsOn7) & empty;
+    bitBoard1 = NortOne(pawnsOn7) & empty & mask;
 
     while(bitBoard1) {
       to = PopForward(&bitBoard1);
@@ -626,7 +626,7 @@ pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
 
   // Promotions.
   if(pawnsOn2 != EmptyBoard && (mask & Rank1Mask) != EmptyBoard) {
-    bitBoard1 = SoutOne(pawnsOn2) & empty;
+    bitBoard1 = SoutOne(pawnsOn2) & empty & mask;
 
     while(bitBoard1) {
       to = PopForward(&bitBoard1);
