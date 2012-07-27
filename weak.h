@@ -473,7 +473,6 @@ Game        NewGame(bool, Side);
 MoveHistory NewMoveHistory(void);
 bool        PseudoLegal(Game*, Move*, BitBoard);
 bool        Stalemated(Game*);
-void        ToggleTurn(Game*);
 void        Unmove(Game*);
 
 // magic.c
