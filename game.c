@@ -1,7 +1,7 @@
 #include "weak.h"
 
- void        initArrays(void);
- CastleEvent updateCastlingRights(Game*, Move*);
+static void        initArrays(void);
+static CastleEvent updateCastlingRights(Game*, Move*);
 
 CheckStats
 CalculateCheckStats(Game *game)
@@ -606,7 +606,7 @@ Unmove(Game *game)
   }
 }
 
-void
+static void
 initArrays()
 {
   BitBoard queenThreats;
@@ -652,7 +652,7 @@ initArrays()
   }
 }
 
-CastleEvent
+static CastleEvent
 updateCastlingRights(Game *game, Move *move)
 {
   int offset;
