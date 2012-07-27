@@ -186,6 +186,8 @@ DoMove(Game *game, Move *move)
     panic("Move type %d not recognised.", move->Type);
   }
 
+  UpdateOccupancies(&game->ChessSet);
+
   castleEvent = updateCastlingRights(game, move);
 
   AppendCastleEvent(&game->History.CastleEvents, castleEvent);
@@ -587,6 +589,8 @@ Unmove(Game *game)
   game->EnPassantSquare = PopEnPassantSquare(&game->History.EnPassantSquares);
 
   castleEvent = PopCastleEvent(&game->History.CastleEvents);
+
+  UpdateOccupancies(&game->ChessSet);
 
   if(castleEvent == NoCastleEvent) {
     return;

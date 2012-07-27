@@ -37,6 +37,8 @@ NewChessSet()
   ret.Occupancy = InitOccupancy;
   ret.EmptySquares = ~InitOccupancy;
 
+  UpdateOccupancies(&ret);
+
   return ret;
 }
 
@@ -49,6 +51,8 @@ NewEmptyChessSet()
   ret.Sets[Black] = NewEmptySet();
   ret.Occupancy = EmptyBoard;
   ret.EmptySquares = FullyOccupied;
+
+  UpdateOccupancies(&ret);
 
   return ret;
 }
@@ -138,45 +142,23 @@ PinnedPieces(ChessSet *chessSet, Side side, BitBoard king, bool pinned)
 }
 
 void
-PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
+UpdateOccupancies(ChessSet *chessSet)
 {
-  chessSet->Occupancy |= POSBOARD(pos);
+  Piece piece;
+
+  chessSet->Sets[White].Occupancy = EmptyBoard;
+  chessSet->Sets[Black].Occupancy = EmptyBoard;
+  for(piece = Pawn; piece <= King; piece++) {
+    chessSet->Sets[White].Occupancy |= chessSet->Sets[White].Boards[piece];
+    chessSet->Sets[Black].Occupancy |= chessSet->Sets[Black].Boards[piece];
+    
+    chessSet->PieceOccupancy[piece] = chessSet->Sets[White].Boards[piece] |
+      chessSet->Sets[Black].Boards[piece];
+  }
+
+  chessSet->Sets[White].EmptySquares = ~chessSet->Sets[White].Occupancy;
+  chessSet->Sets[Black].EmptySquares = ~chessSet->Sets[Black].Occupancy;  
+
+  chessSet->Occupancy = chessSet->Sets[White].Occupancy | chessSet->Sets[Black].Occupancy;
   chessSet->EmptySquares = ~chessSet->Occupancy;
-
-  SetPlacePiece(&chessSet->Sets[side], piece, pos);
-}
-
-void
-RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
-{
-  BitBoard complement = ~POSBOARD(pos);
-
-  chessSet->Occupancy &= complement;
-  chessSet->EmptySquares = ~chessSet->Occupancy;
-
-  SetRemovePiece(&chessSet->Sets[side], piece, pos);
-}
-
-// Place piece on set.
-void
-SetPlacePiece(Set *set, Piece piece, Position pos)
-{
-  BitBoard bitBoard = POSBOARD(pos);
-
-  set->Occupancy |= bitBoard;
-  set->EmptySquares = ~set->Occupancy;
-
-  set->Boards[piece] |= bitBoard;
-}
-
-// Remove piece on set.
-void
-SetRemovePiece(Set *set, Piece piece, Position pos)
-{
-  BitBoard complement = ~POSBOARD(pos);
-
-  set->Occupancy &= complement;
-  set->EmptySquares = ~set->Occupancy;
-
-  set->Boards[piece] &= complement;
 }

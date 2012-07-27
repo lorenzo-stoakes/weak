@@ -169,6 +169,7 @@ struct MoveHistory {
 
 struct ChessSet {
   BitBoard EmptySquares, Occupancy;
+  BitBoard PieceOccupancy[6];
   Set      Sets[2];
 };
 
@@ -313,6 +314,20 @@ FORCE_INLINE int
 FileDistance(Position from, Position to)
 {
   return abs(FILE(from) - FILE(to));
+}
+
+FORCE_INLINE void
+PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
+{
+  chessSet->Sets[side].Boards[piece] |= POSBOARD(pos);
+}
+
+FORCE_INLINE void
+RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
+{
+  BitBoard complement = ~POSBOARD(pos);
+
+  chessSet->Sets[side].Boards[piece] &= complement;
 }
 
 FORCE_INLINE bool
@@ -500,10 +515,7 @@ Set      NewEmptySet(void);
 Set      NewWhiteSet(void);
 Piece    PieceAt(Set*, Position);
 BitBoard PinnedPieces(ChessSet*, Side, BitBoard, bool);
-void     PlacePiece(ChessSet*, Side, Piece, Position);
-void     RemovePiece(ChessSet*, Side, Piece, Position);
-void     SetPlacePiece(Set*, Piece, Position);
-void     SetRemovePiece(Set*, Piece, Position);
+void     UpdateOccupancies(ChessSet*);
 
 // slices.c
 void             AppendPiece(PieceSlice*, Piece);

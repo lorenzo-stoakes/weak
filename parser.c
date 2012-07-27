@@ -166,15 +166,7 @@ ParseFen(char *fen)
 
  done:
 
-  // Set up occupancy/empty square values.
-  for(side = White; side <= Black; side++) {
-    for(piece = Pawn; piece <= King; piece++) {
-      ret.ChessSet.Occupancy |= ret.ChessSet.Sets[side].Boards[piece];
-      ret.ChessSet.Sets[side].Occupancy |= ret.ChessSet.Sets[side].Boards[piece];
-    }
-    ret.ChessSet.Sets[side].EmptySquares = ~ret.ChessSet.Sets[side].Occupancy;
-  }
-  ret.ChessSet.EmptySquares = ~ret.ChessSet.Occupancy;
+  UpdateOccupancies(&ret.ChessSet);
 
   king = BitScanForward(ret.ChessSet.Sets[ret.WhosTurn].Boards[King]);
   ret.CheckStats = CalculateCheckStats(&ret);

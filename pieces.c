@@ -18,10 +18,7 @@ BishopAttacksFrom(Position bishop, BitBoard occupancy)
 BitBoard
 BishopQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
 {
-  return (chessSet->Sets[White].Boards[Bishop] |
-    chessSet->Sets[Black].Boards[Bishop] |
-    chessSet->Sets[White].Boards[Queen] |
-    chessSet->Sets[Black].Boards[Queen]) &
+  return (chessSet->PieceOccupancy[Bishop] | chessSet->PieceOccupancy[Queen]) &
     bishopMagicSquareThreats(to, occupancy);
 }
 
@@ -157,9 +154,7 @@ InitPawn()
 BitBoard
 KingAttackersTo(ChessSet *chessSet, Position to)
 {
-  return (chessSet->Sets[White].Boards[King] |
-          chessSet->Sets[Black].Boards[King]) &
-    kingSquares[to];
+  return chessSet->PieceOccupancy[King] & kingSquares[to];
 }
 
 BitBoard
@@ -171,9 +166,7 @@ KingAttacksFrom(Position king)
 BitBoard
 KnightAttackersTo(ChessSet *chessSet, Position to)
 {
-  return (chessSet->Sets[White].Boards[Knight] |
-          chessSet->Sets[Black].Boards[Knight]) &
-    knightSquares[to];
+  return chessSet->PieceOccupancy[Knight] & knightSquares[to];
 }
 
 BitBoard
@@ -204,10 +197,7 @@ RookAttacksFrom(Position rook, BitBoard occupancy)
 BitBoard
 RookQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
 {
-  return (chessSet->Sets[White].Boards[Rook] |
-    chessSet->Sets[Black].Boards[Rook] |
-    chessSet->Sets[White].Boards[Queen] |
-    chessSet->Sets[Black].Boards[Queen]) &
+  return (chessSet->PieceOccupancy[Rook] | chessSet->PieceOccupancy[Queen]) &
     rookMagicSquareThreats(to, occupancy);
 }
 
