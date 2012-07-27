@@ -477,7 +477,6 @@ PseudoLegal(Game *game, Move *move, BitBoard pinned)
 
   if(move->Piece == King) {
     // Castles already checked.
-
     if(move->Type != Normal) {
       return true;
     }

@@ -8,7 +8,6 @@ static BitBoard pawnSquares[2][64];
 static FORCE_INLINE BitBoard bishopMagicSquareThreats(Position, BitBoard);
 static FORCE_INLINE BitBoard rookMagicSquareThreats(Position, BitBoard);
 
-
 BitBoard
 BishopAttacksFrom(Position bishop, BitBoard occupancy)
 {
