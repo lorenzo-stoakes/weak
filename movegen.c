@@ -537,8 +537,6 @@ pawnMovesWhite(Game *game, MoveSlice *slice, BitBoard mask)
   move.Type = Normal;
 
   bitBoard1 = NoWeOne(pawnsNotOn7) & opposition;
-  bitBoard2 = NoEaOne(pawnsNotOn7) & opposition;
-
   while(bitBoard1) {
     to = PopForward(&bitBoard1);
 
@@ -548,6 +546,7 @@ pawnMovesWhite(Game *game, MoveSlice *slice, BitBoard mask)
     AppendMove(slice, move);
   }
 
+  bitBoard2 = NoEaOne(pawnsNotOn7) & opposition;
   while(bitBoard2) {
     to = PopForward(&bitBoard2);
 
