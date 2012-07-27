@@ -1,6 +1,7 @@
 #include "weak.h"
 
 static void        initArrays(void);
+static FORCE_INLINE void toggleTurn(Game *game);
 static CastleEvent updateCastlingRights(Game*, Move*);
 
 CheckStats
@@ -229,7 +230,7 @@ DoMove(Game *game, Move *move)
     }
   }
 
-  ToggleTurn(game);
+  toggleTurn(game);
 
   game->CheckStats = CalculateCheckStats(game);
   game->CheckStats.CheckSources = checks;
@@ -494,8 +495,8 @@ PseudoLegal(Game *game, Move *move, BitBoard pinned)
 }
 
 // Toggle whose turn it is.
-void
-ToggleTurn(Game *game) {
+static FORCE_INLINE void
+toggleTurn(Game *game) {
   game->WhosTurn = OPPOSITE(game->WhosTurn);
 }
 
@@ -512,7 +513,7 @@ Unmove(Game *game)
 
   // Rollback to previous turn.
   move = PopMove(&game->History.Moves);
-  ToggleTurn(game);
+  toggleTurn(game);
 
   switch(move.Type) {
   case EnPassant:
