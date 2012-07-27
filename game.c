@@ -658,96 +658,62 @@ updateCastlingRights(Game *game, Move *move)
   int offset;
   CastleEvent ret = NoCastleEvent;
   Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
 
-  // TODO: Refactor.
-
-  switch(move->Type) {
-  default:
-    return NoCastleEvent;
-  case Normal:
-  case PromoteKnight:
-  case PromoteBishop:
-  case PromoteRook:
-  case PromoteQueen:
-    if(move->Capture) {
-      switch(side) {
-      case White:
-        if(move->To == H8 && game->CastlingRights[Black][KingSide]) {
-          game->CastlingRights[Black][KingSide] = false;
-          ret |= LostKingSideBlack;
-        } else if(move->To == A8 && game->CastlingRights[Black][QueenSide]) {
-          game->CastlingRights[Black][QueenSide] = false;
-          ret |= LostQueenSideBlack;
-        }
-
-        break;
-      case Black:
-        if(move->To == H1 && game->CastlingRights[White][KingSide]) {
-          game->CastlingRights[White][KingSide] = false;
-          ret |= LostKingSideWhite;
-        } else if(move->To == A1 && game->CastlingRights[White][QueenSide]) {
-          game->CastlingRights[White][QueenSide] = false;
-          ret |= LostQueenSideWhite;
-        }
-
-        break;
-      default:
-        panic("Unrecognised side %d.", side);
-      }
-    } else if(move->Piece != King && move->Piece != Rook) {
-      return NoCastleEvent;
+  if(move->Type == CastleKingSide || move->Type == CastleQueenSide) {
+    if(game->CastlingRights[side][QueenSide]) {
+      game->CastlingRights[side][QueenSide] = false;
+      ret = side == White ? LostQueenSideWhite : LostQueenSideBlack;
     }
-    break;
-  case CastleKingSide:
-  case CastleQueenSide:
-    switch(side) {
-    case White:
-      if(game->CastlingRights[White][KingSide]) {
-        game->CastlingRights[White][KingSide] = false;
-        ret = LostKingSideWhite;
-      }
-      if(game->CastlingRights[White][QueenSide]) {
-        game->CastlingRights[White][QueenSide] = false;
-        ret |= LostQueenSideWhite;
-      }
 
-      return ret;
-    case Black:
-      if(game->CastlingRights[Black][KingSide]) {
-        game->CastlingRights[Black][KingSide] = false;
-        ret = LostKingSideBlack;
-      }
-      if(game->CastlingRights[Black][QueenSide]) {
-        game->CastlingRights[Black][QueenSide] = false;
-        ret |= LostQueenSideBlack;
-      }
+    if(game->CastlingRights[side][KingSide]) {
+      game->CastlingRights[side][KingSide] = false;
+      ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
+    }
 
-      return ret;
-    default:
-      panic("Unrecognised side %d.", game->WhosTurn);
+    return ret;
+  }
+
+  if(move->Capture) {
+    if(move->To == A1+opposite*8*7 && game->CastlingRights[opposite][QueenSide]) {
+      game->CastlingRights[opposite][QueenSide] = false;
+      ret = opposite == White ? LostQueenSideWhite : LostQueenSideBlack;
+    } else if(move->To == H1+opposite*8*7 && game->CastlingRights[opposite][KingSide]) {
+      game->CastlingRights[opposite][KingSide] = false;
+      ret = opposite == White ? LostKingSideWhite : LostKingSideBlack;
     }
   }
 
-  offset = game->WhosTurn*8*7;
+  if(move->Piece != King && move->Piece != Rook) {
+    return ret;
+  }
 
-  if(move->Piece == King && move->From == E1+offset) {
+  offset = side*8*7;
+
+  if(move->Piece == King) {
+    if(move->From != E1+offset) {
+      return ret;
+    }
+
     if(game->CastlingRights[side][QueenSide]) {
-      ret = game->WhosTurn == White ? LostQueenSideWhite : LostQueenSideBlack;
+      ret |= side == White ? LostQueenSideWhite : LostQueenSideBlack;
       game->CastlingRights[side][QueenSide] = false;
     }
     if(game->CastlingRights[side][KingSide]) {
       ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
       game->CastlingRights[side][KingSide] = false;
     }
-  } else if(game->CastlingRights[side][QueenSide] && move->Piece == Rook &&
-            move->From == A1+offset) {
-    ret = side == White ? LostQueenSideWhite : LostQueenSideBlack;
-    game->CastlingRights[side][QueenSide] = false;
-  } else if(game->CastlingRights[side][KingSide] && move->Piece == Rook &&
-            move->From == H1+offset) {
-    ret = side == White ? LostKingSideWhite : LostKingSideBlack;
-    game->CastlingRights[side][KingSide] = false;
+  } else {
+    if(move->From == A1+offset && game->CastlingRights[side][QueenSide]) {
+      ret |= side == White ? LostQueenSideWhite : LostQueenSideBlack;
+      game->CastlingRights[side][QueenSide] = false;
+    }
+    if(move->From == H1+offset && game->CastlingRights[side][KingSide]) {
+      ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
+      game->CastlingRights[side][KingSide] = false;
+    }
   }
 
   return ret;
 }
+
