@@ -31,7 +31,6 @@ QuickPerft(Game *game, int depth)
     return len;
   }
 
-  len = LenMoves(&allMoves);
   for(i = 0; i < len; i++) {
     move = allMoves.Vals[i];
 
