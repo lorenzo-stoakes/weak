@@ -559,7 +559,7 @@ pawnMovesWhite(Game *game, MoveSlice *slice, BitBoard mask)
   // En passant.
   enPassant = game->EnPassantSquare;
   if(enPassant != EmptyPosition) {
-    if(mask != FullyOccupied && (mask & SoutOne(POSBOARD(enPassant))) != EmptyBoard) {
+    if(mask != FullyOccupied && (mask & SoutOne(POSBOARD(enPassant))) == EmptyBoard) {
       return;
     }
 
@@ -718,7 +718,7 @@ pawnMovesBlack(Game *game, MoveSlice *slice, BitBoard mask)
   // En passant.
   enPassant = game->EnPassantSquare;
   if(enPassant != EmptyPosition) {
-    if(mask != FullyOccupied && (mask & NortOne(POSBOARD(enPassant))) != EmptyBoard) {
+    if(mask != FullyOccupied && (mask & NortOne(POSBOARD(enPassant))) == EmptyBoard) {
       return;
     }
 
