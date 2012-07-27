@@ -56,13 +56,13 @@ enum File {
 
 enum MoveType {
   Normal,
+  EnPassant,
   CastleQueenSide,
   CastleKingSide,
   PromoteKnight,
   PromoteBishop,
   PromoteRook,
-  PromoteQueen,
-  EnPassant
+  PromoteQueen
 };
 
 enum Piece {
