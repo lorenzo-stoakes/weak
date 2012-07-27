@@ -151,7 +151,6 @@ UpdateOccupancies(ChessSet *chessSet)
   for(piece = Pawn; piece <= King; piece++) {
     chessSet->Sets[White].Occupancy |= chessSet->Sets[White].Boards[piece];
     chessSet->Sets[Black].Occupancy |= chessSet->Sets[Black].Boards[piece];
-    
 
     chessSet->PieceOccupancy[piece] = chessSet->Sets[White].Boards[piece] |
       chessSet->Sets[Black].Boards[piece];
