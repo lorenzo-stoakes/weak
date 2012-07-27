@@ -152,12 +152,13 @@ UpdateOccupancies(ChessSet *chessSet)
     chessSet->Sets[White].Occupancy |= chessSet->Sets[White].Boards[piece];
     chessSet->Sets[Black].Occupancy |= chessSet->Sets[Black].Boards[piece];
     
+
     chessSet->PieceOccupancy[piece] = chessSet->Sets[White].Boards[piece] |
       chessSet->Sets[Black].Boards[piece];
   }
 
   chessSet->Sets[White].EmptySquares = ~chessSet->Sets[White].Occupancy;
-  chessSet->Sets[Black].EmptySquares = ~chessSet->Sets[Black].Occupancy;  
+  chessSet->Sets[Black].EmptySquares = ~chessSet->Sets[Black].Occupancy;
 
   chessSet->Occupancy = chessSet->Sets[White].Occupancy | chessSet->Sets[Black].Occupancy;
   chessSet->EmptySquares = ~chessSet->Occupancy;
