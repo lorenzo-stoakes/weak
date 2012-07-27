@@ -31,10 +31,10 @@
 #define FEN4_REVERSED "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"
 
 enum CastleEvent {
-  NoCastleEvent = 0,
-  LostKingSideWhite = 1 << 0,
-  LostQueenSideWhite = 1 << 1,
-  LostKingSideBlack = 1 << 2,
+  NoCastleEvent      = 0,
+  LostKingSideWhite  = 1 << 0,
+  LostKingSideBlack  = 1 << 1,
+  LostQueenSideWhite = 1 << 2,
   LostQueenSideBlack = 1 << 3
 };
 
@@ -99,8 +99,8 @@ enum Rank {
 };
 
 enum Side {
-  White,
-  Black
+  White = 0,
+  Black = 1
 };
 
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
