@@ -703,4 +703,3 @@ updateCastlingRights(Game *game, Move *move)
 
   return ret;
 }
-
