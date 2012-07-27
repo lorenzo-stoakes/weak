@@ -35,10 +35,9 @@ BenchPerft()
       iters = 1;
 
       while(elapsed < MIN_ELAPSED) {
-        nodes = 0;
         ticks = clock();
         for(k = 0; k < iters; k++) {
-          nodes += (int64_t)QuickPerft(&games[i], j);
+          nodes = (int64_t)QuickPerft(&games[i], j);
         }
         ticks = clock() - ticks;
         // In ms.
@@ -49,12 +48,12 @@ BenchPerft()
       iters /= 2;
 
       totalNodes += nodes;
-      totalElapsed += elapsed;
+      totalElapsed += elapsed/iters;
 
       sprintf(tmp, "Perft Position %d Depth %d", i+1, j);
       OutputBenchResults(tmp, elapsed, iters, nodes);
     }
   }
 
-  printf("Median Perft Performance: %f n/s\n", 1000*totalNodes/totalElapsed);
+  printf("Median Perft Performance: %f Mn/s\n", 1E-3*totalNodes/totalElapsed);
 }

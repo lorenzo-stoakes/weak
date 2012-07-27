@@ -9,7 +9,7 @@ OutputBenchResults(char *name, double elapsed, long iters, int64_t nodes)
 
   // Not all benchmarks will necessarily return node count, if not they each return -1.
   if(nodes > 0) {
-    printf("\t%.3f\tMn/s", 1E-3*nodes/elapsed);
+    printf("\t%.3f\tMn/s", 1E-3*iters*nodes/elapsed);
   }
 
   printf("\n");
