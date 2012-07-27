@@ -33,8 +33,6 @@ const int bitBackward8[256] = {
   7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 };
 
-static BitBoard nortRays[64], eastRays[64], soutRays[64], westRays[64],
-  noeaRays[64], soweRays[64], noweRays[64], soeaRays[64];
 
 // Are all the positions along the same line?
 bool
@@ -274,110 +272,4 @@ Rotate90Clockwise(BitBoard bitBoard)
   // Flip across A1-H8 diagonal, flip vertical.
   bitBoard = FlipDiagA1H8(bitBoard);
   return FlipVertical(bitBoard);
-}
-
-// northwest    north   northeast
-//  NoWe         Nort         NoEa
-//          +7    +8    +9
-//              \  |  /
-//  West    -1 <-  0 -> +1    East
-//              /  |  \.
-//          -9    -8    -7
-//  SoWe         Sout         SoEa
-//  southwest    south   southeast
-
-BitBoard
-NortOne(BitBoard bitBoard)
-{
-  return bitBoard << 8;
-}
-
-BitBoard
-NortRay(Position pos)
-{
-  return nortRays[pos];
-}
-
-BitBoard
-EastOne(BitBoard bitBoard)
-{
-  return (bitBoard & NotFileHMask) << 1;
-}
-
-BitBoard
-EastRay(Position pos)
-{
-  return eastRays[pos];
-}
-
-BitBoard
-SoutOne(BitBoard bitBoard)
-{
-  return bitBoard >> 8;
-}
-
-BitBoard
-SoutRay(Position pos)
-{
-  return soutRays[pos];
-}
-
-BitBoard
-WestOne(BitBoard bitBoard)
-{
-  return (bitBoard & NotFileAMask) >> 1;
-}
-
-BitBoard
-WestRay(Position pos)
-{
-  return westRays[pos];
-}
-
-BitBoard
-NoEaOne(BitBoard bitBoard)
-{
-  return (bitBoard & NotFileHMask) << 9;
-}
-
-BitBoard
-NoEaRay(Position pos)
-{
-  return noeaRays[pos];
-}
-
-BitBoard
-NoWeOne(BitBoard bitBoard)
-{
-  return (bitBoard & NotFileAMask) << 7;
-}
-
-BitBoard
-NoWeRay(Position pos)
-{
-  return noweRays[pos];
-}
-
-BitBoard
-SoEaOne(BitBoard bitBoard)
-{
-  return (bitBoard & NotFileHMask) >> 7;
-}
-
-BitBoard
-SoEaRay(Position pos)
-{
-  return soeaRays[pos];
-}
-
-BitBoard
-SoWeOne(BitBoard bitBoard)
-{
-  return (bitBoard & NotFileAMask) >> 9;
-}
-
-BitBoard
-SoWeRay(Position pos)
-{
-  return soweRays[pos];
 }

@@ -258,6 +258,10 @@ static const BitBoard
   Rank7Mask                      =  C64(0x00ff000000000000),
   Rank8Mask                      =  C64(0xff00000000000000);
 
+// Ray lookup arrays. Used in inlined function, hence location.
+BitBoard nortRays[64], eastRays[64], soutRays[64], westRays[64],
+  noeaRays[64], soweRays[64], noweRays[64], soeaRays[64];
+
 FORCE_INLINE void
 AppendCastleEvent(CastleEventSlice *slice, CastleEvent castleEvent)
 {
@@ -334,8 +338,104 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
+FORCE_INLINE BitBoard
+NortOne(BitBoard bitBoard)
+{
+  return bitBoard << 8;
+}
+
+FORCE_INLINE BitBoard
+NortRay(Position pos)
+{
+  return nortRays[pos];
+}
+
+FORCE_INLINE BitBoard
+EastOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileHMask) << 1;
+}
+
+FORCE_INLINE BitBoard
+EastRay(Position pos)
+{
+  return eastRays[pos];
+}
+
+FORCE_INLINE BitBoard
+SoutOne(BitBoard bitBoard)
+{
+  return bitBoard >> 8;
+}
+
+FORCE_INLINE BitBoard
+SoutRay(Position pos)
+{
+  return soutRays[pos];
+}
+
+FORCE_INLINE BitBoard
+WestOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileAMask) >> 1;
+}
+
+FORCE_INLINE BitBoard
+WestRay(Position pos)
+{
+  return westRays[pos];
+}
+
+FORCE_INLINE BitBoard
+NoEaOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileHMask) << 9;
+}
+
+FORCE_INLINE BitBoard
+NoEaRay(Position pos)
+{
+  return noeaRays[pos];
+}
+
+FORCE_INLINE BitBoard
+NoWeOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileAMask) << 7;
+}
+
+FORCE_INLINE BitBoard
+NoWeRay(Position pos)
+{
+  return noweRays[pos];
+}
+
+FORCE_INLINE BitBoard
+SoEaOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileHMask) >> 7;
+}
+
+FORCE_INLINE BitBoard
+SoEaRay(Position pos)
+{
+  return soeaRays[pos];
+}
+
+FORCE_INLINE BitBoard
+SoWeOne(BitBoard bitBoard)
+{
+  return (bitBoard & NotFileAMask) >> 9;
+}
+
+FORCE_INLINE BitBoard
+SoWeRay(Position pos)
+{
+  return soweRays[pos];
+}
+
 // bitboard.c
-bool Aligned(Position, Position, Position);
+bool     Aligned(Position, Position, Position);
 BitBoard FlipDiagA1H8(BitBoard);
 BitBoard FlipVertical(BitBoard);
 void     InitRays(void);
@@ -343,22 +443,6 @@ int      PopCount(BitBoard);
 bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
-BitBoard NortOne(BitBoard);
-BitBoard NortRay(Position);
-BitBoard EastOne(BitBoard);
-BitBoard EastRay(Position);
-BitBoard SoutOne(BitBoard);
-BitBoard SoutRay(Position);
-BitBoard WestOne(BitBoard);
-BitBoard WestRay(Position);
-BitBoard NoEaOne(BitBoard);
-BitBoard NoEaRay(Position);
-BitBoard NoWeOne(BitBoard);
-BitBoard NoWeRay(Position);
-BitBoard SoEaOne(BitBoard);
-BitBoard SoEaRay(Position);
-BitBoard SoWeOne(BitBoard);
-BitBoard SoWeRay(Position);
 
 // game.c
 CheckStats  CalculateCheckStats(Game*);
