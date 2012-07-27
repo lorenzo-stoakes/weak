@@ -508,58 +508,41 @@ Unmove(Game *game)
 {
   CastleEvent castleEvent;
   Move move;
-  Piece captured, piece;
+  Piece captured;
   Position to;
   Rank offset;
-  Side opposite;
 
   // Rollback to previous turn.
   move = PopMove(&game->History.Moves);
   toggleTurn(game);
 
-  switch(move.Type) {
+  switch(move.Type){
   case EnPassant:
-  case Normal:
-    piece = move.Piece;
-    break;
-  case PromoteKnight:
-    piece = Knight;
-    break;
-  case PromoteBishop:
-    piece = Bishop;
-    break;
-  case PromoteRook:
-    piece = Rook;
-    break;
-  case PromoteQueen:
-    piece = Queen;
-    break;
-  case CastleQueenSide:
-  case CastleKingSide:
-    break;
-  }
+    RemovePiece(&game->ChessSet, game->WhosTurn, Pawn, move.To);
+    PlacePiece(&game->ChessSet, game->WhosTurn, Pawn, move.From);
 
-  switch(move.Type) {
-  case EnPassant:
+    captured = PopPiece(&game->History.CapturedPieces);
+    offset = -1 + game->WhosTurn*2;
+    to = POSITION(RANK(move.To)+offset, FILE(move.To));
+    PlacePiece(&game->ChessSet, OPPOSITE(game->WhosTurn), captured, to);
+
+    break;
   case PromoteKnight:
   case PromoteBishop:
   case PromoteRook:
   case PromoteQueen:
   case Normal:
-    RemovePiece(&game->ChessSet, game->WhosTurn, piece, move.To);
+    if(move.Type >= PromoteKnight) {
+      RemovePiece(&game->ChessSet, game->WhosTurn, Knight + move.Type - PromoteKnight, move.To);
+    } else {
+      RemovePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.To);
+    }
+
     PlacePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.From);
 
     if(move.Capture) {
-        captured = PopPiece(&game->History.CapturedPieces);
-
-        opposite = OPPOSITE(game->WhosTurn);
-        if(move.Type == EnPassant) {
-          offset = -1 + game->WhosTurn*2;
-          to = POSITION(RANK(move.To)+offset, FILE(move.To));
-          PlacePiece(&game->ChessSet, opposite, captured, to);
-        } else {
-          PlacePiece(&game->ChessSet, opposite, captured, move.To);
-        }
+      captured = PopPiece(&game->History.CapturedPieces);
+      PlacePiece(&game->ChessSet, OPPOSITE(game->WhosTurn), captured, move.To);
     }
 
     break;
