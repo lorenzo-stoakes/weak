@@ -167,7 +167,6 @@ ParseFen(char *fen)
   // TODO: Implement parsing of clock times.
 
  done:
-
   UpdateOccupancies(&ret.ChessSet);
 
   king = BitScanForward(ret.ChessSet.Sets[ret.WhosTurn].Boards[King]);
