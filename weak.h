@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #ifndef WEAK_HEADER
 #define WEAK_HEADER
 
@@ -20,6 +22,7 @@
 #define FORCE_INLINE inline __attribute__((always_inline))
 
 #define INIT_MOVE_LEN 192
+#define MAX_PIECE_LOCATION 10
 
 // Perft positions, see http://chessprogramming.wikispaces.com/Perft+Results.
 
@@ -196,7 +199,12 @@ struct MoveHistory {
 struct ChessSet {
   BitBoard EmptySquares, Occupancy;
   BitBoard PieceOccupancy[7];
-  Piece    Squares[64];
+  int      PieceCounts[2][7];
+  int      PiecePositionIndexes[64];
+
+  Position PiecePositions[2][7][MAX_PIECE_LOCATION];  
+
+  Piece    Squares[64];  
   Set      Sets[2];
 };
 
@@ -345,12 +353,18 @@ LenMoves(Move *start, Move *end)
 FORCE_INLINE Piece
 PieceAt(ChessSet *chessSet, Position pos)
 {
+  assert(pos <= H8);
+  assert(chessSet->Squares[pos] <= King);
+
   return chessSet->Squares[pos];
 }
 
 FORCE_INLINE void
 PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
+  assert(side <= Black);
+  assert(piece <= King);
+
   chessSet->Squares[pos] = piece;
   chessSet->Sets[side].Boards[piece] |= POSBOARD(pos);
 }
@@ -359,6 +373,9 @@ FORCE_INLINE void
 RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
   BitBoard complement = ~POSBOARD(pos);
+
+  assert(side <= Black);  
+  assert(piece <= King);
 
   chessSet->Squares[pos] = MissingPiece;
   chessSet->Sets[side].Boards[piece] &= complement;

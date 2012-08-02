@@ -9,7 +9,7 @@ ParseFen(char *fen)
 {
   bool seenKing[2] = { false, false };
   char chr;
-  int i, len;
+  int i, len, pieceCount;
   // Make file/rank integers so we can make them negative to detect errors. Both are unsigned.
   // TODO: fix.
   int file, rank;
@@ -86,6 +86,11 @@ ParseFen(char *fen)
     ret.ChessSet.Sets[side].Boards[piece] |= POSBOARD(pos);
 
     ret.ChessSet.Squares[pos] = piece;
+
+    pieceCount = ret.ChessSet.PieceCounts[side][piece];
+    ret.ChessSet.PiecePositionIndexes[pos] = pieceCount;
+    ret.ChessSet.PiecePositions[side][piece][pieceCount] = pos;
+    ret.ChessSet.PieceCounts[side][piece]++;
 
     file++;
   }
