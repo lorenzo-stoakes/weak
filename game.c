@@ -662,8 +662,6 @@ Unmove(Game *game)
 
   castleEvent = PopCastleEvent(&game->History.CastleEvents);
 
-  //UpdateOccupancies(chessSet);
-
   if(castleEvent == NoCastleEvent) {
     return;
   }
