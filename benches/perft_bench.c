@@ -11,7 +11,7 @@
 
 static char *fens[PERFT_COUNT] = { FEN1, FEN2, FEN3, FEN4, FEN4_REVERSED };
 static Game games[PERFT_COUNT];
-static int depthCounts[PERFT_COUNT] = { 6, 6, 7, 6, 6 };
+static int depthCounts[PERFT_COUNT] = { 6, 5, 7, 6, 6 };
 
 void
 BenchPerft()
