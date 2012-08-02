@@ -85,6 +85,8 @@ ParseFen(char *fen)
     pos = POSITION(rank, file);
     ret.ChessSet.Sets[side].Boards[piece] |= POSBOARD(pos);
 
+    ret.ChessSet.Squares[pos] = piece;
+
     file++;
   }
 

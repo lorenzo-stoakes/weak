@@ -170,6 +170,7 @@ struct MoveHistory {
 struct ChessSet {
   BitBoard EmptySquares, Occupancy;
   BitBoard PieceOccupancy[6];
+  Piece    Squares[64];
   Set      Sets[2];
 };
 
