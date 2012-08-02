@@ -134,7 +134,7 @@ struct CastleEventSlice {
 };
 
 struct CheckStats {
-  BitBoard CheckSquares[6], CheckSources, Discovered, Pinned;
+  BitBoard CheckSquares[7], CheckSources, Discovered, Pinned;
   Position DefendedKing, AttackedKing;
 };
 
@@ -157,7 +157,7 @@ struct PieceSlice {
 
 struct Set {
   BitBoard EmptySquares, Occupancy;
-  BitBoard Boards[6];
+  BitBoard Boards[7];
 };
 
 struct MoveHistory {
@@ -170,7 +170,7 @@ struct MoveHistory {
 
 struct ChessSet {
   BitBoard EmptySquares, Occupancy;
-  BitBoard PieceOccupancy[6];
+  BitBoard PieceOccupancy[7];
   Piece    Squares[64];
   Set      Sets[2];
 };
