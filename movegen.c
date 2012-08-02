@@ -3,7 +3,7 @@
 static FORCE_INLINE Move* bishopMoves(Game*, Move*, BitBoard, BitBoard);
 static Move* castleMoves(Game*, Move*);
 static Move* evasions(Move*, Game*);
-static Move* kingMoves(Game*, Move*, BitBoard);
+static FORCE_INLINE Move* kingMoves(Game*, Move*, BitBoard);
 static FORCE_INLINE Move* knightMoves(Game*, Move*, BitBoard);
 static Move* nonEvasions(Move*, Game*);
 static Move* pawnMovesBlack(Game*, Move*, BitBoard, bool);
