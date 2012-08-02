@@ -138,6 +138,8 @@ PinnedPieces(ChessSet *chessSet, Side side, Position king, bool pinned)
   Side     pinner     = pinned ? opposite : side;
   Position attacker;
 
+  assert(chessSet->Sets[side].Boards[King] != EmptyBoard);
+
   // If we consider opponents attacks *from* the king's square, this is equivalent to
   // positions in which the pieces in question can attack *to* the king.
 
