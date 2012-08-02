@@ -1,8 +1,10 @@
 #include "weak.h"
 
-static void        initArrays(void);
+static void              initArrays(void);
 static FORCE_INLINE void toggleTurn(Game *game);
-static CastleEvent updateCastlingRights(Game*, Move*);
+static CastleEvent       updateCastlingRights(Game*, Piece, Move, bool);
+static FORCE_INLINE void doCastleKingSide(Game *game);
+static FORCE_INLINE void doCastleQueenSide(Game *game);
 
 CheckStats
 CalculateCheckStats(Game *game)
@@ -44,46 +46,61 @@ bool
 Checkmated(Game *game)
 {
   Move buffer[INIT_MOVE_LEN];
-  MoveSlice slice = NewMoveSlice(buffer);
+  Move *start=buffer, *end;
 
   // TODO: When *first* move returned, return false.
 
-  AllMoves(&slice, game);
+  end = AllMoves(start, game);
 
-  return LenMoves(&slice) == 0 && game->CheckStats.CheckSources != EmptyBoard;
+  return LenMoves(start, end) == 0 && game->CheckStats.CheckSources != EmptyBoard;
 }
 
-void
-DoCastleKingSide(Game *game)
+static FORCE_INLINE void
+doCastleKingSide(Game *game)
 {
+  ChessSet *chessSet = &game->ChessSet;
   int offset = game->WhosTurn*8*7;
+  Side side = game->WhosTurn;
 
-  RemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
-  PlacePiece(&game->ChessSet, game->WhosTurn, King, G1 + offset);
-  RemovePiece(&game->ChessSet, game->WhosTurn, Rook, H1 + offset);
-  PlacePiece(&game->ChessSet, game->WhosTurn, Rook, F1 + offset);
+  RemovePiece(chessSet, side, King, E1 + offset);
+   PlacePiece(chessSet, side, King, G1 + offset);
+  RemovePiece(chessSet, side, Rook, H1 + offset);
+   PlacePiece(chessSet, side, Rook, F1 + offset);
+
+  // Update occupancies.
+
+  UpdateOccupancies(&game->ChessSet);
 }
 
-void
-DoCastleQueenSide(Game *game)
+static FORCE_INLINE void
+doCastleQueenSide(Game *game)
 {
+  ChessSet *chessSet = &game->ChessSet;
   int offset = game->WhosTurn*8*7;
+  Side side = game->WhosTurn;
 
-  RemovePiece(&game->ChessSet, game->WhosTurn, King, E1 + offset);
-  PlacePiece(&game->ChessSet, game->WhosTurn, King, C1 + offset);
-  RemovePiece(&game->ChessSet, game->WhosTurn, Rook, A1 + offset);
-  PlacePiece(&game->ChessSet, game->WhosTurn, Rook, D1 + offset);
+  RemovePiece(chessSet, side, King, E1 + offset);
+  PlacePiece(chessSet, side, King, C1 + offset);
+  RemovePiece(chessSet, side, Rook, A1 + offset);
+  PlacePiece(chessSet, side, Rook, D1 + offset);
+
+  // Update occupancies.
+  UpdateOccupancies(&game->ChessSet);
 }
 
 // Attempt to move piece.
 void
-DoMove(Game *game, Move *move)
+DoMove(Game *game, Move move)
 {
-  BitBoard checks;
+  BitBoard checks, mask;
   bool givesCheck;
   CastleEvent castleEvent;
   CheckStats checkStats;
-  Piece piece;
+  ChessSet *chessSet = &game->ChessSet;
+  Piece enPassantPiece, placePiece, capturePiece;
+  Position from = FROM(move), to = TO(move);
+  Piece originalPiece;
+  Piece piece = PieceAt(chessSet, from);
   Position enPassant, king;
   Rank offset;
   Side side = game->WhosTurn;
@@ -98,40 +115,35 @@ DoMove(Game *game, Move *move)
   // Assume empty, change if necessary.
   game->EnPassantSquare = EmptyPosition;
 
-  switch(move->Type) {
+  switch(TYPE(move)) {
   case CastleKingSide:
-    DoCastleKingSide(game);
+    doCastleKingSide(game);
+    AppendPiece(&game->History.CapturedPieces, MissingPiece);
     break;
   case CastleQueenSide:
-    DoCastleQueenSide(game);
+    doCastleQueenSide(game);
+    AppendPiece(&game->History.CapturedPieces, MissingPiece);
     break;
   case EnPassant:
-    // Panic, because in the usual course of the game .PseudoLegal() would have picked
-    // these up, and the move makes no sense without these conditions being true.
-    if(move->Piece != Pawn) {
-      panic("Expected pawn, en passant performed on piece %s.", move->Piece);
-    }
-    if(!move->Capture) {
-      panic("En passant move, but not capture.");
-    }
-
     offset = -1 + 2*side;
 
-    enPassant = POSITION(RANK(move->To)+offset, FILE(move->To));
+    enPassant = POSITION(RANK(to)+offset, FILE(to));
 
-    piece = PieceAt(&game->ChessSet.Sets[opposite], enPassant);
-    if(piece == MissingPiece) {
-      panic("No piece at %s when attempting en passant.", StringPosition(enPassant));
+    enPassantPiece = PieceAt(chessSet, enPassant);
+    if(enPassantPiece != Pawn) {
+      panic("Piece at en passant capture pawn square %s not pawn, is %s.",
+            StringPosition(enPassant), StringPiece(enPassantPiece));
     } else {
-      if(piece != Pawn) {
-        panic("Piece taken via en passant is %s, not pawn.", StringPiece(piece));
-      }
-      RemovePiece(&game->ChessSet, opposite, piece, enPassant);
-      AppendPiece(&game->History.CapturedPieces, piece);
+      RemovePiece(chessSet, opposite, Pawn, enPassant);
+      AppendPiece(&game->History.CapturedPieces, enPassantPiece);
     }
 
-    RemovePiece(&game->ChessSet, side, move->Piece, move->From);
-    PlacePiece(&game->ChessSet, side, move->Piece, move->To);
+    RemovePiece(chessSet, side, Pawn, from);
+    PlacePiece (chessSet, side, Pawn, to);
+
+    // Update occupancies.
+    // TODO: Make quicker.
+    UpdateOccupancies(chessSet);
 
     break;
   case PromoteKnight:
@@ -139,36 +151,41 @@ DoMove(Game *game, Move *move)
   case PromoteRook:
   case PromoteQueen:
   case Normal:
-    if(move->Capture) {
-      piece = PieceAt(&game->ChessSet.Sets[opposite], move->To);
-      if(piece == MissingPiece) {
-        panic("No piece at %s when attempting capture %s.", StringPosition(move->To),
-              StringMove(move));
-      } else {
-        RemovePiece(&game->ChessSet, opposite, piece, move->To);
-        AppendPiece(&game->History.CapturedPieces, piece);
-      }
+    capturePiece = PieceAt(chessSet, to);
+    if(capturePiece == MissingPiece) {
+      AppendPiece(&game->History.CapturedPieces, MissingPiece);
+    } else {
+      RemovePiece(chessSet, opposite, capturePiece, to);
+      AppendPiece(&game->History.CapturedPieces, capturePiece);
+
+      // Update occupancies.
+      mask = POSBOARD(to);
+      chessSet->Occupancy ^= mask;
+      chessSet->Sets[opposite].Occupancy ^= mask;
+      chessSet->Sets[opposite].EmptySquares = ~chessSet->Sets[opposite].Occupancy;
+      chessSet->PieceOccupancy[capturePiece] ^= mask;
     }
 
-    switch(move->Type) {
+    switch(TYPE(move)) {
     case PromoteKnight:
-      piece = Knight;
+      placePiece = Knight;
       break;
     case PromoteBishop:
-      piece = Bishop;
+      placePiece = Bishop;
       break;
     case PromoteRook:
-      piece = Rook;
+      placePiece = Rook;
       break;
     case PromoteQueen:
-      piece = Queen;
+      placePiece = Queen;
       break;
     case Normal:
-      piece = move->Piece;
+      placePiece = piece;
 
-      if(piece == Pawn && RANK(move->From) == Rank2 + (side*5) &&
-         RANK(move->To) == Rank4 + (side*1)) {
-        game->EnPassantSquare = move->From + (side == White ? 8 : -8);
+      // Update en passant square.
+      if(piece == Pawn && RANK(from) == Rank2 + (side*5) &&
+         RANK(to) == Rank4 + (side*1)) {
+        game->EnPassantSquare = from + (side == White ? 8 : -8);
       }
 
       break;
@@ -176,56 +193,72 @@ DoMove(Game *game, Move *move)
       panic("Impossible.");
     }
 
-    RemovePiece(&game->ChessSet, side, move->Piece, move->From);
-    PlacePiece(&game->ChessSet, side, piece, move->To);
+    RemovePiece(chessSet, side, piece, from);
+    PlacePiece(chessSet, side, placePiece, to);
 
+    // Update occupancies.
+    mask = POSBOARD(from) | POSBOARD(to);
+
+    chessSet->Occupancy ^= mask;
+    chessSet->EmptySquares = ~chessSet->Occupancy;
+
+    chessSet->Sets[side].Occupancy ^= mask;
+    chessSet->Sets[side].EmptySquares = ~chessSet->Sets[side].Occupancy;
+
+    chessSet->PieceOccupancy[piece] ^= POSBOARD(from);
+    chessSet->PieceOccupancy[placePiece] ^= POSBOARD(to);
     break;
 
   default:
-    panic("Move type %d not recognised.", move->Type);
+    panic("Move type %d not recognised.", TYPE(move));
   }
 
-  UpdateOccupancies(&game->ChessSet);
+  //UpdateOccupancies(chessSet);
 
-  castleEvent = updateCastlingRights(game, move);
+  castleEvent = updateCastlingRights(game, piece, move, piece != MissingPiece);
 
   AppendCastleEvent(&game->History.CastleEvents, castleEvent);
   AppendCheckStats(&game->History.CheckStats, game->CheckStats);
-  AppendMove(&game->History.Moves, *move);
+  AppendMove(&game->History.Moves, move);
 
   checks = EmptyBoard;
   if(givesCheck) {
     king = game->CheckStats.AttackedKing;
 
-    switch(move->Type) {
-    case Normal:
+    originalPiece = piece;
+
+    switch(TYPE(move)) {
     case PromoteKnight:
     case PromoteBishop:
     case PromoteRook:
     case PromoteQueen:
-      if((checkStats.CheckSquares[piece] & POSBOARD(move->To)) != EmptyBoard) {
-        checks |= POSBOARD(move->To);
+      piece = Knight + TYPE(move)-PromoteKnight;
+    case Normal:
+
+      if((checkStats.CheckSquares[piece] & POSBOARD(to)) != EmptyBoard) {
+        checks |= POSBOARD(to);
       }
 
-      if(checkStats.Discovered != EmptyBoard &&
-         (checkStats.Discovered & POSBOARD(move->From)) != EmptyBoard) {
+      piece = originalPiece;
 
-        if(move->Piece != Rook) {
-          checks |= RookAttacksFrom(king, game->ChessSet.Occupancy) &
+      if(checkStats.Discovered != EmptyBoard &&
+         (checkStats.Discovered & POSBOARD(from)) != EmptyBoard) {
+        if(piece != Rook) {
+          checks |= RookAttacksFrom(king, chessSet->Occupancy) &
             (game->ChessSet.Sets[side].Boards[Rook] |
              game->ChessSet.Sets[side].Boards[Queen]);
         }
-        if(move->Piece != Bishop) {
-          checks |= BishopAttacksFrom(king, game->ChessSet.Occupancy) &
-            (game->ChessSet.Sets[side].Boards[Bishop] |
-             game->ChessSet.Sets[side].Boards[Queen]);
+        if(piece != Bishop) {
+          checks |= BishopAttacksFrom(king, chessSet->Occupancy) &
+            (chessSet->Sets[side].Boards[Bishop] |
+             chessSet->Sets[side].Boards[Queen]);
         }
       }
 
       break;
     default:
-      checks = AllAttackersTo(&game->ChessSet, king, game->ChessSet.Occupancy) &
-        game->ChessSet.Sets[side].Occupancy;
+      checks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
+        chessSet->Sets[side].Occupancy;
 
       break;
     }
@@ -238,24 +271,42 @@ DoMove(Game *game, Move *move)
 }
 
 bool
-GivesCheck(Game *game, Move *move)
+GivesCheck(Game *game, Move move)
 {
   BitBoard bishopish, kingBoard, occNoFrom, rookish;
-  BitBoard fromBoard = POSBOARD(move->From);
-  BitBoard toBoard = POSBOARD(move->To);
+  BitBoard fromBoard = POSBOARD(FROM(move));
+  BitBoard toBoard = POSBOARD(TO(move));
   int offset;
+  Piece piece = PieceAt(&game->ChessSet, FROM(move));
   Position captureSquare, king, kingFrom, kingTo, rookFrom, rookTo;
   Side side;
 
+  switch(TYPE(move)) {
+  case PromoteKnight:
+    piece = Knight;
+    break;
+  case PromoteBishop:
+    piece = Bishop;
+    break;
+  case PromoteRook:
+    piece = Rook;
+    break;
+  case PromoteQueen:
+    piece = Rook;
+    break;
+  default:
+    break;
+  }
+
   // Direct check.
-  if((game->CheckStats.CheckSquares[move->Piece] & toBoard) != EmptyBoard) {
+  if((game->CheckStats.CheckSquares[piece] & toBoard) != EmptyBoard) {
     return true;
   }
 
   // Discovered checks.
   if(game->CheckStats.Discovered != EmptyBoard &&
      (game->CheckStats.Discovered & fromBoard) != EmptyBoard) {
-    switch(move->Piece) {
+    switch(piece) {
     case Pawn:
     case King:
       // If the piece blocking the discovered check is a rook, knight or bishop, then for it not to
@@ -266,7 +317,7 @@ GivesCheck(Game *game, Move *move)
       // threatens, meaning our check is not revealed. So make sure from, to and the king do
       // not sit along the same line!
 
-      if(Aligned(move->From, move->To, game->CheckStats.AttackedKing)) {
+      if(Aligned(FROM(move), TO(move), game->CheckStats.AttackedKing)) {
         break;
       }
 
@@ -277,30 +328,30 @@ GivesCheck(Game *game, Move *move)
   }
 
   // If this is simply a normal move and we're here, then it's definitely not a checking move.
-  if(move->Type == Normal) {
+  if(TYPE(move) == Normal) {
     return false;
   }
 
   // GivesCheck() is called before the move is executed, so these are valid.
   king = game->CheckStats.AttackedKing;
   kingBoard = POSBOARD(king);
-  occNoFrom = game->ChessSet.Occupancy ^ POSBOARD(move->From);
+  occNoFrom = game->ChessSet.Occupancy ^ POSBOARD(FROM(move));
   side = game->WhosTurn;
 
-  switch(move->Type) {
+  switch(TYPE(move)) {
   case PromoteKnight:
-    return (KnightAttacksFrom(move->To) & kingBoard) != EmptyBoard;
+    return (KnightAttacksFrom(TO(move)) & kingBoard) != EmptyBoard;
   case PromoteRook:
-    return (RookAttacksFrom(move->To, occNoFrom) & kingBoard) != EmptyBoard;
+    return (RookAttacksFrom(TO(move), occNoFrom) & kingBoard) != EmptyBoard;
   case PromoteBishop:
-    return (BishopAttacksFrom(move->To, occNoFrom) & kingBoard) != EmptyBoard;
+    return (BishopAttacksFrom(TO(move), occNoFrom) & kingBoard) != EmptyBoard;
   case PromoteQueen:
-    return ((RookAttacksFrom(move->To, occNoFrom) | BishopAttacksFrom(move->To, occNoFrom)) &
+    return ((RookAttacksFrom(TO(move), occNoFrom) | BishopAttacksFrom(TO(move), occNoFrom)) &
             kingBoard) != EmptyBoard;
   case EnPassant:
-    captureSquare = POSITION(RANK(move->From), FILE(move->To));
+    captureSquare = POSITION(RANK(FROM(move)), FILE(TO(move)));
     occNoFrom ^= POSBOARD(captureSquare);
-    occNoFrom |= POSBOARD(move->To);
+    occNoFrom |= POSBOARD(TO(move));
 
     rookish = game->ChessSet.Sets[side].Boards[Rook] |
       game->ChessSet.Sets[side].Boards[Queen];
@@ -329,7 +380,7 @@ GivesCheck(Game *game, Move *move)
     occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
     return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
   default:
-    panic("Invalid move type %d at this point.", move->Type);
+    panic("Invalid move type %d at this point.", TYPE(move));
 
   }
 
@@ -441,30 +492,30 @@ bool
 Stalemated(Game *game)
 {
   Move buffer[INIT_MOVE_LEN];
-  MoveSlice slice = NewMoveSlice(buffer);
+  Move *start=buffer, *end;
 
   // TODO: When *first* move returned, return false.
 
-  AllMoves(&slice, game);
+  end = AllMoves(start, game);
 
-  return LenMoves(&slice) == 0 && game->CheckStats.CheckSources != EmptyBoard;
+  return LenMoves(start, end) == 0;
 }
 
-
 bool
-PseudoLegal(Game *game, Move *move, BitBoard pinned)
+PseudoLegal(Game *game, Move move, BitBoard pinned)
 {
   BitBoard bitBoard, opposition;
+  Piece piece = PieceAt(&game->ChessSet, FROM(move));
   Position king;
   Side opposite;
 
-  if(move->Type == EnPassant) {
+  if(TYPE(move) == EnPassant) {
     opposite = OPPOSITE(game->WhosTurn);
     king = game->CheckStats.DefendedKing;
 
     // Occupancy after en passant.
-    bitBoard = (game->ChessSet.Occupancy ^ POSBOARD(move->From) ^
-                POSBOARD(move->To + 8*(1 - 2*opposite))) | POSBOARD(move->To);
+    bitBoard = (game->ChessSet.Occupancy ^ POSBOARD(FROM(move)) ^
+                POSBOARD(TO(move) + 8*(1 - 2*opposite))) | POSBOARD(TO(move));
 
     return (RookAttacksFrom(king, bitBoard) &
             (game->ChessSet.Sets[opposite].Boards[Queen] |
@@ -474,9 +525,9 @@ PseudoLegal(Game *game, Move *move, BitBoard pinned)
         game->ChessSet.Sets[opposite].Boards[Bishop])) == EmptyBoard;
   }
 
-  if(move->Piece == King) {
+  if(piece == King) {
     // Castles already checked.
-    if(move->Type != Normal) {
+    if(TYPE(move) != Normal) {
       return true;
     }
 
@@ -484,14 +535,15 @@ PseudoLegal(Game *game, Move *move, BitBoard pinned)
     opposition = game->ChessSet.Sets[opposite].Occupancy;
 
     return
-      (AllAttackersTo(&game->ChessSet, move->To,
+      (AllAttackersTo(&game->ChessSet, TO(move),
                       game->ChessSet.Occupancy) & opposition) == EmptyBoard;
   }
 
   // A non-king move is legal if its not pinned or is moving in the ray between it and the king.
-  return pinned == EmptyBoard ||
-    (pinned & POSBOARD(move->From)) == EmptyBoard ||
-    Aligned(move->From, move->To, game->CheckStats.DefendedKing);
+
+return pinned == EmptyBoard ||
+    (pinned & POSBOARD(FROM(move))) == EmptyBoard ||
+    Aligned(FROM(move), TO(move), game->CheckStats.DefendedKing);
 }
 
 // Toggle whose turn it is.
@@ -504,25 +556,37 @@ toggleTurn(Game *game) {
 void
 Unmove(Game *game)
 {
+  BitBoard mask;
   CastleEvent castleEvent;
+  ChessSet *chessSet = &game->ChessSet;
   Move move;
-  Piece captured;
-  Position to;
+  Piece captured, piece, removePiece;
+  Position from, enPassantTo, to;
   Rank offset;
+  Side opposite = game->WhosTurn, side;
 
   // Rollback to previous turn.
   move = PopMove(&game->History.Moves);
+  from = FROM(move);
+  to = TO(move);
   toggleTurn(game);
+  side = game->WhosTurn;
 
-  switch(move.Type){
+  piece = PieceAt(chessSet, to);
+
+  captured = PopPiece(&game->History.CapturedPieces);
+
+  switch(TYPE(move)) {
   case EnPassant:
-    RemovePiece(&game->ChessSet, game->WhosTurn, Pawn, move.To);
-    PlacePiece(&game->ChessSet, game->WhosTurn, Pawn, move.From);
+    RemovePiece(chessSet, side, Pawn, to);
+    PlacePiece(chessSet, side, Pawn, from);
 
-    captured = PopPiece(&game->History.CapturedPieces);
-    offset = -1 + game->WhosTurn*2;
-    to = POSITION(RANK(move.To)+offset, FILE(move.To));
-    PlacePiece(&game->ChessSet, OPPOSITE(game->WhosTurn), captured, to);
+    offset = -1 + side*2;
+    enPassantTo = POSITION(RANK(to)+offset, FILE(to));
+    PlacePiece(chessSet, opposite, Pawn, enPassantTo);
+
+    // TODO: Do faster. Do this for now.
+    UpdateOccupancies(chessSet);
 
     break;
   case PromoteKnight:
@@ -530,40 +594,67 @@ Unmove(Game *game)
   case PromoteRook:
   case PromoteQueen:
   case Normal:
-    if(move.Type >= PromoteKnight) {
-      RemovePiece(&game->ChessSet, game->WhosTurn, Knight + move.Type - PromoteKnight, move.To);
+    if(TYPE(move) >= PromoteKnight) {
+      piece = Pawn;
+      removePiece = Knight + TYPE(move) - PromoteKnight;
     } else {
-      RemovePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.To);
+      removePiece = piece;
     }
 
-    PlacePiece(&game->ChessSet, game->WhosTurn, move.Piece, move.From);
+    RemovePiece(chessSet, side, removePiece, to);
+    PlacePiece(chessSet, side, piece, from);
 
-    if(move.Capture) {
-      captured = PopPiece(&game->History.CapturedPieces);
-      PlacePiece(&game->ChessSet, OPPOSITE(game->WhosTurn), captured, move.To);
+    // Update occupancies.
+    mask = POSBOARD(from) | POSBOARD(to);
+
+    chessSet->Occupancy ^= mask;
+    chessSet->EmptySquares = ~chessSet->Occupancy;
+
+    chessSet->Sets[side].Occupancy ^= mask;
+    chessSet->Sets[side].EmptySquares = ~chessSet->Sets[side].Occupancy;
+
+    chessSet->PieceOccupancy[piece] ^= POSBOARD(from);
+    chessSet->PieceOccupancy[removePiece] ^= POSBOARD(to);
+
+    if(captured != MissingPiece) {
+      PlacePiece(chessSet, opposite, captured, to);
+
+      // Update occupancies.
+      mask = POSBOARD(to);
+      chessSet->Occupancy ^= mask;
+      chessSet->Sets[opposite].Occupancy ^= mask;
+      chessSet->Sets[opposite].EmptySquares = ~chessSet->Sets[opposite].Occupancy;
+      chessSet->PieceOccupancy[captured] ^= mask;
+
     }
 
     break;
   case CastleQueenSide:
-    offset = game->WhosTurn == White ? 0 : 8*7;
+    offset = side == White ? 0 : 8*7;
 
-    RemovePiece(&game->ChessSet, game->WhosTurn, King, C1+offset);
-    PlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
-    RemovePiece(&game->ChessSet, game->WhosTurn, Rook, D1+offset);
-    PlacePiece(&game->ChessSet, game->WhosTurn, Rook, A1+offset);
+    RemovePiece(chessSet, side, King, C1+offset);
+    PlacePiece(chessSet, side, King, E1+offset);
+    RemovePiece(chessSet, side, Rook, D1+offset);
+    PlacePiece(chessSet, side, Rook, A1+offset);
+
+    // TODO: Do faster. Do this for now.
+    UpdateOccupancies(chessSet);
 
     break;
   case CastleKingSide:
     offset = game->WhosTurn == White ? 0 : 8*7;
 
-    RemovePiece(&game->ChessSet, game->WhosTurn, King, G1+offset);
-    PlacePiece(&game->ChessSet, game->WhosTurn, King, E1+offset);
-    RemovePiece(&game->ChessSet, game->WhosTurn, Rook, F1+offset);
-    PlacePiece(&game->ChessSet, game->WhosTurn, Rook, H1+offset);
+    RemovePiece(chessSet, side, King, G1+offset);
+    PlacePiece(chessSet, side, King, E1+offset);
+    RemovePiece(chessSet, side, Rook, F1+offset);
+    PlacePiece(chessSet, side, Rook, H1+offset);
+
+    // TODO: Do faster. Do this for now.
+    UpdateOccupancies(chessSet);
 
     break;
   default:
-    panic("Unrecognised move type %d.", move.Type);
+    panic("Unrecognised move type %d.", TYPE(move));
   }
 
   game->CheckStats = PopCheckStats(&game->History.CheckStats);
@@ -571,7 +662,7 @@ Unmove(Game *game)
 
   castleEvent = PopCastleEvent(&game->History.CastleEvents);
 
-  UpdateOccupancies(&game->ChessSet);
+  //UpdateOccupancies(chessSet);
 
   if(castleEvent == NoCastleEvent) {
     return;
@@ -583,7 +674,6 @@ Unmove(Game *game)
   if(castleEvent&LostQueenSideWhite) {
     game->CastlingRights[White][QueenSide] = true;
   }
-
   if(castleEvent&LostKingSideBlack) {
     game->CastlingRights[Black][KingSide] = true;
   }
@@ -626,6 +716,9 @@ initArrays()
         delta = (to - from) / Distance[from][to];
 
         for(pos = from + delta; pos != to; pos += delta) {
+          if(pos < 0 || pos > 63) {
+            panic("Invalid pos.");
+          }
           Between[from][to] |= POSBOARD(pos);
         }
       }
@@ -639,14 +732,14 @@ initArrays()
 }
 
 static CastleEvent
-updateCastlingRights(Game *game, Move *move)
+updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
 {
   int offset;
   CastleEvent ret = NoCastleEvent;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
 
-  if(move->Type == CastleKingSide || move->Type == CastleQueenSide) {
+  if(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide) {
     if(game->CastlingRights[side][QueenSide]) {
       game->CastlingRights[side][QueenSide] = false;
       ret = side == White ? LostQueenSideWhite : LostQueenSideBlack;
@@ -660,24 +753,24 @@ updateCastlingRights(Game *game, Move *move)
     return ret;
   }
 
-  if(move->Capture) {
-    if(move->To == A1+opposite*8*7 && game->CastlingRights[opposite][QueenSide]) {
+  if(capture) {
+    if(TO(move) == A1+opposite*8*7 && game->CastlingRights[opposite][QueenSide]) {
       game->CastlingRights[opposite][QueenSide] = false;
       ret = opposite == White ? LostQueenSideWhite : LostQueenSideBlack;
-    } else if(move->To == H1+opposite*8*7 && game->CastlingRights[opposite][KingSide]) {
+    } else if(TO(move) == H1+opposite*8*7 && game->CastlingRights[opposite][KingSide]) {
       game->CastlingRights[opposite][KingSide] = false;
       ret = opposite == White ? LostKingSideWhite : LostKingSideBlack;
     }
   }
 
-  if(move->Piece != King && move->Piece != Rook) {
+  if(piece != King && piece != Rook) {
     return ret;
   }
 
   offset = side*8*7;
 
-  if(move->Piece == King) {
-    if(move->From != E1+offset) {
+  if(piece == King) {
+    if(FROM(move) != E1+offset) {
       return ret;
     }
 
@@ -690,11 +783,11 @@ updateCastlingRights(Game *game, Move *move)
       game->CastlingRights[side][KingSide] = false;
     }
   } else {
-    if(move->From == A1+offset && game->CastlingRights[side][QueenSide]) {
+    if(FROM(move) == A1+offset && game->CastlingRights[side][QueenSide]) {
       ret |= side == White ? LostQueenSideWhite : LostQueenSideBlack;
       game->CastlingRights[side][QueenSide] = false;
     }
-    if(move->From == H1+offset && game->CastlingRights[side][KingSide]) {
+    if(FROM(move) == H1+offset && game->CastlingRights[side][KingSide]) {
       ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
       game->CastlingRights[side][KingSide] = false;
     }

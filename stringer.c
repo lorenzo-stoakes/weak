@@ -137,16 +137,16 @@ StringChessSet(ChessSet *chessSet)
 
 // String move in long algebraic form.
 char*
-StringMove(Move *move)
+StringMove(Move move, Piece piece, bool capture)
 {
   char actionChr, pieceChr;
   char *suffix, *from, *to;
   char ret[1+2+1+2+2+1];
 
-  from = StringPosition(move->From);
-  to = StringPosition(move->To);
+  from = StringPosition(FROM(move));
+  to = StringPosition(TO(move));
 
-  switch(move->Type) {
+  switch(TYPE(move)) {
   default:
     suffix = "??";
     break;
@@ -174,13 +174,13 @@ StringMove(Move *move)
     break;
   }
 
-  if(move->Capture) {
+  if(capture) {
     actionChr = 'x';
   } else {
     actionChr = '-';
   }
 
-  pieceChr = CharPiece(move->Piece);
+  pieceChr = CharPiece(piece);
 
   if(pieceChr == 'P' || pieceChr == 'p') {
     sprintf(ret, "%s%c%s%s", from, actionChr, to, suffix);

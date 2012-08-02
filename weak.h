@@ -19,7 +19,7 @@
 
 #define FORCE_INLINE inline __attribute__((always_inline))
 
-#define INIT_MOVE_LEN 100
+#define INIT_MOVE_LEN 192
 
 // Perft positions, see http://chessprogramming.wikispaces.com/Perft+Results.
 
@@ -30,6 +30,31 @@
 #define FEN3 "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -"
 #define FEN4 "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"
 #define FEN4_REVERSED "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"
+
+/*
+
+From    1 size = 6
+To      2 size = 6
+Type    3 size = 3
+
+  3         2         1
+21098765432109876543210987654321
+00000000000000000333111111222222 shift
+                 |  |     222222   0
+                 |  111111......   6
+                 333............   12
+*/
+
+#define MOVE_MASK(n) ((1<<n)-1)
+
+#define MAKE_MOVE_QUICK(from, to) ((Move)((from<<6)|to))
+
+#define MAKE_MOVE(from, to, type)             \
+  ((Move)((type<<12)|(from<<6)|(to)))
+
+#define TO(move)      ((Position)(    (move)&(MOVE_MASK(6))))
+#define FROM(move)    ((Position)( (move>>6)&(MOVE_MASK(6))))
+#define TYPE(move)    ((MoveType)((move>>12)&(MOVE_MASK(3))))
 
 enum CastleEvent {
   NoCastleEvent      = 0,
@@ -67,13 +92,13 @@ enum MoveType {
 };
 
 enum Piece {
+  MissingPiece,
   Pawn,
   Knight,
   Bishop,
   Rook,
   Queen,
-  King,
-  MissingPiece
+  King
 };
 
 enum Position {
@@ -115,7 +140,7 @@ typedef struct CheckStatsSlice  CheckStatsSlice;
 typedef struct ChessSet         ChessSet;
 typedef struct EnPassantSlice   EnPassantSlice;
 typedef struct Game             Game;
-typedef struct Move             Move;
+typedef uint64_t                Move;
 typedef struct MoveHistory      MoveHistory;
 typedef struct MoveSlice        MoveSlice;
 typedef enum MoveType           MoveType;
@@ -183,13 +208,6 @@ struct Game {
   MoveHistory History;
   Position    EnPassantSquare;
   Side        WhosTurn, HumanSide;
-};
-
-struct Move {
-  Piece    Piece;
-  Position From, To;
-  bool     Capture;
-  MoveType Type;
 };
 
 struct PerftStats {
@@ -333,6 +351,7 @@ PieceAt(ChessSet *chessSet, Position pos)
 FORCE_INLINE void
 PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
+  chessSet->Squares[pos] = piece;
   chessSet->Sets[side].Boards[piece] |= POSBOARD(pos);
 }
 
@@ -341,13 +360,14 @@ RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
   BitBoard complement = ~POSBOARD(pos);
 
+  chessSet->Squares[pos] = MissingPiece;
   chessSet->Sets[side].Boards[piece] &= complement;
 }
 
 FORCE_INLINE bool
 SingleBit(BitBoard bitBoard) {
   // This is clever (not my idea!) - if there is only 1 bit, it'll be the msb. (n-1) gives you
-  // all the bits below the msb, so if there's anything set there there's more than 1 bit.
+  // all the bits below the msb, so if there's only 1 bit set, anding these will return 0.
   return (bitBoard & (bitBoard - 1)) == C64(0);
 }
 
@@ -476,16 +496,14 @@ BitBoard Rotate90Clockwise(BitBoard);
 // game.c
 CheckStats  CalculateCheckStats(Game*);
 bool        Checkmated(Game*);
-void        DoCastleKingSide(Game*);
-void        DoCastleQueenSide(Game*);
-bool        GivesCheck(Game*, Move*);
+bool        GivesCheck(Game*, Move);
 void        InitEngine(void);
-void        DoMove(Game*, Move*);
+void        DoMove(Game*, Move);
 CheckStats  NewCheckStats(void);
 Game        NewEmptyGame(bool, Side);
 Game        NewGame(bool, Side);
 MoveHistory NewMoveHistory(void);
-bool        PseudoLegal(Game*, Move*, BitBoard);
+bool        PseudoLegal(Game*, Move, BitBoard);
 bool        Stalemated(Game*);
 void        Unmove(Game*);
 
@@ -493,7 +511,7 @@ void        Unmove(Game*);
 void InitMagics(void);
 
 // movegen.c
-void AllMoves(MoveSlice*, Game*);
+Move* AllMoves(Move*, Game*);
 
 // parser.c
 Game ParseFen(char*);
@@ -526,7 +544,7 @@ ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
 Set      NewEmptySet(void);
 Set      NewWhiteSet(void);
-BitBoard PinnedPieces(ChessSet*, Side, BitBoard, bool);
+BitBoard PinnedPieces(ChessSet*, Side, Position, bool);
 void     UpdateOccupancies(ChessSet*);
 
 // slices.c
@@ -547,7 +565,7 @@ Piece            PopPiece(PieceSlice*);
 char  CharPiece(Piece);
 char* StringBitBoard(BitBoard);
 char* StringChessSet(ChessSet*);
-char* StringMove(Move*);
+char* StringMove(Move, Piece, bool);
 char* StringPerft(PerftStats*);
 char* StringPiece(Piece);
 char* StringPosition(Position);

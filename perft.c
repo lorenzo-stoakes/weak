@@ -8,33 +8,42 @@ static PerftStats initStats(void);
 uint64_t
 QuickPerft(Game *game, int depth)
 {
-  int i, len;
-  uint64_t ret = 0;
-  MoveSlice allMoves;
+#if defined(SHOW_MOVES)
+  bool capture;
+  Piece piece;
+#endif
   Move move;
+  Move *curr, *end;
   Move buffer[INIT_MOVE_LEN];
 
-  allMoves = NewMoveSlice(buffer);
-  AllMoves(&allMoves, game);
+  uint64_t ret = 0;
 
-  len = LenMoves(&allMoves);
+  end = AllMoves(buffer, game);
 
   if(depth <= 1) {
 #if defined(SHOW_MOVES)
-    for(i = 0; i < len; i++) {
-      move = allMoves.Vals[i];
+    for(curr = buffer; curr < end; curr++) {
+      move = *curr;
 
-      puts(StringMove(&move));
+      piece = PieceAt(&game->ChessSet, FROM(move));
+
+      if(TYPE(move) == EnPassant) {
+        capture = true;
+      } else {
+        capture = PieceAt(&game->ChessSet, TO(move)) != MissingPiece;
+      }
+
+      puts(StringMove(move, piece, capture));
     }
 #endif
 
-    return len;
+    return end-buffer;
   }
 
-  for(i = 0; i < len; i++) {
-    move = allMoves.Vals[i];
+  for(curr = buffer; curr < end; curr++) {
+    move = *curr;
 
-    DoMove(game, &move);
+    DoMove(game, move);
     ret += QuickPerft(game, depth - 1);
     Unmove(game);
   }
@@ -45,10 +54,13 @@ QuickPerft(Game *game, int depth)
 PerftStats
 Perft(Game *game, int depth)
 {
-  int i, len;
+#if defined(SHOW_MOVES)
+  bool capture;
+  Piece piece;
+#endif
   Move move;
-  MoveSlice allMoves;
   Move buffer[INIT_MOVE_LEN];
+  Move *curr, *end;
   PerftStats ret, stats;
 
   if(depth <= 0) {
@@ -57,22 +69,30 @@ Perft(Game *game, int depth)
 
   ret = initStats();
 
-  allMoves = NewMoveSlice(buffer);
-  AllMoves(&allMoves, game);
+  end = AllMoves(buffer, game);
 
-  len = LenMoves(&allMoves);
-  for(i = 0; i < len; i++) {
-    move = allMoves.Vals[i];
+  for(curr = buffer; curr != end; curr++) {
+    move = *curr;
 
     if(depth == 1) {
 #if defined(SHOW_MOVES)
-      puts(StringMove(&move));
+      piece = PieceAt(&game->ChessSet, FROM(move));
+
+      if(TYPE(move) == EnPassant) {
+        capture = true;
+      } else {
+        capture = PieceAt(&game->ChessSet, TO(move)) != MissingPiece;
+      }
+
+      puts(StringMove(move, piece, capture));
 #endif
       ret.Count++;
-      if(move.Capture) {
+      /*
+      if(CAPTURE(move)) {
         ret.Captures++;
       }
-      switch(move.Type) {
+      */
+      switch(TYPE(move)) {
       case CastleQueenSide:
       case CastleKingSide:
         ret.Castles++;
@@ -89,10 +109,10 @@ Perft(Game *game, int depth)
       case Normal:
         break;
       default:
-        panic("Invalid move type %d.", move.Type);
+        panic("Invalid move type %d.", TYPE(move));
       }
 
-      DoMove(game, &move);
+      DoMove(game, move);
       if(game->CheckStats.CheckSources != EmptyBoard) {
         ret.Checks++;
 
@@ -102,7 +122,7 @@ Perft(Game *game, int depth)
       }
       Unmove(game);
     } else {
-      DoMove(game, &move);
+      DoMove(game, move);
       stats = Perft(game, depth - 1);
       Unmove(game);
       ret.Count += stats.Count;
