@@ -4,8 +4,8 @@
 
 //#define SHOW_PERFT_STATS
 
-#define FEN FEN1
-#define DEPTH 6
+#define FEN FEN4
+#define DEPTH 5
 #define REPETITIONS 1
 
 int
