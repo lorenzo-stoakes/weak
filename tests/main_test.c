@@ -2,6 +2,9 @@
 #include <strings.h>
 #include "test.h"
 
+char* (*TestFunctions[TEST_COUNT])(void);
+char *TestNames[TEST_COUNT];
+
 static void
 init()
 {
@@ -20,11 +23,13 @@ int main()
   InitEngine();
 
   for(i = 0; i < TEST_COUNT; i++) {
-    msg = TestFunctions[i]();
+    // HACK. TODO: Fix!
+    msg = TestPerft();    
+    //msg = testFunctions[i]();
 
     if(msg != NULL) {
       failed++;
-      printf("%s FAILED: %s\n", TestNames[i], msg);
+      printf("%s FAILED: %s\n", "Perft Test", msg);
     }
   }
 
