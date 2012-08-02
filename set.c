@@ -31,11 +31,44 @@ ChessSet
 NewChessSet()
 {
   ChessSet ret;
+  Position pos;
 
   ret.Sets[White] = NewWhiteSet();
   ret.Sets[Black] = NewBlackSet();
   ret.Occupancy = InitOccupancy;
   ret.EmptySquares = ~InitOccupancy;
+
+  for(pos = A3; pos <= H6; pos++) {
+    ret.Squares[pos] = MissingPiece;
+  }
+
+  for(pos = A2; pos <= H2; pos++) {
+    ret.Squares[pos] = Pawn;
+  }
+  for(pos = A7; pos <= H7; pos++) {
+    ret.Squares[pos] = Pawn;
+  }
+
+  ret.Squares[A1] = Rook;
+  ret.Squares[H1] = Rook;
+  ret.Squares[A8] = Rook;
+  ret.Squares[H8] = Rook;
+
+  ret.Squares[B1] = Knight;
+  ret.Squares[G1] = Knight;
+  ret.Squares[B8] = Knight;
+  ret.Squares[G8] = Knight;
+
+  ret.Squares[C1] = Bishop;
+  ret.Squares[F1] = Bishop;
+  ret.Squares[C8] = Bishop;
+  ret.Squares[F8] = Bishop;
+
+  ret.Squares[D1] = Queen;
+  ret.Squares[D8] = Queen;
+
+  ret.Squares[E1] = King;
+  ret.Squares[E8] = King;
 
   UpdateOccupancies(&ret);
 
@@ -46,11 +79,16 @@ ChessSet
 NewEmptyChessSet()
 {
   ChessSet ret;
+  Position pos;
 
   ret.Sets[White] = NewEmptySet();
   ret.Sets[Black] = NewEmptySet();
   ret.Occupancy = EmptyBoard;
   ret.EmptySquares = FullyOccupied;
+
+  for(pos = A1; pos <= H8; pos++) {
+    ret.Squares[pos] = MissingPiece;
+  }
 
   UpdateOccupancies(&ret);
 
