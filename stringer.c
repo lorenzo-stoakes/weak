@@ -99,18 +99,16 @@ StringChessSet(ChessSet *chessSet)
       ret[ind+1] = '\n';
     }
 
-    piece = PieceAt(&chessSet->Sets[White], pos);
-
-    if(piece != MissingPiece) {
-      side = White;
-    } else {
-      side = Black;
-      piece = PieceAt(&chessSet->Sets[Black], pos);
-    }
-
+    piece = PieceAt(chessSet, pos);
     if(piece == MissingPiece) {
       ret[ind] = '.';
     } else {
+      if((chessSet->Sets[White].Occupancy & POSBOARD(pos)) != EmptyBoard) {
+        side = White;
+      } else {
+        side = Black;
+      }
+
       pieceChr = CharPiece(piece);
 
       switch(side) {
