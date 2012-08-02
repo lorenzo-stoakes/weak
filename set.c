@@ -146,7 +146,7 @@ PieceAt(Set *set, Position pos)
 }
 
 BitBoard
-PinnedPieces(ChessSet *chessSet, Side side, BitBoard king, bool pinned)
+PinnedPieces(ChessSet *chessSet, Side side, Position king, bool pinned)
 {
   BitBoard attackers, bitBoard;
   BitBoard ret        = EmptyBoard;
