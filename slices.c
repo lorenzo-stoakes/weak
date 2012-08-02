@@ -25,11 +25,6 @@ LenCastleEvents(CastleEventSlice *slice)
   return slice->Curr - slice->Vals;
 }
 
-int
-LenMoves(MoveSlice *slice)
-{
-  return slice->Curr - slice->Vals;
-}
 
 CastleEventSlice
 NewCastleEventSlice()

@@ -129,22 +129,6 @@ NewWhiteSet()
   return ret;
 }
 
-// Determine whether the set has a piece at the specified position, and if so what that piece
-// is.
-Piece
-PieceAt(Set *set, Position pos)
-{
-  Piece piece;
-
-  for(piece = Pawn; piece <= King; piece++) {
-    if(PositionOccupied(set->Boards[piece], pos)) {
-      return piece;
-    }
-  }
-
-  return MissingPiece;
-}
-
 BitBoard
 PinnedPieces(ChessSet *chessSet, Side side, Position king, bool pinned)
 {

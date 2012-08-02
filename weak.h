@@ -317,6 +317,18 @@ FileDistance(Position from, Position to)
   return abs(FILE(from) - FILE(to));
 }
 
+FORCE_INLINE int
+LenMoves(Move *start, Move *end)
+{
+  return end - start;
+}
+
+FORCE_INLINE Piece
+PieceAt(ChessSet *chessSet, Position pos)
+{
+  return chessSet->Squares[pos];
+}
+
 FORCE_INLINE void
 PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
@@ -513,14 +525,12 @@ ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);
 Set      NewEmptySet(void);
 Set      NewWhiteSet(void);
-Piece    PieceAt(Set*, Position);
 BitBoard PinnedPieces(ChessSet*, Side, BitBoard, bool);
 void     UpdateOccupancies(ChessSet*);
 
 // slices.c
 void             AppendPiece(PieceSlice*, Piece);
 int              LenCastleEvents(CastleEventSlice*);
-int              LenMoves(MoveSlice*);
 CastleEventSlice NewCastleEventSlice(void);
 CheckStatsSlice  NewCheckStatsSlice(void);
 EnPassantSlice   NewEnPassantSlice(void);
