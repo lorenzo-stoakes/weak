@@ -63,7 +63,6 @@ BishopSquareThreats(Position bishop, BitBoard occupancy)
   return ret;
 }
 
-
 void
 InitKing()
 {
