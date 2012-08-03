@@ -228,8 +228,9 @@ DoMove(Game *game, Move move)
 
       // Swap the captured piece position and the last piece position.
 
-      // Obtain the index of the position for the last entry in the list of positions for the capture
-      // piece type, and simultaneously reduce the piece count for this piece type.
+      // Obtain the index of the position for the last entry in the list of positions for the
+      // capture of this piece type, and simultaneously reduce the piece count for this piece
+      // type.
       indexLast = --chessSet->PieceCounts[opposite][capturePiece];
 
       assert(opposite <= Black);
