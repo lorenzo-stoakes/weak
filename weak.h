@@ -201,10 +201,8 @@ struct ChessSet {
   BitBoard PieceOccupancy[7];
   int      PieceCounts[2][7];
   int      PiecePositionIndexes[64];
-
-  Position PiecePositions[2][7][MAX_PIECE_LOCATION];  
-
-  Piece    Squares[64];  
+  Position PiecePositions[2][7][MAX_PIECE_LOCATION];
+  Piece    Squares[64];
   Set      Sets[2];
 };
 
