@@ -721,13 +721,14 @@ Unmove(Game *game)
     offset = -1 + side*2;
     enPassantTo = POSITION(RANK(to)+offset, FILE(to));
 
-    assert(enPassantTo <= H8);
+    assert(enPassantTo >= A1 && enPassantTo <= H8);
 
     PlacePiece(chessSet, opposite, Pawn, enPassantTo);
 
     indexLast = chessSet->PieceCounts[opposite][Pawn]++;
     chessSet->PiecePositionIndexes[enPassantTo] = indexLast;
 
+    assert(opposite == White || opposite == Black);
     assert(indexLast >= 0);
     assert(indexLast < MAX_PIECE_LOCATION);
 
