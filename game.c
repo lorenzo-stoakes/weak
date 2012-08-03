@@ -323,7 +323,7 @@ DoMove(Game *game, Move move)
       assert(indexTo >= 0);
       assert(indexTo < MAX_PIECE_LOCATION);
 
-      chessSet->PiecePositionIndexes[indexLast] = indexTo;
+      chessSet->PiecePositionIndexes[last] = indexTo;
       chessSet->PiecePositions[side][Pawn][indexTo] = last;
       chessSet->PiecePositions[side][Pawn][indexLast] = EmptyPosition;
 
