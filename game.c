@@ -743,14 +743,6 @@ Unmove(Game *game)
   case PromoteRook:
   case PromoteQueen:
   case Normal:
-    indexTo = chessSet->PiecePositionIndexes[from];
-
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
-
-    chessSet->PiecePositionIndexes[to] = indexTo;
-    chessSet->PiecePositions[side][piece][indexTo] = to;
-
     if(TYPE(move) >= PromoteKnight) {
       piece = Pawn;
       removePiece = Knight + TYPE(move) - PromoteKnight;
@@ -785,6 +777,16 @@ Unmove(Game *game)
     } else {
       removePiece = piece;
     }
+
+    indexTo = chessSet->PiecePositionIndexes[to];
+
+    assert(piece >= Pawn);
+    assert(piece <= King);
+    assert(indexTo >= 0);
+    assert(indexTo < MAX_PIECE_LOCATION);
+
+    chessSet->PiecePositionIndexes[from] = indexTo;
+    chessSet->PiecePositions[side][piece][indexTo] = from;
 
     RemovePiece(chessSet, side, removePiece, to);
     PlacePiece(chessSet, side, piece, from);
