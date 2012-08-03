@@ -374,7 +374,7 @@ RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
   BitBoard complement = ~POSBOARD(pos);
 
-  assert(side <= Black);  
+  assert(side <= Black);
   assert(piece <= King);
 
   chessSet->Squares[pos] = MissingPiece;

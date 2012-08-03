@@ -111,7 +111,7 @@ doCastleQueenSide(Game *game)
   index = chessSet->PiecePositionIndexes[A1 + offset];
 
   assert(index >= 0);
-  assert(index < MAX_PIECE_LOCATION);  
+  assert(index < MAX_PIECE_LOCATION);
 
   chessSet->PiecePositionIndexes[D1 + offset] = index;
   chessSet->PiecePositions[side][Rook][index] = D1 + offset;
@@ -145,7 +145,7 @@ DoMove(Game *game, Move move)
   assert(to <= H8);
 
   assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece >= Pawn);
-  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);  
+  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);
 
   checkStats = game->CheckStats;
   givesCheck = GivesCheck(game, move);
@@ -238,7 +238,7 @@ DoMove(Game *game, Move move)
       assert(indexLast >= 0);
       assert(indexLast < MAX_PIECE_LOCATION);
       assert(capturePiece >= Pawn);
-      assert(capturePiece <= King);      
+      assert(capturePiece <= King);
 
       // Now get the actual position for the last piece.
       last = chessSet->PiecePositions[opposite][capturePiece][indexLast];
@@ -331,7 +331,7 @@ DoMove(Game *game, Move move)
 
       assert(indexTo >= 0);
       assert(indexTo < MAX_PIECE_LOCATION);
-      assert(placePiece >= Pawn);      
+      assert(placePiece >= Pawn);
       assert(placePiece <= King);
 
       chessSet->PiecePositions[side][placePiece][indexTo] = to;
@@ -708,7 +708,7 @@ Unmove(Game *game)
   piece = PieceAt(chessSet, to);
   
   assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece >= Pawn);
-  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);  
+  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);
 
   captured = PopPiece(&game->History.CapturedPieces);
 
@@ -758,7 +758,7 @@ Unmove(Game *game)
       assert(side <= Black);
 
       assert(removePiece >= Pawn);
-      assert(removePiece <= King);      
+      assert(removePiece <= King);
 
       assert(indexLast >= 0);
       assert(indexLast < MAX_PIECE_LOCATION);
