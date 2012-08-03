@@ -691,7 +691,7 @@ Unmove(Game *game)
   ChessSet *chessSet = &game->ChessSet;
   int indexLast, indexTo;
   Move move;
-  Piece captured, piece, removePiece;
+  Piece capturePiece, piece, removePiece;
   Position from, enPassantTo, last, to;
   Rank offset;
   Side opposite = game->WhosTurn, side;
@@ -711,7 +711,7 @@ Unmove(Game *game)
   assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece >= Pawn);
   assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);
 
-  captured = PopPiece(&game->History.CapturedPieces);
+  capturePiece = PopPiece(&game->History.CapturedPieces);
 
   switch(TYPE(move)) {
   case EnPassant:
@@ -800,26 +800,26 @@ Unmove(Game *game)
     chessSet->PieceOccupancy[piece] ^= POSBOARD(from);
     chessSet->PieceOccupancy[removePiece] ^= POSBOARD(to);
 
-    if(captured != MissingPiece) {
-      PlacePiece(chessSet, opposite, captured, to);
+    if(capturePiece != MissingPiece) {
+      PlacePiece(chessSet, opposite, capturePiece, to);
 
       // Update occupancies.
       mask = POSBOARD(to);
       chessSet->Occupancy ^= mask;
       chessSet->Sets[opposite].Occupancy ^= mask;
       chessSet->Sets[opposite].EmptySquares = ~chessSet->Sets[opposite].Occupancy;
-      chessSet->PieceOccupancy[captured] ^= mask;
+      chessSet->PieceOccupancy[capturePiece] ^= mask;
 
-      indexTo = chessSet->PieceCounts[opposite][captured]++;
+      indexTo = chessSet->PieceCounts[opposite][capturePiece]++;
 
       assert(indexTo >= 0);
       assert(indexTo < MAX_PIECE_LOCATION);
-      assert(captured >= Pawn);
-      assert(captured <= King);
+      assert(capturePiece >= Pawn);
+      assert(capturePiece <= King);
       assert(opposite <= Black);
 
       chessSet->PiecePositionIndexes[to] = indexTo;
-      chessSet->PiecePositions[opposite][captured][indexTo] = to;
+      chessSet->PiecePositions[opposite][capturePiece][indexTo] = to;
     }
 
     break;
