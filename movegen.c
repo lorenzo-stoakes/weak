@@ -17,18 +17,20 @@ knightMoves(Game *game, Move *end, BitBoard mask)
   Side side = game->WhosTurn;
 
   BitBoard attacks;
-  BitBoard pieceBoard = game->ChessSet.Sets[side].Boards[Knight];
   Position from, to;
+  Position *positions = game->ChessSet.PiecePositions[side][Knight];
 
-  while(pieceBoard) {
-    from = PopForward(&pieceBoard);
+  if(*positions != EmptyPosition) {
+    do {
+      from = *positions;
 
-    attacks = KnightAttacksFrom(from) & mask;
-    while(attacks != EmptyBoard) {
-      to = PopForward(&attacks);
+      attacks = KnightAttacksFrom(from) & mask;
+      while(attacks != EmptyBoard) {
+        to = PopForward(&attacks);
 
-      *end++ = MAKE_MOVE_QUICK(from, to);
-    }
+        *end++ = MAKE_MOVE_QUICK(from, to);
+      }
+    } while(*++positions != EmptyPosition);
   }
 
   return end;
@@ -80,18 +82,21 @@ rookMoves(Game *game, Move *end, BitBoard occupancy, BitBoard mask)
   Side side = game->WhosTurn;
 
   BitBoard attacks;
-  BitBoard pieceBoard = game->ChessSet.Sets[side].Boards[Rook];
   Position from, to;
 
-  while(pieceBoard) {
-    from = PopForward(&pieceBoard);
+  Position *positions = game->ChessSet.PiecePositions[side][Rook];
 
-    attacks = RookAttacksFrom(from, occupancy) & mask;
-    while(attacks != EmptyBoard) {
-      to = PopForward(&attacks);
+  if(*positions != EmptyPosition) {
+    do {
+      from = *positions;
 
-      *end++ = MAKE_MOVE_QUICK(from, to);
-    }
+      attacks = RookAttacksFrom(from, occupancy) & mask;
+      while(attacks != EmptyBoard) {
+        to = PopForward(&attacks);
+
+        *end++ = MAKE_MOVE_QUICK(from, to);
+      }
+    } while(*++positions != EmptyPosition);
   }
 
   return end;
@@ -103,18 +108,22 @@ queenMoves(Game *game, Move *end, BitBoard occupancy, BitBoard mask)
   Side side = game->WhosTurn;
 
   BitBoard attacks;
-  BitBoard pieceBoard = game->ChessSet.Sets[side].Boards[Queen];
   Position from, to;
 
-  while(pieceBoard) {
-    from = PopForward(&pieceBoard);
+  Position *positions = game->ChessSet.PiecePositions[side][Queen];
 
-    attacks = (RookAttacksFrom(from, occupancy) | BishopAttacksFrom(from, occupancy)) & mask;
-    while(attacks != EmptyBoard) {
-      to = PopForward(&attacks);
+  if(*positions != EmptyPosition) {
+    do {
+      from = *positions;
 
-      *end++ = MAKE_MOVE_QUICK(from, to);
-    }
+      attacks = (RookAttacksFrom(from, occupancy) |
+                 BishopAttacksFrom(from, occupancy)) & mask;
+      while(attacks != EmptyBoard) {
+        to = PopForward(&attacks);
+
+        *end++ = MAKE_MOVE_QUICK(from, to);
+      }
+    } while(*++positions != EmptyPosition);
   }
 
   return end;
