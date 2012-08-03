@@ -320,6 +320,7 @@ pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
   BitBoard pawnsNotOn7 = pawns&~Rank7Mask;
 
   Position enPassant, to;
+
   // Moves.
 
   bitBoard1 = NortOne(pawnsNotOn7) & empty;

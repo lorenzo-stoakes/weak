@@ -216,6 +216,7 @@ DoMove(Game *game, Move move)
       AppendPiece(&game->History.CapturedPieces, MissingPiece);
     } else {
       // Capture.
+
       RemovePiece(chessSet, opposite, capturePiece, to);
       AppendPiece(&game->History.CapturedPieces, capturePiece);
 
@@ -706,7 +707,7 @@ Unmove(Game *game)
   assert(opposite <= Black);
 
   piece = PieceAt(chessSet, to);
-  
+
   assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece >= Pawn);
   assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);
 
