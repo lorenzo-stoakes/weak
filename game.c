@@ -182,6 +182,10 @@ DoMove(Game *game, Move move)
     chessSet->PiecePositions[opposite][Pawn][indexCaptured] = last;
     chessSet->PiecePositions[opposite][Pawn][indexLast] = EmptyPosition;
 
+    indexTo = chessSet->PiecePositionIndexes[from];
+    chessSet->PiecePositionIndexes[to] = indexTo;
+    chessSet->PiecePositions[side][Pawn][indexTo] = to;
+
     break;
   case PromoteKnight:
   case PromoteBishop:
@@ -693,6 +697,10 @@ Unmove(Game *game)
     indexLast = chessSet->PieceCounts[opposite][Pawn]++;
     chessSet->PiecePositionIndexes[enPassantedPawn] = indexLast;
     chessSet->PiecePositions[opposite][Pawn][indexLast] = enPassantedPawn;
+
+    indexTo = chessSet->PiecePositionIndexes[to];
+    chessSet->PiecePositionIndexes[from] = indexTo;
+    chessSet->PiecePositions[side][piece][indexTo] = from;
 
     // TODO: Do faster. Do this for now.
     UpdateOccupancies(chessSet);
