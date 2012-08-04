@@ -151,7 +151,6 @@ nonEvasions(Move *end, Game *game)
 
   end = castleMoves(game, end);
 
-
   return end;
 }
 
