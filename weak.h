@@ -23,6 +23,7 @@
 
 #define INIT_MOVE_LEN 192
 #define MAX_PIECE_LOCATION 10
+#define APPEND_STRING_BUFFER_LENGTH 2000
 
 // Perft positions, see http://chessprogramming.wikispaces.com/Perft+Results.
 
@@ -591,7 +592,7 @@ void*         allocate(size_t, size_t);
 void*         allocateZero(size_t, size_t);
 void          release(void*);
 void          panic(char*, ...);
-void          AppendString(StringBuilder *, char*);
+void          AppendString(StringBuilder *, char*, ...);
 char*         BuildString(StringBuilder*, bool);
 int           Max(int, int);
 StringBuilder NewStringBuilder(void);

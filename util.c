@@ -51,23 +51,28 @@ release(void *ptr)
 }
 
 void
-AppendString(StringBuilder *builder, char *str)
+AppendString(StringBuilder *builder, char *str, ...)
 {
-  int strLen = strlen(str);
-
-  if(strLen <= 0) {
-    return;
-  }
+  char buffer[APPEND_STRING_BUFFER_LENGTH];
+  int strLen;
+  va_list args;
 
   if(builder->cap < builder->len) {
     panic("Impossible.");
   }
   if(builder->cap == builder->len) {
-    expandBuilder
-(builder);
+    expandBuilder(builder);
   }
 
-  builder->strings[builder->len] = strdup(str);
+  va_start(args, str);
+
+  vsprintf(buffer, str, args);
+
+  va_end(args);
+
+  strLen = strlen(buffer);
+
+  builder->strings[builder->len] = strdup(buffer);
   builder->len++;
 
   builder->Length += strLen;
