@@ -250,28 +250,31 @@ StringPiece(Piece piece)
   char *ret;
 
   switch(piece) {
-    case Pawn:
-      ret = "pawn";
-      break;
-    case Rook:
-      ret = "rook";
-      break;
-    case Knight:
-      ret = "knight";
-      break;
-    case Bishop:
-      ret = "bishop";
-      break;
-    case Queen:
-      ret = "queen";
-      break;
-    case King:
-      ret = "king";
-      break;
-    default:
-      ret = "#invalid piece";
-      break;
-  }
+  case Pawn:
+    ret = "pawn";
+    break;
+  case Rook:
+    ret = "rook";
+    break;
+  case Knight:
+    ret = "knight";
+    break;
+  case Bishop:
+    ret = "bishop";
+    break;
+  case Queen:
+    ret = "queen";
+    break;
+  case King:
+    ret = "king";
+    break;
+  case MissingPiece:
+    ret = "#missing piece";
+    break;    
+  default:
+    ret = "#invalid piece";
+    break;
+  } 
 
   return strdup(ret);
 }
