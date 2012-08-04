@@ -231,7 +231,7 @@ castleMoves(Game *game, Move *end)
 static Move*
 evasions(Move *end, Game *game)
 {
-  BitBoard attacks, captures, moves, targets;
+  BitBoard attacks, moves, targets;
   BitBoard checks = game->CheckStats.CheckSources;
 
   BitBoard slideAttacks = EmptyBoard;
@@ -240,9 +240,7 @@ evasions(Move *end, Game *game)
   Position check;
   Position king = game->CheckStats.DefendedKing;
   Side side = game->WhosTurn;
-  Side opposite = OPPOSITE(side);
   BitBoard occupancy = game->ChessSet.Occupancy;
-  BitBoard opposition = game->ChessSet.Sets[opposite].Occupancy;
 
   while(checks != EmptyBoard) {
     check = PopForward(&checks);
