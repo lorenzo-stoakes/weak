@@ -129,7 +129,7 @@ DoMove(Game *game, Move move)
 {
 #ifndef NDEBUG
   static BitBoard doMoveCount;
-  char *msg;  
+  char *msg;
 #endif
 
   BitBoard checks, mask;
@@ -713,7 +713,7 @@ void
 Unmove(Game *game)
 {
 #ifndef NDEBUG
-  char *msg;  
+  char *msg;
   static BitBoard unmoveCount;
 #endif
 
@@ -931,7 +931,7 @@ Unmove(Game *game)
 #ifndef NDEBUG
   if((msg = checkConsistency(game, move)) != NULL) {
     printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
-           StringSide(side),           
+           StringSide(side),
            StringMove(move, piece, capturePiece != MissingPiece),
            unmoveCount);
     puts(StringChessSet(chessSet));
