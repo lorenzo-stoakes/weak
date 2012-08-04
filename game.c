@@ -410,7 +410,8 @@ DoMove(Game *game, Move move)
 
 #ifndef NDEBUG
   if((msg = checkConsistency(game, move)) != NULL) {
-    printf("Inconsistency in DoMove of %s at doMoveCount %llu:-\n\n",
+    printf("Inconsistency in %s's DoMove of %s at doMoveCount %llu:-\n\n",
+           StringSide(side),
            StringMove(move, piece, capturePiece != MissingPiece),
            doMoveCount);
     puts(StringChessSet(chessSet));
@@ -929,7 +930,8 @@ Unmove(Game *game)
 
 #ifndef NDEBUG
   if((msg = checkConsistency(game, move)) != NULL) {
-    printf("Inconsistency in Unmove of %s at unmoveCount %llu:-\n\n",
+    printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
+           StringSide(side),           
            StringMove(move, piece, capturePiece != MissingPiece),
            unmoveCount);
     puts(StringChessSet(chessSet));
