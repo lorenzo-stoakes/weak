@@ -335,6 +335,7 @@ DoMove(Game *game, Move move)
       assert(placePiece >= Pawn);
       assert(placePiece <= King);
 
+      chessSet->PiecePositionIndexes[to] = indexTo;
       chessSet->PiecePositions[side][placePiece][indexTo] = to;
     }
 
