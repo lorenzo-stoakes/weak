@@ -57,20 +57,21 @@ static FORCE_INLINE Move*
 bishopMoves(Game *game, Move *end, BitBoard occupancy, BitBoard mask)
 {
   Side side = game->WhosTurn;
-
   BitBoard attacks;
-  BitBoard pieceBoard = game->ChessSet.Sets[side].Boards[Bishop];
   Position from, to;
+  Position *positions = game->ChessSet.PiecePositions[side][Bishop];
 
-  while(pieceBoard) {
-    from = PopForward(&pieceBoard);
+  if(*positions != EmptyPosition) {
+    do {
+      from = *positions;
 
-    attacks = BishopAttacksFrom(from, occupancy) & mask;
-    while(attacks != EmptyBoard) {
-      to = PopForward(&attacks);
+      attacks = BishopAttacksFrom(from, occupancy) & mask;
+      while(attacks != EmptyBoard) {
+        to = PopForward(&attacks);
 
-      *end++ = MAKE_MOVE_QUICK(from, to);
-    }
+        *end++ = MAKE_MOVE_QUICK(from, to);
+      }
+    } while(*++positions != EmptyPosition);
   }
 
   return end;
