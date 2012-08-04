@@ -779,6 +779,9 @@ Unmove(Game *game)
       removePiece = piece;
     }
 
+    RemovePiece(chessSet, side, removePiece, to);
+    PlacePiece(chessSet, side, piece, from);
+
     indexTo = chessSet->PiecePositionIndexes[to];
 
     assert(piece >= Pawn);
@@ -788,9 +791,6 @@ Unmove(Game *game)
 
     chessSet->PiecePositionIndexes[from] = indexTo;
     chessSet->PiecePositions[side][piece][indexTo] = from;
-
-    RemovePiece(chessSet, side, removePiece, to);
-    PlacePiece(chessSet, side, piece, from);
 
     // Update occupancies.
     mask = POSBOARD(from) | POSBOARD(to);
