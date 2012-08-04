@@ -6,6 +6,10 @@ static CastleEvent       updateCastlingRights(Game*, Piece, Move, bool);
 static FORCE_INLINE void doCastleKingSide(Game *game);
 static FORCE_INLINE void doCastleQueenSide(Game *game);
 
+#ifndef NDEBUG
+static char*             checkConsistency(Game *game, Move move);
+#endif
+
 CheckStats
 CalculateCheckStats(Game *game)
 {
@@ -123,6 +127,11 @@ doCastleQueenSide(Game *game)
 void
 DoMove(Game *game, Move move)
 {
+#ifndef NDEBUG
+  static BitBoard doMoveCount;
+  char *msg;  
+#endif
+
   BitBoard checks, mask;
   bool givesCheck;
   CastleEvent castleEvent;
@@ -137,6 +146,10 @@ DoMove(Game *game, Move move)
   Rank offset;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
+
+#ifndef NDEBUG
+  doMoveCount++;
+#endif
 
   assert(from >= A1);
   assert(from <= H8);
@@ -394,6 +407,17 @@ DoMove(Game *game, Move move)
       break;
     }
   }
+
+#ifndef NDEBUG
+  if((msg = checkConsistency(game, move)) != NULL) {
+    printf("Inconsistency in DoMove of %s at doMoveCount %llu:-\n\n",
+           StringMove(move, piece, capturePiece != MissingPiece),
+           doMoveCount);
+    puts(StringChessSet(chessSet));
+    puts(msg);
+    abort();
+  }
+#endif
 
   toggleTurn(game);
 
@@ -687,6 +711,11 @@ toggleTurn(Game *game) {
 void
 Unmove(Game *game)
 {
+#ifndef NDEBUG
+  char *msg;  
+  static BitBoard unmoveCount;
+#endif
+
   BitBoard mask;
   CastleEvent castleEvent;
   ChessSet *chessSet = &game->ChessSet;
@@ -696,6 +725,10 @@ Unmove(Game *game)
   Position from, enPassantTo, last, to;
   Rank offset;
   Side opposite = game->WhosTurn, side;
+
+#ifndef NDEBUG
+  unmoveCount++;
+#endif
 
   // Rollback to previous turn.
   move = PopMove(&game->History.Moves);
@@ -893,6 +926,18 @@ Unmove(Game *game)
 
   castleEvent = PopCastleEvent(&game->History.CastleEvents);
 
+
+#ifndef NDEBUG
+  if((msg = checkConsistency(game, move)) != NULL) {
+    printf("Inconsistency in Unmove of %s at unmoveCount %llu:-\n\n",
+           StringMove(move, piece, capturePiece != MissingPiece),
+           unmoveCount);
+    puts(StringChessSet(chessSet));
+    puts(msg);
+    abort();
+  }
+#endif
+
   if(castleEvent == NoCastleEvent) {
     return;
   }
@@ -1024,3 +1069,78 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
 
   return ret;
 }
+
+#ifndef NDEBUG
+
+// Helper debug function which checks the consistency of the game object to ensure
+// everything should be as it is, returning a message if not.
+static char*
+checkConsistency(Game *game, Move move)
+{
+  BitBoard occupancy = EmptyBoard, emptySquares = EmptyBoard;
+  BitBoard sideOccupancies[2] = {EmptyBoard, EmptyBoard};
+  BitBoard sideEmptySquares[2] = {EmptyBoard, EmptyBoard};
+  ChessSet *chessSet = &game->ChessSet;
+  Side side;
+  Piece piece;
+  StringBuilder builder = NewStringBuilder();
+
+  // TODO: Reduce duplication.
+
+  // Check overall occupancies.
+  for(side = White; side <= Black; side++) {
+    for(piece = Pawn; piece <= King; piece++) {
+      occupancy |= chessSet->Sets[side].Boards[piece];
+      sideOccupancies[side] |= chessSet->Sets[side].Boards[piece];
+    }
+
+    sideEmptySquares[side] = ~sideOccupancies[side];
+
+    if(chessSet->Sets[side].Occupancy != sideOccupancies[side]) {
+      AppendString(&builder, "%s's occupancy is incorrect.\n\n"
+                   "Expected:-\n\n"
+                   "%s\n"                   
+                   "Actual:-\n\n"
+                   "%s\n",
+                   StringSide(side),
+                   StringBitBoard(sideOccupancies[side]),                   
+                   StringBitBoard(chessSet->Sets[side].Occupancy));
+    }
+
+    if(chessSet->Sets[side].EmptySquares != sideEmptySquares[side]) {
+      AppendString(&builder, "%s's empty squares are incorrect.\n\n"
+                   "Expected:-\n\n"
+                   "%s\n"                   
+                   "Actual:-\n\n"
+                   "%s\n",
+                   StringSide(side),
+                   StringBitBoard(sideEmptySquares[side]),
+                   StringBitBoard(chessSet->Sets[side].EmptySquares));                   
+    }
+  }
+  emptySquares = ~occupancy;
+
+  if(emptySquares != chessSet->EmptySquares) {
+    if(chessSet->EmptySquares != emptySquares) {
+      AppendString(&builder, "Overall empty squares are incorrect.\n\n"
+                   "Expected:-\n\n"
+                   "%s\n"                   
+                   "Actual:-\n\n"
+                   "%s\n",
+                   StringBitBoard(emptySquares),
+                   StringBitBoard(chessSet->EmptySquares));
+    }
+  }
+
+  if(builder.Length == 0) {
+    return NULL;
+  }
+
+  AppendString(&builder, "Move History:-\n\n"
+               "%s",
+               StringMoveHistory(&game->History));
+
+  return BuildString(&builder, true);
+}
+
+#endif
