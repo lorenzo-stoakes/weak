@@ -810,6 +810,7 @@ Unmove(Game *game)
       // Update occupancies.
       mask = POSBOARD(to);
       chessSet->Occupancy ^= mask;
+      chessSet->EmptySquares = ~chessSet->Occupancy;
       chessSet->Sets[opposite].Occupancy ^= mask;
       chessSet->Sets[opposite].EmptySquares = ~chessSet->Sets[opposite].Occupancy;
       chessSet->PieceOccupancy[capturePiece] ^= mask;
