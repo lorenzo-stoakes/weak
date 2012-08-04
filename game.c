@@ -130,7 +130,7 @@ DoMove(Game *game, Move move)
   Position from = FROM(move), to = TO(move);
   Piece originalPiece;
   Piece piece = PieceAt(chessSet, from);
-  Position enPassant, king, last;
+  Position enPassantedPawn, king, last;
   Rank offset;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
@@ -160,10 +160,9 @@ DoMove(Game *game, Move move)
   case EnPassant:
     offset = -1 + 2*side;
 
-    enPassant = POSITION(RANK(to)+offset, FILE(to));
+    enPassantedPawn = POSITION(RANK(to)+offset, FILE(to));
 
-
-    RemovePiece(chessSet, opposite, Pawn, enPassant);
+    RemovePiece(chessSet, opposite, Pawn, enPassantedPawn);
     AppendPiece(&game->History.CapturedPieces, Pawn);
 
     RemovePiece(chessSet, side, Pawn, from);
