@@ -38,8 +38,9 @@ test: $(TEST_FILES)
 	./tests/test
 
 # However, if pedantry is required, we have this :-)
+# Don't use debug flags here, as full tests become impractically slow.
 testfull: $(TEST_FILES)
-	$(CC) $(DEBUG_FLAGS) $(filter-out $(FILTER_FILES) main.c, $^) -o tests/test
+	$(CC) $(CFLAGS) $(filter-out $(FILTER_FILES) main.c, $^) -o tests/test
 	./tests/test
 
 trail:
