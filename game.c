@@ -100,16 +100,10 @@ doCastleQueenSide(Game *game)
 
   index = chessSet->PiecePositionIndexes[E1 + offset];
 
-  assert(index >= 0);
-  assert(index < MAX_PIECE_LOCATION);
-
   chessSet->PiecePositionIndexes[C1 + offset] = index;
   chessSet->PiecePositions[side][King][index] = C1 + offset;
 
   index = chessSet->PiecePositionIndexes[A1 + offset];
-
-  assert(index >= 0);
-  assert(index < MAX_PIECE_LOCATION);
 
   chessSet->PiecePositionIndexes[D1 + offset] = index;
   chessSet->PiecePositions[side][Rook][index] = D1 + offset;
@@ -145,15 +139,6 @@ DoMove(Game *game, Move move)
   doMoveCount++;
 #endif
 
-  assert(from >= A1);
-  assert(from <= H8);
-
-  assert(to >= A1);
-  assert(to <= H8);
-
-  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece >= Pawn);
-  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);
-
   checkStats = game->CheckStats;
   givesCheck = GivesCheck(game, move);
 
@@ -177,7 +162,6 @@ DoMove(Game *game, Move move)
 
     enPassant = POSITION(RANK(to)+offset, FILE(to));
 
-    assert(PieceAt(chessSet, enPassant) == Pawn);
 
     RemovePiece(chessSet, opposite, Pawn, enPassant);
     AppendPiece(&game->History.CapturedPieces, Pawn);
@@ -193,16 +177,8 @@ DoMove(Game *game, Move move)
 
     indexLast = --chessSet->PieceCounts[opposite][Pawn];
 
-    assert(opposite <= Black);
-
-    assert(indexLast >= 0);
-    assert(indexLast < MAX_PIECE_LOCATION);
-
     last = chessSet->PiecePositions[opposite][Pawn][indexLast];
     indexCaptured = chessSet->PiecePositionIndexes[to];
-
-    assert(indexCaptured >= 0);
-    assert(indexCaptured < MAX_PIECE_LOCATION);
 
     chessSet->PiecePositionIndexes[last] = indexCaptured;
     chessSet->PiecePositions[opposite][Pawn][indexCaptured] = last;
@@ -215,9 +191,6 @@ DoMove(Game *game, Move move)
   case PromoteQueen:
   case Normal:
     capturePiece = PieceAt(chessSet, to);
-
-    assert(capturePiece <= King);
-    assert(opposite <= Black);
 
     if(capturePiece == MissingPiece) {
       AppendPiece(&game->History.CapturedPieces, MissingPiece);
@@ -241,20 +214,10 @@ DoMove(Game *game, Move move)
       // type.
       indexLast = --chessSet->PieceCounts[opposite][capturePiece];
 
-      assert(opposite <= Black);
-
-      assert(indexLast >= 0);
-      assert(indexLast < MAX_PIECE_LOCATION);
-      assert(capturePiece >= Pawn);
-      assert(capturePiece <= King);
-
       // Now get the actual position for the last piece.
       last = chessSet->PiecePositions[opposite][capturePiece][indexLast];
       // Find out the index in our piece position list for the actually captured piece.
       indexCaptured = chessSet->PiecePositionIndexes[to];
-
-      assert(indexCaptured >= 0);
-      assert(indexCaptured < MAX_PIECE_LOCATION);
 
       // Update the index for our last piece to the index for the captured piece.
       chessSet->PiecePositionIndexes[last] = indexCaptured;
@@ -309,9 +272,6 @@ DoMove(Game *game, Move move)
 
     indexTo = chessSet->PiecePositionIndexes[from];
 
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
-
     chessSet->PiecePositionIndexes[to] = indexTo;
     chessSet->PiecePositions[side][piece][indexTo] = to;
 
@@ -319,16 +279,8 @@ DoMove(Game *game, Move move)
       // Delete from pawn list by swapping with last and decrementing count (as with capture).
       indexLast = --chessSet->PieceCounts[side][Pawn];
 
-      assert(side <= Black);
-
-      assert(indexLast >= 0);
-      assert(indexLast < MAX_PIECE_LOCATION);
-
       last = chessSet->PiecePositions[side][Pawn][indexLast];
       indexTo = chessSet->PiecePositionIndexes[to];
-
-      assert(indexTo >= 0);
-      assert(indexTo < MAX_PIECE_LOCATION);
 
       chessSet->PiecePositionIndexes[last] = indexTo;
       chessSet->PiecePositions[side][Pawn][indexTo] = last;
@@ -336,11 +288,6 @@ DoMove(Game *game, Move move)
 
       // Now add the piece promoted to.
       indexTo = chessSet->PieceCounts[side][placePiece]++;
-
-      assert(indexTo >= 0);
-      assert(indexTo < MAX_PIECE_LOCATION);
-      assert(placePiece >= Pawn);
-      assert(placePiece <= King);
 
       chessSet->PiecePositionIndexes[to] = indexTo;
       chessSet->PiecePositions[side][placePiece][indexTo] = to;
@@ -370,7 +317,6 @@ DoMove(Game *game, Move move)
     case PromoteRook:
     case PromoteQueen:
       piece = Knight + TYPE(move)-PromoteKnight;
-      assert(piece >= Knight && piece <= Queen);
     case Normal:
 
       if((checkStats.CheckSquares[piece] & POSBOARD(to)) != EmptyBoard) {
@@ -732,13 +678,7 @@ Unmove(Game *game)
   toggleTurn(game);
   side = game->WhosTurn;
 
-  assert(side <= Black);
-  assert(opposite <= Black);
-
   piece = PieceAt(chessSet, to);
-
-  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece >= Pawn);
-  assert(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide || piece <= King);
 
   capturePiece = PopPiece(&game->History.CapturedPieces);
 
@@ -750,17 +690,10 @@ Unmove(Game *game)
     offset = -1 + side*2;
     enPassantTo = POSITION(RANK(to)+offset, FILE(to));
 
-    assert(enPassantTo >= A1 && enPassantTo <= H8);
-
     PlacePiece(chessSet, opposite, Pawn, enPassantTo);
 
     indexLast = chessSet->PieceCounts[opposite][Pawn]++;
     chessSet->PiecePositionIndexes[enPassantTo] = indexLast;
-
-    assert(opposite == White || opposite == Black);
-    assert(indexLast >= 0);
-    assert(indexLast < MAX_PIECE_LOCATION);
-
     chessSet->PiecePositions[opposite][Pawn][indexLast] = to;
 
     // TODO: Do faster. Do this for now.
@@ -781,17 +714,11 @@ Unmove(Game *game)
       last = chessSet->PiecePositions[side][removePiece][indexLast];
       indexTo = chessSet->PiecePositionIndexes[to];
 
-      assert(indexTo >= 0);
-      assert(indexTo < MAX_PIECE_LOCATION);
-
       chessSet->PiecePositionIndexes[last] = indexTo;
       chessSet->PiecePositions[side][removePiece][indexTo] = last;
       chessSet->PiecePositions[side][removePiece][indexLast] = EmptyPosition;
 
       indexTo = chessSet->PieceCounts[side][Pawn]++;
-
-      assert(indexTo >= 0);
-      assert(indexTo < MAX_PIECE_LOCATION);
 
       chessSet->PiecePositionIndexes[to] = indexTo;
       chessSet->PiecePositions[side][Pawn][indexTo] = to;
