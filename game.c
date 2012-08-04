@@ -168,7 +168,6 @@ DoMove(Game *game, Move move)
     RemovePiece(chessSet, side, Pawn, from);
     PlacePiece (chessSet, side, Pawn, to);
 
-    // Update occupancies.
     // TODO: Make quicker.
     UpdateOccupancies(chessSet);
 
