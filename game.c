@@ -736,12 +736,6 @@ Unmove(Game *game)
     PlacePiece(chessSet, side, piece, from);
 
     indexTo = chessSet->PiecePositionIndexes[to];
-
-    assert(piece >= Pawn);
-    assert(piece <= King);
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
-
     chessSet->PiecePositionIndexes[from] = indexTo;
     chessSet->PiecePositions[side][piece][indexTo] = from;
 
@@ -770,12 +764,6 @@ Unmove(Game *game)
 
       indexTo = chessSet->PieceCounts[opposite][capturePiece]++;
 
-      assert(indexTo >= 0);
-      assert(indexTo < MAX_PIECE_LOCATION);
-      assert(capturePiece >= Pawn);
-      assert(capturePiece <= King);
-      assert(opposite <= Black);
-
       chessSet->PiecePositionIndexes[to] = indexTo;
       chessSet->PiecePositions[opposite][capturePiece][indexTo] = to;
     }
@@ -791,16 +779,10 @@ Unmove(Game *game)
 
     indexTo = chessSet->PiecePositionIndexes[C1 + offset];
 
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
-
     chessSet->PiecePositionIndexes[E1 + offset] = indexTo;
     chessSet->PiecePositions[side][King][indexTo] = E1 + offset;
 
     indexTo = chessSet->PiecePositionIndexes[D1 + offset];
-
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
 
     chessSet->PiecePositionIndexes[A1 + offset] = indexTo;
     chessSet->PiecePositions[side][Rook][indexTo] = A1 + offset;
@@ -819,16 +801,10 @@ Unmove(Game *game)
 
     indexTo = chessSet->PiecePositionIndexes[G1 + offset];
 
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
-
     chessSet->PiecePositionIndexes[E1 + offset] = indexTo;
     chessSet->PiecePositions[side][King][indexTo] = E1 + offset;
 
     indexTo = chessSet->PiecePositionIndexes[F1 + offset];
-
-    assert(indexTo >= 0);
-    assert(indexTo < MAX_PIECE_LOCATION);
 
     chessSet->PiecePositionIndexes[H1 + offset] = indexTo;
     chessSet->PiecePositions[side][Rook][indexTo] = H1 + offset;
