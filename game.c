@@ -1079,17 +1079,23 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
 static char*
 checkConsistency(Game *game, Move move)
 {
+  BitBoard bitBoard;
   BitBoard occupancy = EmptyBoard, emptySquares = EmptyBoard;
   BitBoard sideOccupancies[2] = {EmptyBoard, EmptyBoard};
   BitBoard sideEmptySquares[2] = {EmptyBoard, EmptyBoard};
+  bool seen;
   ChessSet *chessSet = &game->ChessSet;
+  int i, index, pieceCount, seenCount;
   Side side;
-  Piece piece;
+  Piece piece, seenPiece;
+  Position pos;
+  Position *currPos;
   StringBuilder builder = NewStringBuilder();
 
   // TODO: Reduce duplication.
 
-  // Check overall occupancies.
+  // Occupancies checks.
+
   for(side = White; side <= Black; side++) {
     for(piece = Pawn; piece <= King; piece++) {
       occupancy |= chessSet->Sets[side].Boards[piece];
@@ -1101,32 +1107,47 @@ checkConsistency(Game *game, Move move)
     if(chessSet->Sets[side].Occupancy != sideOccupancies[side]) {
       AppendString(&builder, "%s's occupancy is incorrect.\n\n"
                    "Expected:-\n\n"
-                   "%s\n"                   
+                   "%s\n"
                    "Actual:-\n\n"
                    "%s\n",
                    StringSide(side),
-                   StringBitBoard(sideOccupancies[side]),                   
+                   StringBitBoard(sideOccupancies[side]),
                    StringBitBoard(chessSet->Sets[side].Occupancy));
     }
 
     if(chessSet->Sets[side].EmptySquares != sideEmptySquares[side]) {
       AppendString(&builder, "%s's empty squares are incorrect.\n\n"
                    "Expected:-\n\n"
-                   "%s\n"                   
+                   "%s\n"
                    "Actual:-\n\n"
                    "%s\n",
                    StringSide(side),
                    StringBitBoard(sideEmptySquares[side]),
-                   StringBitBoard(chessSet->Sets[side].EmptySquares));                   
+                   StringBitBoard(chessSet->Sets[side].EmptySquares));
     }
   }
-  emptySquares = ~occupancy;
 
+  for(piece = Pawn; piece <= King; piece++) {
+    bitBoard = chessSet->Sets[White].Boards[piece] | chessSet->Sets[Black].Boards[piece];
+    if(chessSet->PieceOccupancy[piece] !=
+       bitBoard) {
+      AppendString(&builder, "%s piece occupancy is incorrect.\n\n"
+                   "Expected:-\n\n"
+                   "%s\n"
+                   "Actual:-\n\n"
+                   "%s\n",
+                   StringPiece(piece),
+                   StringBitBoard(bitBoard),
+                   StringBitBoard(chessSet->PieceOccupancy[piece]));
+    }
+  }
+
+  emptySquares = ~occupancy;
   if(emptySquares != chessSet->EmptySquares) {
     if(chessSet->EmptySquares != emptySquares) {
       AppendString(&builder, "Overall empty squares are incorrect.\n\n"
                    "Expected:-\n\n"
-                   "%s\n"                   
+                   "%s\n"
                    "Actual:-\n\n"
                    "%s\n",
                    StringBitBoard(emptySquares),
@@ -1134,11 +1155,115 @@ checkConsistency(Game *game, Move move)
     }
   }
 
+  for(pos = A1; pos <= H8; pos++) {
+    seenCount = 0;
+    seenPiece = MissingPiece;
+
+    for(piece = Pawn; piece <= King; piece++) {
+      bitBoard = chessSet->Sets[White].Boards[piece] |
+        chessSet->Sets[Black].Boards[piece];
+
+      if((POSBOARD(pos)&bitBoard) == POSBOARD(pos)) {
+        seenCount++;
+        seenPiece = piece;
+
+        if(seenCount > 1) {
+          AppendString(&builder, "%s overlaps at %s.\n",
+                       StringPiece(piece), StringPosition(pos));
+        }
+      }
+    }
+
+    if(chessSet->Squares[pos] != seenPiece) {
+      AppendString(&builder, "%s at %s, but Squares[%s] = %s.\n",
+                   StringPiece(seenPiece), StringPosition(pos),
+                   StringPosition(pos), StringPiece(chessSet->Squares[pos]));
+    }
+  }
+
+  // Piece position checks.
+
+  for(side = White; side <= Black; side++) {
+    for(piece = Pawn; piece <= King; piece++) {
+      pieceCount = PopCount(chessSet->Sets[side].Boards[piece]);
+
+      if(pieceCount != chessSet->PieceCounts[side][piece]) {
+        AppendString(&builder, "%d %s %ss on the board, but PieceCounts[%s][%s]=%d.\n",
+                     pieceCount, StringSide(side), StringPiece(piece),
+                     StringSide(side), StringPiece(piece),
+                     chessSet->PieceCounts[side][piece]);
+      }
+
+      currPos = chessSet->PiecePositions[side][piece];
+
+      bitBoard = EmptyBoard;
+      for(i = 0; i < MAX_PIECE_LOCATION && *currPos != EmptyPosition; i++, currPos++) {
+        pos = *currPos;
+
+        bitBoard |= POSBOARD(pos);
+      }
+
+      if(i > MAX_PIECE_LOCATION) {
+        AppendString(&builder, "Ran off end of PiecePositions[%s][%s], "
+                     "MAX_PIECE_LOCATION = %d.\n",
+                     StringSide(side), StringPiece(piece), MAX_PIECE_LOCATION);
+      } else if(bitBoard != chessSet->Sets[side].Boards[piece]) {
+        AppendString(&builder, "PiecePositions[%s][%s] gives incorrect results.\n\n"
+                     "Expected:-\n\n"
+                     "%s\n\n"
+                     "Actual:-\n\n"
+                     "%s\n",
+                     StringSide(side), StringPiece(piece),
+                     StringBitBoard(chessSet->Sets[side].Boards[piece]),
+                     StringBitBoard(bitBoard));
+      }
+    }
+  }
+
+  // We've already checked overlaps here, so not a problem to not consider that.
+  for(pos = A1; pos <= H8; pos++) {
+    seen = false;
+
+    // TODO: Use goto?
+    for(side = White; side <= Black; side++) {
+      for(piece = Pawn; piece <= King; piece++) {
+        if(chessSet->Sets[side].Boards[piece]&POSBOARD(pos)) {
+          seen = true;
+          break;
+        }
+        if(seen) {
+          break;
+        }
+      }
+      if(seen) {
+        break;
+      }
+    }
+
+    // Empty square. PiecePositionIndexes can be left stale here so nothing to check.
+    if(!seen) {
+      continue;
+    }
+
+    index = chessSet->PiecePositionIndexes[pos];
+
+    if(index < 0) {
+      AppendString(&builder, "Index %d < 0 for position %s.\n", index, StringPosition(pos));
+    } else if(index >= MAX_PIECE_LOCATION) {
+      AppendString(&builder, "Index %d for position %s exceeds MAX_PIECE_LOCATION = %d.\n",
+                   index, StringPosition(pos), MAX_PIECE_LOCATION);
+    } else if(chessSet->PiecePositions[side][piece][index] != pos) {
+      AppendString(&builder, "Index %d for position %s != PiecePositions[%s][%s][%d]=%s.\n",
+                   index, StringPosition(pos), StringSide(side), StringPiece(piece), index,
+                   StringPosition(chessSet->PiecePositions[side][piece][index]));
+    }
+  }
+
   if(builder.Length == 0) {
     return NULL;
   }
 
-  AppendString(&builder, "Move History:-\n\n"
+  AppendString(&builder, "\nMove History:-\n\n"
                "%s",
                StringMoveHistory(&game->History));
 
