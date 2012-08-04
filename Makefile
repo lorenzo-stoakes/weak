@@ -34,12 +34,12 @@ debug: $(CODE_FILES)
 
 # Typically, we don't want to run long-running tests. Default to QUICK_TEST.
 test: $(TEST_FILES)
-	$(CC) $(CFLAGS) -DQUICK_TEST $(filter-out $(FILTER_FILES) main.c, $^) -o tests/test
+	$(CC) $(DEBUG_FLAGS) -DQUICK_TEST $(filter-out $(FILTER_FILES) main.c, $^) -o tests/test
 	./tests/test
 
 # However, if pedantry is required, we have this :-)
 testfull: $(TEST_FILES)
-	$(CC) $(CFLAGS) $(filter-out $(FILTER_FILES) main.c, $^) -o tests/test
+	$(CC) $(DEBUG_FLAGS) $(filter-out $(FILTER_FILES) main.c, $^) -o tests/test
 	./tests/test
 
 trail:
