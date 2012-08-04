@@ -1101,7 +1101,7 @@ checkConsistency(Game *game, Move move)
       pieceCount = PopCount(chessSet->Sets[side].Boards[piece]);
 
       if(pieceCount != chessSet->PieceCounts[side][piece]) {
-        AppendString(&builder, "%d %s %ss on the board, but PieceCounts[%s][%s]=%d.\n",
+        AppendString(&builder, "%d %s %ss on the board, but PieceCounts[%s][%s] = %d.\n",
                      pieceCount, StringSide(side), StringPiece(piece),
                      StringSide(side), StringPiece(piece),
                      chessSet->PieceCounts[side][piece]);
@@ -1166,7 +1166,7 @@ checkConsistency(Game *game, Move move)
       AppendString(&builder, "Index %d for position %s exceeds MAX_PIECE_LOCATION = %d.\n",
                    index, StringPosition(pos), MAX_PIECE_LOCATION);
     } else if(chessSet->PiecePositions[side][piece][index] != pos) {
-      AppendString(&builder, "Index %d for position %s != PiecePositions[%s][%s][%d]=%s.\n",
+      AppendString(&builder, "Index %d for position %s != PiecePositions[%s][%s][%d] = %s.\n",
                    index, StringPosition(pos), StringSide(side), StringPiece(piece), index,
                    StringPosition(chessSet->PiecePositions[side][piece][index]));
     }
