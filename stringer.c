@@ -27,30 +27,57 @@
  char*
  StringBitBoard(BitBoard bitBoard)
  {
-   Rank rank;
-   File file;
+   const int LINE_LENGTH = 36;
+   const int LINE_COUNT = 18;
+
+   // TODO: Reduce duplication from StringChessSet.
+
+   // Include space for newlines.
+   char ret[LINE_LENGTH * LINE_COUNT + 1 + 1000];
+   int file, offset, rank;
    Position pos;
-   int newline, ind;
+   Side lineSide = Black;
 
-   char ret[64+8+1];
+   char *topLine    = "    A   B   C   D   E   F   G   H  \n";
+   char *dottedLine = "  ---------------------------------\n";
+   char *blackLine  = "  |   |...|   |...|   |...|   |...|\n";
+   char *whiteLine  = "  |...|   |...|   |...|   |...|   |\n";
 
-   for(pos = A1; pos <= H8; pos++) {
-     rank = Rank8 - RANK(pos);
-     file = FILE(pos);
-     newline = rank;
-     ind = 8*rank + file + newline;
+   // Add top lines.
+   strncpy(ret, topLine, LINE_LENGTH);
+   strncpy(ret+LINE_LENGTH, dottedLine, LINE_LENGTH);
 
-     if(file == 7) {
-         ret[ind+1] = '\n';
+   for(rank = Rank8; rank >= Rank1; rank--) {
+     offset = 2*LINE_LENGTH + 2*LINE_LENGTH*(Rank8-rank);
+
+     // Add line.
+     strncpy(ret + offset, lineSide == White ? whiteLine : blackLine, LINE_LENGTH);
+
+     // Add number.
+     ret[offset] = '1'+rank;
+
+     // Add pieces.
+
+     // For the sake of debugging, avoid PieceAt() in case it is buggy.
+
+     offset += 4;
+     for(file = FileA; file <= FileH; file++) {
+       pos = POSITION(rank, file);
+
+       if((bitBoard&POSBOARD(pos)) == POSBOARD(pos)) {
+         ret[offset] = 'X';
+       }
+
+       offset += 4;
      }
 
-     if((POSBOARD(pos)&bitBoard) == 0) {
-       ret[ind] = '.';
-     } else {
-       ret[ind] = '1';
-     }
+     // Add dotted line.
+     strncpy(ret + offset, dottedLine, LINE_LENGTH);
+
+     lineSide = OPPOSITE(lineSide);
    }
-   ret[64+8] = '\0';
+
+   ret[LINE_LENGTH * LINE_COUNT] = '\0';
 
    return strdup(ret);
  }
@@ -59,15 +86,26 @@
  char*
  StringChessSet(ChessSet *chessSet)
  {
+   const int LINE_LENGTH = 36;
+   const int LINE_COUNT = 18;
+
    // Include space for newlines.
-   char ret[64+8+1];
+   char ret[LINE_LENGTH * LINE_COUNT + 1 + 1000];
    char pieceChr;
-   int ind, newline;
-   File file;
+   int file, offset, rank;
    Piece piece;
    Position pos;
-   Rank rank;
    Side side;
+   Side lineSide = Black;
+
+   char *topLine    = "    A   B   C   D   E   F   G   H  \n";
+   char *dottedLine = "  ---------------------------------\n";
+   char *blackLine  = "  |   |...|   |...|   |...|   |...|\n";
+   char *whiteLine  = "  |...|   |...|   |...|   |...|   |\n";
+
+   // Add top lines.
+   strncpy(ret, topLine, LINE_LENGTH);
+   strncpy(ret+LINE_LENGTH, dottedLine, LINE_LENGTH);
 
    // Outputs chess set as ascii-art.
    // pieces are upper-case if white, lower-case if black.
@@ -75,62 +113,91 @@
 
    // e.g., the initial position is output as follows:-
 
-   // rnbqkbnr
-   // pppppppp
-   // ........
-   // ........
-   // ........
-   // ........
-   // PPPPPPPP
-   // RNBQKBNR
+   //     A   B   C   D   E   F   G   H
+   //   ---------------------------------
+   // 8 | r |.n.| b |.q.| k |.b.| n |.r.|
+   //   ---------------------------------
+   // 7 |.p.| p |.p.| p |.p.| p |.p.| p |
+   //   ---------------------------------
+   // 6 |   |...|   |...|   |...|   |...|
+   //   ---------------------------------
+   // 5 |...|   |...|   |...|   |...|   |
+   //   ---------------------------------
+   // 4 |   |...|   |...|   |...|   |...|
+   //   ---------------------------------
+   // 3 |...|   |...|   |...|   |...|   |
+   //   ---------------------------------
+   // 2 | P |.P.| P |.P.| P |.P.| P |.P.|
+   //   ---------------------------------
+   // 1 |.R.| N |.B.| Q |.K.| B |.N.| R |
+   //   ---------------------------------
 
-   for(pos = A1; pos <= H8; pos++) {
-     // Vertical flip.
-     rank = Rank8 - RANK(pos);
-     file = FILE(pos);
+   for(rank = Rank8; rank >= Rank1; rank--) {
+     offset = 2*LINE_LENGTH + 2*LINE_LENGTH*(Rank8-rank);
 
-     // We need to leave space for a newline after each rank. This is equal to the
-     // number of ranks which will appear before this one in the ASCII board,
-     // e.g. the vertically flipped rank.
-     newline = rank;
-     ind = 8*rank + file + newline;
+     // Add line.
+     strncpy(ret + offset, lineSide == White ? whiteLine : blackLine, LINE_LENGTH);
 
-     if(file == 7) {
-       ret[ind+1] = '\n';
-     }
+     // Add number.
+     ret[offset] = '1'+rank;
 
-     piece = PieceAt(chessSet, pos);
-     if(piece == MissingPiece) {
-       ret[ind] = '.';
-     } else {
-       if((chessSet->Sets[White].Occupancy & POSBOARD(pos)) != EmptyBoard) {
-         side = White;
-       } else {
-         side = Black;
+     // Add pieces.
+
+     // For the sake of debugging, avoid PieceAt() in case it is buggy.
+
+     offset += 4;
+     for(file = FileA; file <= FileH; file++) {
+       pos = POSITION(rank, file);
+
+       pieceChr = '\0';
+
+       for(side = White; side <= Black; side++) {
+         for(piece = Pawn; piece <= King; piece++) {
+           if((chessSet->Sets[side].Boards[piece]&POSBOARD(pos)) == POSBOARD(pos)) {
+             switch(piece) {
+             case Pawn:
+               pieceChr = 'P';
+               break;
+             case Rook:
+               pieceChr = 'R';
+               break;
+             case Knight:
+               pieceChr = 'N';
+               break;
+             case Bishop:
+               pieceChr = 'B';
+               break;
+             case Queen:
+               pieceChr = 'Q';
+               break;
+             case King:
+               pieceChr = 'K';
+               break;
+             default:
+               panic("Impossible.");
+             }
+             goto loop;
+           }
+         }
+       }
+     loop:
+       if(pieceChr != '\0') {
+         if(side == Black) {
+           pieceChr += 32;
+         }
+         ret[offset] = pieceChr;
        }
 
-       pieceChr = CharPiece(piece);
-
-       switch(side) {
-       case White:
-         ret[ind] = pieceChr;
-         break;
-       case Black:
-         ret[ind] = tolower(pieceChr);
-         break;
-       default:
-         panic("Impossible.");
-       }
+       offset += 4;
      }
+
+     // Add dotted line.
+     strncpy(ret + offset, dottedLine, LINE_LENGTH);
+
+     lineSide = OPPOSITE(lineSide);
    }
 
-   ret[64+8] = '\0';
-
-   for(pos = A1; pos <= H8; pos++) {
-     if(ret[pos] == '\0') {
-         ret[pos] = '?';
-     }
-   }
+   ret[LINE_LENGTH * LINE_COUNT] = '\0';
 
    return strdup(ret);
  }
@@ -215,7 +282,7 @@
                     StringMove(move, Pawn, false));
 
        fullMoveCount++;
-       
+
        break;
      }
 
@@ -270,11 +337,11 @@ StringPiece(Piece piece)
     break;
   case MissingPiece:
     ret = "#missing piece";
-    break;    
+    break;
   default:
     ret = "#invalid piece";
     break;
-  } 
+  }
 
   return strdup(ret);
 }
