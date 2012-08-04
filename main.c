@@ -4,8 +4,13 @@
 
 //#define SHOW_PERFT_STATS
 
+<<<<<<< HEAD
 #define FEN FEN3
 #define DEPTH 7
+=======
+#define FEN FEN1
+#define DEPTH 6
+>>>>>>> master
 #define REPETITIONS 1
 
 int
