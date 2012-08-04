@@ -1210,7 +1210,7 @@ checkConsistency(Game *game, Move move)
       } else if(bitBoard != chessSet->Sets[side].Boards[piece]) {
         AppendString(&builder, "PiecePositions[%s][%s] gives incorrect results.\n\n"
                      "Expected:-\n\n"
-                     "%s\n\n"
+                     "%s\n"
                      "Actual:-\n\n"
                      "%s\n",
                      StringSide(side), StringPiece(piece),
