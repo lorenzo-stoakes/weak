@@ -74,16 +74,10 @@ doCastleKingSide(Game *game)
 
   index = chessSet->PiecePositionIndexes[E1 + offset];
 
-  assert(index >= 0);
-  assert(index < MAX_PIECE_LOCATION);
-
   chessSet->PiecePositionIndexes[G1 + offset] = index;
   chessSet->PiecePositions[side][King][index] = G1 + offset;
 
   index = chessSet->PiecePositionIndexes[H1 + offset];
-
-  assert(index >= 0);
-  assert(index < MAX_PIECE_LOCATION);
 
   chessSet->PiecePositionIndexes[F1 + offset] = index;
   chessSet->PiecePositions[side][Rook][index] = F1 + offset;
@@ -783,14 +777,6 @@ Unmove(Game *game)
       removePiece = Knight + TYPE(move) - PromoteKnight;
 
       indexLast = --chessSet->PieceCounts[side][removePiece];
-
-      assert(side <= Black);
-
-      assert(removePiece >= Pawn);
-      assert(removePiece <= King);
-
-      assert(indexLast >= 0);
-      assert(indexLast < MAX_PIECE_LOCATION);
 
       last = chessSet->PiecePositions[side][removePiece][indexLast];
       indexTo = chessSet->PiecePositionIndexes[to];
