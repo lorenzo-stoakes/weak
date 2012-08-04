@@ -361,9 +361,6 @@ PieceAt(ChessSet *chessSet, Position pos)
 FORCE_INLINE void
 PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
-  assert(side <= Black);
-  assert(piece <= King);
-
   chessSet->Squares[pos] = piece;
   chessSet->Sets[side].Boards[piece] |= POSBOARD(pos);
 }
@@ -372,9 +369,6 @@ FORCE_INLINE void
 RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
   BitBoard complement = ~POSBOARD(pos);
-
-  assert(side <= Black);
-  assert(piece <= King);
 
   chessSet->Squares[pos] = MissingPiece;
   chessSet->Sets[side].Boards[piece] &= complement;
