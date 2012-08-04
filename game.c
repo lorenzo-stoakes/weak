@@ -176,7 +176,7 @@ DoMove(Game *game, Move move)
     indexLast = --chessSet->PieceCounts[opposite][Pawn];
 
     last = chessSet->PiecePositions[opposite][Pawn][indexLast];
-    indexCaptured = chessSet->PiecePositionIndexes[to];
+    indexCaptured = chessSet->PiecePositionIndexes[enPassantedPawn];
 
     chessSet->PiecePositionIndexes[last] = indexCaptured;
     chessSet->PiecePositions[opposite][Pawn][indexCaptured] = last;
@@ -661,7 +661,7 @@ Unmove(Game *game)
   int indexLast, indexTo;
   Move move;
   Piece capturePiece, piece, removePiece;
-  Position from, enPassantTo, last, to;
+  Position from, enPassantedPawn, last, to;
   Rank offset;
   Side opposite = game->WhosTurn, side;
 
@@ -686,13 +686,13 @@ Unmove(Game *game)
     PlacePiece(chessSet, side, Pawn, from);
 
     offset = -1 + side*2;
-    enPassantTo = POSITION(RANK(to)+offset, FILE(to));
+    enPassantedPawn = POSITION(RANK(to)+offset, FILE(to));
 
-    PlacePiece(chessSet, opposite, Pawn, enPassantTo);
+    PlacePiece(chessSet, opposite, Pawn, enPassantedPawn);
 
     indexLast = chessSet->PieceCounts[opposite][Pawn]++;
-    chessSet->PiecePositionIndexes[enPassantTo] = indexLast;
-    chessSet->PiecePositions[opposite][Pawn][indexLast] = to;
+    chessSet->PiecePositionIndexes[enPassantedPawn] = indexLast;
+    chessSet->PiecePositions[opposite][Pawn][indexLast] = enPassantedPawn;
 
     // TODO: Do faster. Do this for now.
     UpdateOccupancies(chessSet);
