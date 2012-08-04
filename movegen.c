@@ -281,14 +281,9 @@ evasions(Move *end, Game *game)
 
   // King evasion moves.
 
-  moves = attacks & game->ChessSet.EmptySquares;
+  moves = attacks & ~game->ChessSet.Sets[side].Occupancy;
   while(moves) {
     *end++ = MAKE_MOVE_QUICK(king, PopForward(&moves));
-  }
-
-  captures = attacks & opposition;
-  while(captures) {
-    *end++ = MAKE_MOVE_QUICK(king, PopForward(&captures));
   }
 
   // If there is more than 1 check, blocking won't achieve anything.
