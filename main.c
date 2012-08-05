@@ -9,7 +9,7 @@
 #define REPETITIONS 1
 
 int
-main(int argc, char **argv)
+main()
 {
   int i;
   clock_t ticks;
