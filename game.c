@@ -7,7 +7,7 @@ static FORCE_INLINE void doCastleKingSide(Game *game);
 static FORCE_INLINE void doCastleQueenSide(Game *game);
 
 #ifndef NDEBUG
-static char*             checkConsistency(Game *game, Move move);
+static char*             checkConsistency(Game *game);
 #endif
 
 CheckStats
@@ -351,7 +351,7 @@ DoMove(Game *game, Move move)
   }
 
 #ifndef NDEBUG
-  if((msg = checkConsistency(game, move)) != NULL) {
+  if((msg = checkConsistency(game)) != NULL) {
     printf("Inconsistency in %s's DoMove of %s at doMoveCount %llu:-\n\n",
            StringSide(side),
            StringMove(move, piece, capturePiece != MissingPiece),
@@ -824,7 +824,7 @@ Unmove(Game *game)
 
 
 #ifndef NDEBUG
-  if((msg = checkConsistency(game, move)) != NULL) {
+  if((msg = checkConsistency(game)) != NULL) {
     printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
            StringSide(side),
            StringMove(move, piece, capturePiece != MissingPiece),
@@ -972,7 +972,7 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
 // Helper debug function which checks the consistency of the game object to ensure
 // everything should be as it is, returning a message if not.
 static char*
-checkConsistency(Game *game, Move move)
+checkConsistency(Game *game)
 {
   BitBoard bitBoard;
   BitBoard occupancy = EmptyBoard, emptySquares = EmptyBoard;
