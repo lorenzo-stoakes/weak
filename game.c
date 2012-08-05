@@ -905,7 +905,7 @@ initArrays()
 static CastleEvent
 updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
 {
-  int offset;
+  unsigned int offset;
   CastleEvent ret = NoCastleEvent;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
