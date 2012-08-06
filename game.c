@@ -1092,7 +1092,7 @@ checkConsistency(Game *game)
 
   AppendString(&builder, "\nMove History:-\n\n"
                "%s",
-               StringMoveHistory(&game->History));
+               StringMoveHistory(&game->Memories));
 
   return BuildString(&builder, true);
 }
