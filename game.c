@@ -122,15 +122,16 @@ DoMove(Game *game, Move move)
 
   BitBoard checks, mask;
   bool givesCheck;
-  CastleEvent castleEvent;
   CheckStats checkStats;
   ChessSet *chessSet = &game->ChessSet;
   int indexCaptured, indexLast, indexTo;
+  Memory memory;
+  MoveType type = TYPE(move);
   Piece placePiece, capturePiece;
+  Position enPassantedPawn, king, last;
   Position from = FROM(move), to = TO(move);
   Piece originalPiece;
   Piece piece = PieceAt(chessSet, from);
-  Position enPassantedPawn, king, last;
   Rank offset;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
@@ -139,31 +140,29 @@ DoMove(Game *game, Move move)
   doMoveCount++;
 #endif
 
+  // Default to no capture.
+  memory.Captured = MissingPiece;
+
   checkStats = game->CheckStats;
   givesCheck = GivesCheck(game, move);
 
   // Store previous en passant square.
-  AppendEnpassantSquare(&game->History.EnPassantSquares, game->EnPassantSquare);
+  memory.EnPassantSquare = game->EnPassantSquare;
 
   // Assume empty, change if necessary.
   game->EnPassantSquare = EmptyPosition;
 
-  switch(TYPE(move)) {
-  case CastleKingSide:
+  if(type == CastleKingSide) {
     doCastleKingSide(game);
-    AppendPiece(&game->History.CapturedPieces, MissingPiece);
-    break;
-  case CastleQueenSide:
+  } else if(type == CastleQueenSide) {
     doCastleQueenSide(game);
-    AppendPiece(&game->History.CapturedPieces, MissingPiece);
-    break;
-  case EnPassant:
+  } else if(type == EnPassant) {
     offset = -1 + 2*side;
 
     enPassantedPawn = POSITION(RANK(to)+offset, FILE(to));
 
     RemovePiece(chessSet, opposite, Pawn, enPassantedPawn);
-    AppendPiece(&game->History.CapturedPieces, Pawn);
+    memory.Captured = Pawn;
 
     RemovePiece(chessSet, side, Pawn, from);
     PlacePiece (chessSet, side, Pawn, to);
@@ -198,6 +197,8 @@ DoMove(Game *game, Move move)
       AppendPiece(&game->History.CapturedPieces, MissingPiece);
     } else {
       // Capture.
+
+      memory.Captured = capturePiece;
 
       RemovePiece(chessSet, opposite, capturePiece, to);
       AppendPiece(&game->History.CapturedPieces, capturePiece);
@@ -295,17 +296,14 @@ DoMove(Game *game, Move move)
       chessSet->PiecePositions[side][placePiece][indexTo] = to;
     }
 
-    break;
 
-  default:
-    panic("Move type %d not recognised.", TYPE(move));
   }
 
-  castleEvent = updateCastlingRights(game, piece, move, piece != MissingPiece);
+  memory.CastleEvent = updateCastlingRights(game, piece, move, piece != MissingPiece);
+  memory.CheckStats = game->CheckStats;
+  memory.Move = move;
 
-  AppendCastleEvent(&game->History.CastleEvents, castleEvent);
-  AppendCheckStats(&game->History.CheckStats, game->CheckStats);
-  AppendMove(&game->History.Moves, move);
+  AppendMemory(&game->Memories, memory);
 
   checks = EmptyBoard;
   if(givesCheck) {
@@ -549,27 +547,9 @@ NewGame(bool debug, Side humanSide)
   ret.ChessSet = NewChessSet();
   ret.Debug = debug;
   ret.EnPassantSquare = EmptyPosition;
-  ret.History = NewMoveHistory();
+  ret.Memories = NewMemorySlice();
   ret.HumanSide = humanSide;
   ret.WhosTurn = White;
-
-  return ret;
-}
-
-MoveHistory
-NewMoveHistory()
-{
-  MoveHistory ret;
-
-  Move *buffer;
-
-  buffer = (Move*)allocate(sizeof(Move), INIT_MOVE_LEN);
-
-  ret.CapturedPieces = NewPieceSlice();
-  ret.CastleEvents = NewCastleEventSlice();
-  ret.CheckStats = NewCheckStatsSlice();
-  ret.EnPassantSquares = NewEnPassantSlice();
-  ret.Moves = NewMoveSlice(buffer);
 
   return ret;
 }
@@ -653,6 +633,7 @@ Unmove(Game *game)
   CastleEvent castleEvent;
   ChessSet *chessSet = &game->ChessSet;
   int indexLast, indexTo;
+  Memory memory;
   Move move;
   Piece capturePiece, piece, removePiece;
   Position from, enPassantedPawn, last, to;
@@ -663,16 +644,17 @@ Unmove(Game *game)
   unmoveCount++;
 #endif
 
+  memory = PopMemory(&game->Memories);
+  move = memory.Move;
+  capturePiece = memory.Captured;
+  
   // Rollback to previous turn.
-  move = PopMove(&game->History.Moves);
   from = FROM(move);
   to = TO(move);
   toggleTurn(game);
   side = game->WhosTurn;
 
   piece = PieceAt(chessSet, to);
-
-  capturePiece = PopPiece(&game->History.CapturedPieces);
 
   switch(TYPE(move)) {
   case EnPassant:
@@ -807,10 +789,10 @@ Unmove(Game *game)
     panic("Unrecognised move type %d.", TYPE(move));
   }
 
-  game->CheckStats = PopCheckStats(&game->History.CheckStats);
-  game->EnPassantSquare = PopEnPassantSquare(&game->History.EnPassantSquares);
+  game->CheckStats = memory.CheckStats;
+  game->EnPassantSquare = memory.EnPassantSquare;
 
-  castleEvent = PopCastleEvent(&game->History.CastleEvents);
+  castleEvent = memory.CastleEvent;
 
 
 #ifndef NDEBUG

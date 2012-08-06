@@ -259,18 +259,18 @@
  }
 
  char*
- StringMoveHistory(MoveHistory *history)
+ StringMoveHistory(MemorySlice *history)
  {
    Move move;
-   Move *curr;
+   Memory *curr;
    Side side = White;
    StringBuilder builder = NewStringBuilder();
    int fullMoveCount = 1;
 
    // TODO: Determine positions + capture condition for moves.
 
-   for(curr = history->Moves.Vals; curr != history->Moves.Curr; curr++) {
-     move = *curr;
+   for(curr = history->Vals; curr != history->Curr; curr++) {
+     move = curr->Move;
 
      switch(side) {
      case White:

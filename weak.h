@@ -139,53 +139,37 @@ enum Side {
 
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
 // We use little-endian rank-file (LERF) mapping [1].
-typedef uint64_t                BitBoard;
-typedef enum CastleEvent        CastleEvent;
-typedef struct CastleEventSlice CastleEventSlice;
-typedef enum CastleSide         CastleSide;
-typedef struct CheckStats       CheckStats;
-typedef struct CheckStatsSlice  CheckStatsSlice;
-typedef struct ChessSet         ChessSet;
-typedef struct EnPassantSlice   EnPassantSlice;
-typedef struct Game             Game;
-typedef uint64_t                Move;
-typedef struct MoveHistory      MoveHistory;
-typedef struct MoveSlice        MoveSlice;
-typedef enum MoveType           MoveType;
-typedef struct PerftStats       PerftStats;
-typedef enum Piece              Piece;
-typedef struct PieceSlice       PieceSlice;
-typedef enum Position           Position;
-typedef enum Rank               Rank;
-typedef enum File               File;
-typedef struct Set              Set;
-typedef enum Side               Side;
-typedef struct StringBuilder    StringBuilder;
-
-struct CastleEventSlice {
-  CastleEvent *Vals, *Curr;
-};
+typedef uint64_t             BitBoard;
+typedef enum CastleEvent     CastleEvent;
+typedef enum CastleSide      CastleSide;
+typedef struct CheckStats    CheckStats;
+typedef struct ChessSet      ChessSet;
+typedef struct Game          Game;
+typedef struct Memory        Memory;
+typedef struct MemorySlice   MemorySlice;
+typedef uint64_t             Move;
+typedef struct MoveSlice     MoveSlice;
+typedef enum MoveType        MoveType;
+typedef struct PerftStats    PerftStats;
+typedef enum Piece           Piece;
+typedef enum Position        Position;
+typedef enum Rank            Rank;
+typedef enum File            File;
+typedef struct Set           Set;
+typedef enum Side            Side;
+typedef struct StringBuilder StringBuilder;
 
 struct CheckStats {
   BitBoard CheckSquares[7], CheckSources, Discovered, Pinned;
   Position DefendedKing, AttackedKing;
 };
 
-struct CheckStatsSlice {
-  CheckStats *Vals, *Curr;
-};
-
-struct EnPassantSlice {
-  Position *Vals, *Curr;
+struct MemorySlice {
+  Memory *Vals, *Curr;
 };
 
 struct MoveSlice {
   Move *Vals, *Curr;
-};
-
-struct PieceSlice {
-  int Len, Cap;
-  Piece *Vals;
 };
 
 struct Set {
@@ -193,12 +177,12 @@ struct Set {
   BitBoard Boards[7];
 };
 
-struct MoveHistory {
-  CastleEventSlice CastleEvents;
-  CheckStatsSlice  CheckStats;
-  EnPassantSlice   EnPassantSquares;
-  MoveSlice        Moves;
-  PieceSlice       CapturedPieces;
+struct Memory {
+  CastleEvent CastleEvent;
+  CheckStats  CheckStats;
+  Position    EnPassantSquare;
+  Move        Move;
+  Piece       Captured;
 };
 
 struct ChessSet {
@@ -216,7 +200,7 @@ struct Game {
   CheckStats  CheckStats;
   ChessSet    ChessSet;
   bool        Debug;
-  MoveHistory History;
+  MemorySlice Memories;
   Position    EnPassantSquare;
   Side        WhosTurn, HumanSide;
 };
@@ -295,21 +279,25 @@ BitBoard nortRays[64], eastRays[64], soutRays[64], westRays[64],
   noeaRays[64], soweRays[64], noweRays[64], soeaRays[64];
 
 FORCE_INLINE void
-AppendCastleEvent(CastleEventSlice *slice, CastleEvent castleEvent)
+AppendMemory(MemorySlice *slice, Memory memory)
 {
-  *slice->Curr++ = castleEvent;
+  *slice->Curr++ = memory;
 }
 
-FORCE_INLINE void
-AppendCheckStats(CheckStatsSlice* slice, CheckStats checkStats)
+FORCE_INLINE Move
+PopMove(MoveSlice *slice)
 {
-  *slice->Curr++ = checkStats;
+  slice->Curr--;
+
+  return *slice->Curr;
 }
 
-FORCE_INLINE void
-AppendEnpassantSquare(EnPassantSlice* slice, Position pos)
+FORCE_INLINE Memory
+PopMemory(MemorySlice *slice)
 {
-  *slice->Curr++ = pos;
+  slice->Curr--;
+
+  return *slice->Curr;
 }
 
 FORCE_INLINE void
@@ -505,18 +493,17 @@ BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
 
 // game.c
-CheckStats  CalculateCheckStats(Game*);
-bool        Checkmated(Game*);
-bool        GivesCheck(Game*, Move);
-void        InitEngine(void);
-void        DoMove(Game*, Move);
-CheckStats  NewCheckStats(void);
-Game        NewEmptyGame(bool, Side);
-Game        NewGame(bool, Side);
-MoveHistory NewMoveHistory(void);
-bool        PseudoLegal(Game*, Move, BitBoard);
-bool        Stalemated(Game*);
-void        Unmove(Game*);
+CheckStats CalculateCheckStats(Game*);
+bool       Checkmated(Game*);
+bool       GivesCheck(Game*, Move);
+void       InitEngine(void);
+void       DoMove(Game*, Move);
+CheckStats NewCheckStats(void);
+Game       NewEmptyGame(bool, Side);
+Game       NewGame(bool, Side);
+bool       PseudoLegal(Game*, Move, BitBoard);
+bool       Stalemated(Game*);
+void       Unmove(Game*);
 
 // magic.c
 void InitMagics(void);
@@ -559,25 +546,16 @@ BitBoard PinnedPieces(ChessSet*, Side, Position, bool);
 void     UpdateOccupancies(ChessSet*);
 
 // slices.c
-void             AppendPiece(PieceSlice*, Piece);
-int              LenCastleEvents(CastleEventSlice*);
-CastleEventSlice NewCastleEventSlice(void);
-CheckStatsSlice  NewCheckStatsSlice(void);
-EnPassantSlice   NewEnPassantSlice(void);
-MoveSlice        NewMoveSlice(Move*);
-PieceSlice       NewPieceSlice(void);
-CastleEvent      PopCastleEvent(CastleEventSlice*);
-CheckStats       PopCheckStats(CheckStatsSlice*);
-Position         PopEnPassantSquare(EnPassantSlice*);
-Move             PopMove(MoveSlice*);
-Piece            PopPiece(PieceSlice*);
+
+MemorySlice NewMemorySlice(void);
+MoveSlice   NewMoveSlice(Move*);
 
 // stringer.c
 char  CharPiece(Piece);
 char* StringBitBoard(BitBoard);
 char* StringChessSet(ChessSet*);
 char* StringMove(Move, Piece, bool);
-char* StringMoveHistory(MoveHistory*);
+char* StringMoveHistory(MemorySlice*);
 char* StringPerft(PerftStats*);
 char* StringPiece(Piece);
 char* StringPosition(Position);
