@@ -352,9 +352,6 @@ LenMoves(Move *start, Move *end)
 FORCE_INLINE Piece
 PieceAt(ChessSet *chessSet, Position pos)
 {
-  assert(pos <= H8);
-  assert(chessSet->Squares[pos] <= King);
-
   return chessSet->Squares[pos];
 }
 
