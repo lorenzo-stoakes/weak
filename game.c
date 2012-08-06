@@ -184,24 +184,15 @@ DoMove(Game *game, Move move)
     indexTo = chessSet->PiecePositionIndexes[from];
     chessSet->PiecePositionIndexes[to] = indexTo;
     chessSet->PiecePositions[side][Pawn][indexTo] = to;
-
-    break;
-  case PromoteKnight:
-  case PromoteBishop:
-  case PromoteRook:
-  case PromoteQueen:
-  case Normal:
+  } else {
     capturePiece = PieceAt(chessSet, to);
 
-    if(capturePiece == MissingPiece) {
-      AppendPiece(&game->History.CapturedPieces, MissingPiece);
-    } else {
+    if(capturePiece != MissingPiece) {
       // Capture.
 
       memory.Captured = capturePiece;
 
       RemovePiece(chessSet, opposite, capturePiece, to);
-      AppendPiece(&game->History.CapturedPieces, capturePiece);
 
       // Update occupancies.
       mask = POSBOARD(to);
@@ -231,31 +222,35 @@ DoMove(Game *game, Move move)
       chessSet->PiecePositions[opposite][capturePiece][indexLast] = EmptyPosition;
     }
 
-    switch(TYPE(move)) {
-    case PromoteKnight:
-      placePiece = Knight;
-      break;
-    case PromoteBishop:
-      placePiece = Bishop;
-      break;
-    case PromoteRook:
-      placePiece = Rook;
-      break;
-    case PromoteQueen:
-      placePiece = Queen;
-      break;
-    case Normal:
-      placePiece = piece;
+    indexTo = chessSet->PiecePositionIndexes[from];
+    chessSet->PiecePositionIndexes[to] = indexTo;
+    chessSet->PiecePositions[side][piece][indexTo] = to;
 
+    if(type & PromoteMask) {
+      placePiece = type - PromoteMask;
+
+      // Delete from pawn list by swapping with last and decrementing count (as with capture).
+      indexLast = --chessSet->PieceCounts[side][Pawn];
+
+      last = chessSet->PiecePositions[side][Pawn][indexLast];
+      indexTo = chessSet->PiecePositionIndexes[to];
+
+      chessSet->PiecePositionIndexes[last] = indexTo;
+      chessSet->PiecePositions[side][Pawn][indexTo] = last;
+      chessSet->PiecePositions[side][Pawn][indexLast] = EmptyPosition;
+
+      // Now add the piece promoted to.
+      indexTo = chessSet->PieceCounts[side][placePiece]++;
+
+      chessSet->PiecePositionIndexes[to] = indexTo;
+      chessSet->PiecePositions[side][placePiece][indexTo] = to;
+    } else {
+      placePiece = piece;
       // Update en passant square.
       if(piece == Pawn && RANK(from) == Rank2 + (side*5) &&
          RANK(to) == Rank4 + (side*1)) {
         game->EnPassantSquare = from + (side == White ? 8 : -8);
       }
-
-      break;
-    default:
-      panic("Impossible.");
     }
 
     RemovePiece(chessSet, side, piece, from);
@@ -272,31 +267,6 @@ DoMove(Game *game, Move move)
 
     chessSet->PieceOccupancy[piece] ^= POSBOARD(from);
     chessSet->PieceOccupancy[placePiece] ^= POSBOARD(to);
-
-    indexTo = chessSet->PiecePositionIndexes[from];
-
-    chessSet->PiecePositionIndexes[to] = indexTo;
-    chessSet->PiecePositions[side][piece][indexTo] = to;
-
-    if(TYPE(move) >= PromoteKnight) {
-      // Delete from pawn list by swapping with last and decrementing count (as with capture).
-      indexLast = --chessSet->PieceCounts[side][Pawn];
-
-      last = chessSet->PiecePositions[side][Pawn][indexLast];
-      indexTo = chessSet->PiecePositionIndexes[to];
-
-      chessSet->PiecePositionIndexes[last] = indexTo;
-      chessSet->PiecePositions[side][Pawn][indexTo] = last;
-      chessSet->PiecePositions[side][Pawn][indexLast] = EmptyPosition;
-
-      // Now add the piece promoted to.
-      indexTo = chessSet->PieceCounts[side][placePiece]++;
-
-      chessSet->PiecePositionIndexes[to] = indexTo;
-      chessSet->PiecePositions[side][placePiece][indexTo] = to;
-    }
-
-
   }
 
   memory.CastleEvent = updateCastlingRights(game, piece, move, piece != MissingPiece);
@@ -309,15 +279,12 @@ DoMove(Game *game, Move move)
   if(givesCheck) {
     king = game->CheckStats.AttackedKing;
 
-    originalPiece = piece;
-
-    switch(TYPE(move)) {
-    case PromoteKnight:
-    case PromoteBishop:
-    case PromoteRook:
-    case PromoteQueen:
-      piece = Knight + TYPE(move)-PromoteKnight;
-    case Normal:
+    if(type & CastleMask) {
+      checks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
+        chessSet->Sets[side].Occupancy;
+    } else {
+      originalPiece = piece;
+      piece = placePiece;
 
       if((checkStats.CheckSquares[piece] & POSBOARD(to)) != EmptyBoard) {
         checks |= POSBOARD(to);
@@ -338,13 +305,6 @@ DoMove(Game *game, Move move)
              chessSet->Sets[side].Boards[Queen]);
         }
       }
-
-      break;
-    default:
-      checks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
-        chessSet->Sets[side].Occupancy;
-
-      break;
     }
   }
 
