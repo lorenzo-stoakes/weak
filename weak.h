@@ -39,14 +39,14 @@
 
 From    1 size = 6
 To      2 size = 6
-Type    3 size = 3
+Type    3 size = 4
 
   3         2         1
 21098765432109876543210987654321
-00000000000000000333111111222222 shift
-                 |  |     222222   0
-                 |  111111......   6
-                 333............   12
+00000000000000003333111111222222 shift
+                |   |     222222   0
+                |   111111......   6
+                3333............   13
 */
 
 #define MOVE_MASK(n) ((1<<n)-1)
@@ -54,11 +54,11 @@ Type    3 size = 3
 #define MAKE_MOVE_QUICK(from, to) ((Move)(((from)<<6)|(to)))
 
 #define MAKE_MOVE(from, to, type)             \
-  ((Move)(((type)<<12)|((from)<<6)|(to)))
+  ((Move)(((type)<<13)|((from)<<6)|(to)))
 
 #define TO(move)      ((Position)(    (move)&(MOVE_MASK(6))))
 #define FROM(move)    ((Position)( ((move)>>6)&(MOVE_MASK(6))))
-#define TYPE(move)    ((MoveType)(((move)>>12)&(MOVE_MASK(3))))
+#define TYPE(move)    ((MoveType)(((move)>>13)&(MOVE_MASK(4))))
 
 enum CastleEvent {
   NoCastleEvent      = 0,
@@ -84,16 +84,6 @@ enum File {
   FileH = 7
 };
 
-enum MoveType {
-  Normal,
-  EnPassant,
-  CastleQueenSide,
-  CastleKingSide,
-  PromoteKnight,
-  PromoteBishop,
-  PromoteRook,
-  PromoteQueen
-};
 
 enum Piece {
   MissingPiece,
@@ -103,6 +93,20 @@ enum Piece {
   Rook,
   Queen,
   King
+};
+
+
+enum MoveType {
+  Normal          = 0,
+  EnPassant       = 1,
+  CastleMask      = 1<<1,
+  CastleQueenSide = CastleMask + 0,
+  CastleKingSide  = CastleMask + 1,
+  PromoteMask     = 1<<3,
+  PromoteKnight   = PromoteMask + Knight,
+  PromoteBishop   = PromoteMask + Bishop,
+  PromoteRook     = PromoteMask + Rook,
+  PromoteQueen    = PromoteMask + Queen
 };
 
 enum Position {
