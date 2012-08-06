@@ -375,25 +375,15 @@ GivesCheck(Game *game, Move move)
   BitBoard fromBoard = POSBOARD(FROM(move));
   BitBoard toBoard = POSBOARD(TO(move));
   int offset;
-  Piece piece = PieceAt(&game->ChessSet, FROM(move));
+  Piece piece;
   Position captureSquare, king, kingFrom, kingTo, rookFrom, rookTo;
   Side side;
+  MoveType type = TYPE(move);
 
-  switch(TYPE(move)) {
-  case PromoteKnight:
-    piece = Knight;
-    break;
-  case PromoteBishop:
-    piece = Bishop;
-    break;
-  case PromoteRook:
-    piece = Rook;
-    break;
-  case PromoteQueen:
-    piece = Rook;
-    break;
-  default:
-    break;
+  if(type&PromoteMask) {
+    piece = type ^ PromoteMask;
+  } else {
+    piece = PieceAt(&game->ChessSet, FROM(move));    
   }
 
   // Direct check.
@@ -426,7 +416,7 @@ GivesCheck(Game *game, Move move)
   }
 
   // If this is simply a normal move and we're here, then it's definitely not a checking move.
-  if(TYPE(move) == Normal) {
+  if(type == Normal) {
     return false;
   }
 
@@ -436,7 +426,7 @@ GivesCheck(Game *game, Move move)
   occNoFrom = game->ChessSet.Occupancy ^ POSBOARD(FROM(move));
   side = game->WhosTurn;
 
-  switch(TYPE(move)) {
+  switch(type) {
   case PromoteKnight:
     return (KnightAttacksFrom(TO(move)) & kingBoard) != EmptyBoard;
   case PromoteRook:
@@ -478,7 +468,7 @@ GivesCheck(Game *game, Move move)
     occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
     return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
   default:
-    panic("Invalid move type %d at this point.", TYPE(move));
+    panic("Invalid move type %d at this point.", type);
 
   }
 
