@@ -379,7 +379,7 @@ GivesCheck(Game *game, Move move)
   MoveType type = TYPE(move);
 
   if(type&PromoteMask) {
-    piece = type ^ PromoteMask;
+    piece = type - PromoteMask;
   } else {
     piece = PieceAt(&game->ChessSet, FROM(move));    
   }
