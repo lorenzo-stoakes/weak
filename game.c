@@ -421,7 +421,7 @@ GivesCheck(Game *game, Move move)
   // GivesCheck() is called before the move is executed, so these are valid.
   king = game->CheckStats.AttackedKing;
   kingBoard = POSBOARD(king);
-  occNoFrom = game->ChessSet.Occupancy ^ POSBOARD(FROM(move));
+  occNoFrom = game->ChessSet.Occupancy ^ fromBoard;
   side = game->WhosTurn;
 
   switch(type) {
@@ -437,7 +437,7 @@ GivesCheck(Game *game, Move move)
   case EnPassant:
     captureSquare = POSITION(RANK(FROM(move)), FILE(TO(move)));
     occNoFrom ^= POSBOARD(captureSquare);
-    occNoFrom |= POSBOARD(TO(move));
+    occNoFrom |= toBoard;
 
     rookish = game->ChessSet.Sets[side].Boards[Rook] |
       game->ChessSet.Sets[side].Boards[Queen];
