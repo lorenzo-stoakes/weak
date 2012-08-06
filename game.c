@@ -331,8 +331,8 @@ DoMove(Game *game, Move move)
          (checkStats.Discovered & POSBOARD(from)) != EmptyBoard) {
         if(piece != Rook) {
           checks |= RookAttacksFrom(king, chessSet->Occupancy) &
-            (game->ChessSet.Sets[side].Boards[Rook] |
-             game->ChessSet.Sets[side].Boards[Queen]);
+            (chessSet->Sets[side].Boards[Rook] |
+             chessSet->Sets[side].Boards[Queen]);
         }
         if(piece != Bishop) {
           checks |= BishopAttacksFrom(king, chessSet->Occupancy) &
