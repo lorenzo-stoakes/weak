@@ -47,7 +47,7 @@ castleMoves(Game *game, Move *end)
   // If we have the rights and aren't obstructed...
   for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
     if(game->CastlingRights[side][castleSide] &&
-       (game->ChessSet.Occupancy&CastlingMasks[side][castleSide]) == EmptyBoard) {
+       !(game->ChessSet.Occupancy&CastlingMasks[side][castleSide])) {
       occupancy = game->ChessSet.Occupancy;
       opposite = OPPOSITE(side);
       opposition = game->ChessSet.Sets[opposite].Occupancy;
@@ -58,7 +58,7 @@ castleMoves(Game *game, Move *end)
       while(attackMask) {
         pos = PopForward(&attackMask);
 
-        if((AllAttackersTo(&game->ChessSet, pos, occupancy) & opposition) != EmptyBoard) {
+        if((AllAttackersTo(&game->ChessSet, pos, occupancy) & opposition)) {
           good = false;
           break;
         }
@@ -91,7 +91,7 @@ evasions(Move *end, Game *game)
   Position king = game->CheckStats.DefendedKing;
   Side side = game->WhosTurn;
 
-  while(checks != EmptyBoard) {
+  while(checks) {
     check = PopForward(&checks);
 
     checkCount++;
@@ -110,8 +110,8 @@ evasions(Move *end, Game *game)
     case Queen:
       // If king and queen are far away, i.e. there are squares between them, or they are not
       // on a diagonal, we can remove all squares in all directions as the king can't get to them.
-      if(Between[king][check] != EmptyBoard ||
-         (EmptyAttacks[Bishop][check] & POSBOARD(king)) == EmptyBoard) {
+      if(Between[king][check] ||
+         !(EmptyAttacks[Bishop][check] & POSBOARD(king))) {
         slideAttacks |= EmptyAttacks[Queen][check];
       } else {
         slideAttacks |= EmptyAttacks[Bishop][check] |
@@ -162,14 +162,12 @@ static FORCE_INLINE Move*
 bishopMoves(Position *positions, Move *end, BitBoard occupancy, BitBoard mask)
 {
   BitBoard attacks;
-  Position from, to;
+  Position from;
 
   while((from = *positions++) != EmptyPosition) {
     attacks = BishopAttacksFrom(from, occupancy) & mask;
-    while(attacks != EmptyBoard) {
-      to = PopForward(&attacks);
-
-      *end++ = MAKE_MOVE_QUICK(from, to);
+    while(attacks) {
+      *end++ = MAKE_MOVE_QUICK(from, PopForward(&attacks));
     }
   }
 
@@ -180,13 +178,10 @@ static FORCE_INLINE Move*
 kingMoves(Position from, Move *end, BitBoard mask)
 {
   BitBoard attacks;
-  Position to;
 
   attacks = KingAttacksFrom(from) & mask;
-  while(attacks != EmptyBoard) {
-    to = PopForward(&attacks);
-
-    *end++ = MAKE_MOVE_QUICK(from, to);
+  while(attacks) {
+    *end++ = MAKE_MOVE_QUICK(from, PopForward(&attacks));
   }
 
   return end;
@@ -196,17 +191,15 @@ static FORCE_INLINE Move*
 knightMoves(Position *positions, Move *end, BitBoard mask)
 {
   BitBoard attacks;
-  Position from, to;
+  Position from;
 
   if(*positions != EmptyPosition) {
     do {
       from = *positions;
 
       attacks = KnightAttacksFrom(from) & mask;
-      while(attacks != EmptyBoard) {
-        to = PopForward(&attacks);
-
-        *end++ = MAKE_MOVE_QUICK(from, to);
+      while(attacks) {
+        *end++ = MAKE_MOVE_QUICK(from, PopForward(&attacks));
       }
     } while(*++positions != EmptyPosition);
   }
@@ -381,7 +374,7 @@ pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
   }
 
   // Promotions.
-  if(pawnsOn7 != EmptyBoard && (mask & Rank8Mask) != EmptyBoard) {
+  if(pawnsOn7 && (mask & Rank8Mask)) {
     bitBoard1 = NortOne(pawnsOn7) & empty & mask;
 
     while(bitBoard1) {
@@ -432,7 +425,7 @@ pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
 
   // En passant.
   if(enPassant != EmptyPosition) {
-    if(evasion && (mask & SoutOne(POSBOARD(enPassant))) == EmptyBoard) {
+    if(evasion && !(mask & SoutOne(POSBOARD(enPassant)))) {
       return curr;
     }
 
@@ -450,17 +443,15 @@ static FORCE_INLINE Move*
 queenMoves(Position *positions, Move *end, BitBoard occupancy, BitBoard mask)
 {
   BitBoard attacks;
-  Position from, to;
+  Position from;
 
   if(*positions != EmptyPosition) {
     do {
       from = *positions;
       attacks = (RookAttacksFrom(from, occupancy) |
                  BishopAttacksFrom(from, occupancy)) & mask;
-      while(attacks != EmptyBoard) {
-        to = PopForward(&attacks);
-
-        *end++ = MAKE_MOVE_QUICK(from, to);
+      while(attacks) {
+        *end++ = MAKE_MOVE_QUICK(from, PopForward(&attacks));
       }
     } while(*++positions != EmptyPosition);
   }
@@ -472,14 +463,12 @@ static FORCE_INLINE Move*
 rookMoves(Position *positions, Move *end, BitBoard occupancy, BitBoard mask)
 {
   BitBoard attacks;
-  Position from, to;
+  Position from;
 
   while((from = *positions++) != EmptyPosition) {
     attacks = RookAttacksFrom(from, occupancy) & mask;
-    while(attacks != EmptyBoard) {
-      to = PopForward(&attacks);
-
-      *end++ = MAKE_MOVE_QUICK(from, to);
+    while(attacks) {
+      *end++ = MAKE_MOVE_QUICK(from, PopForward(&attacks));
     }
   }
 
