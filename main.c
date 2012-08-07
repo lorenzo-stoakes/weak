@@ -32,6 +32,8 @@ main()
 
   game = ParseFen(FEN);
 
+  puts(StringChessSet(&game.ChessSet));
+
   ticks = clock();
   for(i = 0; i < REPETITIONS; i++) {
 #if defined(SHOW_PERFT_STATS)
