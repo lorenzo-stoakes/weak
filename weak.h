@@ -54,11 +54,11 @@ Type    3 size = 4
 #define MAKE_MOVE_QUICK(from, to) ((Move)(((from)<<6)|(to)))
 
 #define MAKE_MOVE(from, to, type)             \
-  ((Move)(((type)<<13)|((from)<<6)|(to)))
+  ((Move)(((type)<<12)|((from)<<6)|(to)))
 
 #define TO(move)      ((Position)(    (move)&(MOVE_MASK(6))))
 #define FROM(move)    ((Position)( ((move)>>6)&(MOVE_MASK(6))))
-#define TYPE(move)    ((MoveType)(((move)>>13)&(MOVE_MASK(4))))
+#define TYPE(move)    ((MoveType)(((move)>>12)&(MOVE_MASK(4))))
 
 enum CastleEvent {
   NoCastleEvent      = 0,
