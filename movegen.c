@@ -223,7 +223,7 @@ nonEvasions(Move *end, Game *game)
   BitBoard attackable = ~(chessSet->Sets[side].Occupancy);
 
   if(side == White) {
-    end = pawnMovesWhite(game, end, attackable, false);    
+    end = pawnMovesWhite(game, end, attackable, false);
   } else {
     end = pawnMovesBlack(chessSet, game->EnPassantSquare, end, attackable, false);
   }
