@@ -276,7 +276,7 @@ pawnMovesBlack(ChessSet *chessSet, Position enPassant, Move *curr, BitBoard mask
   }
 
   // Promotions.
-  if(pawnsOn2 != EmptyBoard && (mask & Rank1Mask) != EmptyBoard) {
+  if(pawnsOn2 && (mask & Rank1Mask)) {
     bitBoard1 = SoutOne(pawnsOn2) & empty & mask;
 
     while(bitBoard1) {
@@ -327,7 +327,7 @@ pawnMovesBlack(ChessSet *chessSet, Position enPassant, Move *curr, BitBoard mask
 
   // En passant.
   if(enPassant != EmptyPosition) {
-    if(evasion && (mask & NortOne(POSBOARD(enPassant))) == EmptyBoard) {
+    if(evasion && !(mask & NortOne(POSBOARD(enPassant)))) {
       return curr;
     }
 
@@ -365,7 +365,7 @@ pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
   bitBoard2 = NortOne(bitBoard1 & Rank3Mask) & empty & mask;
 
   // Do this separately, as for double pushes we don't care about target squares in the region
-  // we're pushing *through*.  
+  // we're pushing *through*.
   bitBoard1 &= mask;
 
   while(bitBoard1) {
