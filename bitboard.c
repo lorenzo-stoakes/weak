@@ -33,13 +33,12 @@ const int bitBackward8[256] = {
   7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 };
 
-
 // Are all the positions along the same line?
 bool
 Aligned(Position pos1, Position pos2, Position pos3)
 {
   return ((Between[pos1][pos2] | Between[pos1][pos3] | Between[pos2][pos3]) &
-          (POSBOARD(pos1) | POSBOARD(pos2) | POSBOARD(pos3))) != EmptyBoard;
+          (POSBOARD(pos1) | POSBOARD(pos2) | POSBOARD(pos3)));
 }
 
 #ifndef USE_BITSCAN_ASM
