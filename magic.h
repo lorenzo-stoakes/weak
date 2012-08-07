@@ -417,4 +417,15 @@ static const BitBoard magicShift[2][64] = {
     C64(52)
   }};
 
+FORCE_INLINE BitBoard
+RookAttacksFrom(Position rook, BitBoard occupancy)
+{
+  BitBoard magic = magicBoard[MAGIC_ROOK][rook];
+  BitBoard mask = magicMask[MAGIC_ROOK][rook];
+  int shift = magicShift[MAGIC_ROOK][rook];
+  BitBoard index = (magic*(occupancy&mask))>>shift;
+
+  return RookThreatBase[rook][index];  
+}
+
 #endif

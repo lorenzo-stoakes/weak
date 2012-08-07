@@ -531,7 +531,6 @@ BitBoard KnightAttacksFrom(Position);
 BitBoard KnightAttackersTo(ChessSet *, Position);
 BitBoard PawnAttackersTo(ChessSet*, Position);
 BitBoard PawnAttacksFrom(Position, Side);
-BitBoard RookAttacksFrom(Position, BitBoard);
 BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard CalcRookSquareThreats(Position, BitBoard);
 

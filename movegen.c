@@ -1,4 +1,5 @@
 #include "weak.h"
+#include "magic.h"
 
 static FORCE_INLINE Move* bishopMoves(Position*, Move*, BitBoard, BitBoard);
 static Move* castleMoves(Game*, Move*);

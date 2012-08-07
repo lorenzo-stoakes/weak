@@ -1,4 +1,5 @@
 #include "weak.h"
+#include "magic.h"
 
 static void              initArrays(void);
 static FORCE_INLINE void toggleTurn(Game *game);

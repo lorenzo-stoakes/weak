@@ -187,12 +187,6 @@ PawnAttacksFrom(Position pawn, Side side)
 }
 
 BitBoard
-RookAttacksFrom(Position rook, BitBoard occupancy)
-{
-  return rookMagicSquareThreats(rook, occupancy);
-}
-
-BitBoard
 RookQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
 {
   return (chessSet->PieceOccupancy[Rook] | chessSet->PieceOccupancy[Queen]) &
