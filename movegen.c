@@ -250,7 +250,7 @@ pawnMovesBlack(ChessSet *chessSet, Position enPassant, Move *curr, BitBoard mask
   BitBoard pawns = chessSet->Sets[Black].Boards[Pawn];
 
   BitBoard pawnsOn2 = pawns&Rank2Mask;
-  BitBoard pawnsNotOn2 = pawns&~Rank2Mask;
+  BitBoard pawnsNotOn2 = pawns&NotRank2Mask;
 
   Position to;
 
@@ -353,7 +353,7 @@ pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
   BitBoard pawns = chessSet->Sets[White].Boards[Pawn];
 
   BitBoard pawnsOn7 = pawns&Rank7Mask;
-  BitBoard pawnsNotOn7 = pawns&~Rank7Mask;
+  BitBoard pawnsNotOn7 = pawns&NotRank7Mask;
 
   Position enPassant = game->EnPassantSquare;
   Position to;
