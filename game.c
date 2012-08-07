@@ -122,7 +122,7 @@ DoMove(Game *game, Move move)
 
   BitBoard checks, mask;
   bool givesCheck;
-  CheckStats checkStats;
+  CheckStats checkStats = game->CheckStats;
   ChessSet *chessSet = &game->ChessSet;
   int indexCaptured, indexLast, indexTo;
   Memory memory;
@@ -143,7 +143,6 @@ DoMove(Game *game, Move move)
   // Default to no capture.
   memory.Captured = MissingPiece;
 
-  checkStats = game->CheckStats;
   givesCheck = GivesCheck(game, move);
 
   // Store previous en passant square.
