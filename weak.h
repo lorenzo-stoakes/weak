@@ -521,7 +521,7 @@ uint64_t   QuickPerft(Game*, int);
 // pieces.c
 BitBoard BishopAttacksFrom(Position, BitBoard);
 BitBoard BishopQueenAttackersTo(ChessSet*, Position, BitBoard);
-BitBoard BishopSquareThreats(Position, BitBoard);
+BitBoard CalcBishopSquareThreats(Position, BitBoard);
 void     InitKing(void);
 void     InitKnight(void);
 void     InitPawn(void);
@@ -533,7 +533,7 @@ BitBoard PawnAttackersTo(ChessSet*, Position);
 BitBoard PawnAttacksFrom(Position, Side);
 BitBoard RookAttacksFrom(Position, BitBoard);
 BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
-BitBoard RookSquareThreats(Position, BitBoard);
+BitBoard CalcRookSquareThreats(Position, BitBoard);
 
 // set.c
 BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);

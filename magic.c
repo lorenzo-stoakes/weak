@@ -31,7 +31,7 @@ InitMagics()
     bitBoard = EmptyBoard;
     do {
       index = (bitBoard * magic) >> shift;
-      threats = BishopSquareThreats(from, bitBoard);
+      threats = CalcBishopSquareThreats(from, bitBoard);
       currThreats = BishopThreatBase[from][index];
 
       if(currThreats != EmptyBoard && currThreats != threats) {
@@ -63,7 +63,7 @@ InitMagics()
     do {
       index = (bitBoard * magic) >> shift;
 
-      threats = RookSquareThreats(from, bitBoard);
+      threats = CalcRookSquareThreats(from, bitBoard);
       currThreats = RookThreatBase[from][index];
 
       if(currThreats != EmptyBoard && currThreats != threats) {

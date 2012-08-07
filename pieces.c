@@ -22,7 +22,7 @@ BishopQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
 }
 
 BitBoard
-BishopSquareThreats(Position bishop, BitBoard occupancy)
+CalcBishopSquareThreats(Position bishop, BitBoard occupancy)
 {
   BitBoard blockers, noea, nowe, soea, sowe;
   BitBoard ret = EmptyBoard;
@@ -201,7 +201,7 @@ RookQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
 
 // Get rook threats from the specified square and occupancy.
 BitBoard
-RookSquareThreats(Position rook, BitBoard occupancy)
+CalcRookSquareThreats(Position rook, BitBoard occupancy)
 {
   BitBoard blockers, east, nort, sout, west;
   BitBoard ret = EmptyBoard;
