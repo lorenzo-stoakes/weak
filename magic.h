@@ -425,7 +425,7 @@ RookAttacksFrom(Position rook, BitBoard occupancy)
   int shift = magicShift[MAGIC_ROOK][rook];
   BitBoard index = (magic*(occupancy&mask))>>shift;
 
-  return RookThreatBase[rook][index];  
+  return RookThreatBase[rook][index];
 }
 
 #endif
