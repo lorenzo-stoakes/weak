@@ -57,7 +57,7 @@ Checkmated(Game *game)
 
   end = AllMoves(start, game);
 
-  return LenMoves(start, end) == 0 && game->CheckStats.CheckSources != EmptyBoard;
+  return LenMoves(start, end) == 0 && game->CheckStats.CheckSources;
 }
 
 static FORCE_INLINE void
@@ -286,14 +286,14 @@ DoMove(Game *game, Move move)
       originalPiece = piece;
       piece = placePiece;
 
-      if((checkStats.CheckSquares[piece] & POSBOARD(to)) != EmptyBoard) {
+      if((checkStats.CheckSquares[piece] & POSBOARD(to))) {
         checks |= POSBOARD(to);
       }
 
       piece = originalPiece;
 
-      if(checkStats.Discovered != EmptyBoard &&
-         (checkStats.Discovered & POSBOARD(from)) != EmptyBoard) {
+      if(checkStats.Discovered &&
+         (checkStats.Discovered & POSBOARD(from))) {
         if(piece != Rook) {
           checks |= RookAttacksFrom(king, chessSet->Occupancy) &
             (chessSet->Sets[side].Boards[Rook] |
@@ -345,13 +345,12 @@ GivesCheck(Game *game, Move move)
   }
 
   // Direct check.
-  if((game->CheckStats.CheckSquares[piece] & toBoard) != EmptyBoard) {
+  if((game->CheckStats.CheckSquares[piece] & toBoard)) {
     return true;
   }
 
   // Discovered checks.
-  if(game->CheckStats.Discovered != EmptyBoard &&
-     (game->CheckStats.Discovered & fromBoard) != EmptyBoard) {
+  if(game->CheckStats.Discovered && (game->CheckStats.Discovered & fromBoard)) {
     switch(piece) {
     case Pawn:
     case King:
@@ -386,14 +385,14 @@ GivesCheck(Game *game, Move move)
 
   switch(type) {
   case PromoteKnight:
-    return (KnightAttacksFrom(TO(move)) & kingBoard) != EmptyBoard;
+    return KnightAttacksFrom(TO(move)) & kingBoard;
   case PromoteRook:
-    return (RookAttacksFrom(TO(move), occNoFrom) & kingBoard) != EmptyBoard;
+    return RookAttacksFrom(TO(move), occNoFrom) & kingBoard;
   case PromoteBishop:
-    return (BishopAttacksFrom(TO(move), occNoFrom) & kingBoard) != EmptyBoard;
+    return BishopAttacksFrom(TO(move), occNoFrom) & kingBoard;
   case PromoteQueen:
     return ((RookAttacksFrom(TO(move), occNoFrom) | BishopAttacksFrom(TO(move), occNoFrom)) &
-            kingBoard) != EmptyBoard;
+            kingBoard);
   case EnPassant:
     captureSquare = POSITION(RANK(FROM(move)), FILE(TO(move)));
     occNoFrom ^= POSBOARD(captureSquare);
@@ -406,7 +405,7 @@ GivesCheck(Game *game, Move move)
       game->ChessSet.Sets[side].Boards[Queen];
 
     return ((RookAttacksFrom(king, occNoFrom)&rookish) |
-            (BishopAttacksFrom(king, occNoFrom)&bishopish)) != EmptyBoard;
+            (BishopAttacksFrom(king, occNoFrom)&bishopish));
   case CastleQueenSide:
     offset = side*8*7;
     rookFrom = A1 + offset;
@@ -415,7 +414,7 @@ GivesCheck(Game *game, Move move)
     kingTo = C1 + offset;
 
     occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
-    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
+    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard);
   case CastleKingSide:
     offset = side*8*7;
     rookFrom = H1 + offset;
@@ -424,7 +423,7 @@ GivesCheck(Game *game, Move move)
     kingTo = G1 + offset;
 
     occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
-    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard) != EmptyBoard;
+    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard);
   default:
     panic("Invalid move type %d at this point.", type);
 
@@ -545,12 +544,12 @@ PseudoLegal(Game *game, Move move, BitBoard pinned)
     bitBoard = (game->ChessSet.Occupancy ^ POSBOARD(FROM(move)) ^
                 POSBOARD(TO(move) + 8*(1 - 2*opposite))) | POSBOARD(TO(move));
 
-    return (RookAttacksFrom(king, bitBoard) &
+    return !(RookAttacksFrom(king, bitBoard) &
             (game->ChessSet.Sets[opposite].Boards[Queen] |
-             game->ChessSet.Sets[opposite].Boards[Rook])) == EmptyBoard &&
-      (BishopAttacksFrom(king, bitBoard) &
-       (game->ChessSet.Sets[opposite].Boards[Queen] |
-        game->ChessSet.Sets[opposite].Boards[Bishop])) == EmptyBoard;
+             game->ChessSet.Sets[opposite].Boards[Rook])) &&
+      !(BishopAttacksFrom(king, bitBoard) &
+        (game->ChessSet.Sets[opposite].Boards[Queen] |
+         game->ChessSet.Sets[opposite].Boards[Bishop]));
   }
 
   if(piece == King) {
@@ -563,14 +562,14 @@ PseudoLegal(Game *game, Move move, BitBoard pinned)
     opposition = game->ChessSet.Sets[opposite].Occupancy;
 
     return
-      (AllAttackersTo(&game->ChessSet, TO(move),
-                      game->ChessSet.Occupancy) & opposition) == EmptyBoard;
+      !(AllAttackersTo(&game->ChessSet, TO(move),
+                      game->ChessSet.Occupancy) & opposition);
   }
 
   // A non-king move is legal if its not pinned or is moving in the ray between it and the king.
 
-return pinned == EmptyBoard ||
-    (pinned & POSBOARD(FROM(move))) == EmptyBoard ||
+return !pinned ||
+    !(pinned & POSBOARD(FROM(move))) ||
     Aligned(FROM(move), TO(move), game->CheckStats.DefendedKing);
 }
 
@@ -808,7 +807,7 @@ initArrays()
     for(to = A1; to <= H8; to++) {
       CanSlideAttack[from][to] = false;
 
-      if((queenThreats&POSBOARD(to)) == EmptyBoard) {
+      if(!(queenThreats&POSBOARD(to))) {
         Between[from][to] = EmptyBoard;
       } else {
         // We determine step size in two parts - sign and amount. The sign is determined by
