@@ -6,7 +6,7 @@ static Move* evasions(Move*, Game*);
 static FORCE_INLINE Move* kingMoves(Position, Move*, BitBoard);
 static FORCE_INLINE Move* knightMoves(Position*, Move*, BitBoard);
 static Move* nonEvasions(Move*, Game*);
-static Move* pawnMovesBlack(Game*, Move*, BitBoard, bool);
+static Move* pawnMovesBlack(ChessSet*, Position, Move*, BitBoard, bool);
 static Move* pawnMovesWhite(Game*, Move*, BitBoard, bool);
 static FORCE_INLINE Move* queenMoves(Position*, Move*, BitBoard, BitBoard);
 static FORCE_INLINE Move* rookMoves(Position*, Move*, BitBoard, BitBoard);
@@ -146,7 +146,7 @@ evasions(Move *end, Game *game)
   if(side == White) {
     end = pawnMovesWhite(game, end, targets, true);
   } else {
-    end = pawnMovesBlack(game, end, targets, true);
+    end = pawnMovesBlack(chessSet, game->EnPassantSquare, end, targets, true);
   }
 
   // King already handled.
@@ -164,7 +164,7 @@ bishopMoves(Position *positions, Move *end, BitBoard occupancy, BitBoard mask)
   BitBoard attacks;
   Position from, to;
 
-  while((from = *positions++) != EmptyPosition) {  
+  while((from = *positions++) != EmptyPosition) {
     attacks = BishopAttacksFrom(from, occupancy) & mask;
     while(attacks != EmptyBoard) {
       to = PopForward(&attacks);
@@ -220,12 +220,12 @@ nonEvasions(Move *end, Game *game)
   Side side = game->WhosTurn;
   ChessSet *chessSet = &game->ChessSet;
   BitBoard occupancy =  chessSet->Occupancy;
-  BitBoard attackable = ~(chessSet->Sets[side].Occupancy);  
+  BitBoard attackable = ~(chessSet->Sets[side].Occupancy);
 
   if(side == White) {
-    end = pawnMovesWhite(game, end, attackable, false);
+    end = pawnMovesWhite(game, end, attackable, false);    
   } else {
-    end = pawnMovesBlack(game, end, attackable, false);
+    end = pawnMovesBlack(chessSet, game->EnPassantSquare, end, attackable, false);
   }
 
   end = knightMoves(chessSet->PiecePositions[side][Knight], end, attackable);
@@ -240,19 +240,19 @@ nonEvasions(Move *end, Game *game)
 }
 
 static Move*
-pawnMovesBlack(Game *game, Move *curr, BitBoard mask, bool evasion)
+pawnMovesBlack(ChessSet *chessSet, Position enPassant, Move *curr, BitBoard mask, bool evasion)
 {
-  BitBoard empty = game->ChessSet.EmptySquares;
-  BitBoard opposition = game->ChessSet.Sets[White].Occupancy & mask;
+  BitBoard empty = chessSet->EmptySquares;
+  BitBoard opposition = chessSet->Sets[White].Occupancy & mask;
 
   BitBoard bitBoard1, bitBoard2;
 
-  BitBoard pawns = game->ChessSet.Sets[Black].Boards[Pawn];
+  BitBoard pawns = chessSet->Sets[Black].Boards[Pawn];
 
   BitBoard pawnsOn2 = pawns&Rank2Mask;
   BitBoard pawnsNotOn2 = pawns&~Rank2Mask;
 
-  Position enPassant, to;
+  Position to;
 
   // Moves.
 
@@ -325,7 +325,6 @@ pawnMovesBlack(Game *game, Move *curr, BitBoard mask, bool evasion)
   }
 
   // En passant.
-  enPassant = game->EnPassantSquare;
   if(enPassant != EmptyPosition) {
     if(evasion && (mask & NortOne(POSBOARD(enPassant))) == EmptyBoard) {
       return curr;
@@ -344,17 +343,20 @@ pawnMovesBlack(Game *game, Move *curr, BitBoard mask, bool evasion)
 static Move*
 pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
 {
-  BitBoard empty = game->ChessSet.EmptySquares;
-  BitBoard opposition = game->ChessSet.Sets[Black].Occupancy & mask;
+  ChessSet *chessSet = &game->ChessSet;
+
+  BitBoard empty = chessSet->EmptySquares;
+  BitBoard opposition = chessSet->Sets[Black].Occupancy & mask;
 
   BitBoard bitBoard1, bitBoard2;
 
-  BitBoard pawns = game->ChessSet.Sets[White].Boards[Pawn];
+  BitBoard pawns = chessSet->Sets[White].Boards[Pawn];
 
   BitBoard pawnsOn7 = pawns&Rank7Mask;
   BitBoard pawnsNotOn7 = pawns&~Rank7Mask;
 
-  Position enPassant, to;
+  Position enPassant = game->EnPassantSquare;
+  Position to;
 
   // Moves.
 
@@ -427,7 +429,6 @@ pawnMovesWhite(Game *game, Move *curr, BitBoard mask, bool evasion)
   }
 
   // En passant.
-  enPassant = game->EnPassantSquare;
   if(enPassant != EmptyPosition) {
     if(evasion && (mask & SoutOne(POSBOARD(enPassant))) == EmptyBoard) {
       return curr;
