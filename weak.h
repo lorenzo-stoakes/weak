@@ -519,23 +519,18 @@ PerftStats Perft(Game*, int);
 uint64_t   QuickPerft(Game*, int);
 
 // pieces.c
+BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
 BitBoard BishopAttacksFrom(Position, BitBoard);
-BitBoard BishopQueenAttackersTo(ChessSet*, Position, BitBoard);
 BitBoard CalcBishopSquareThreats(Position, BitBoard);
 void     InitKing(void);
 void     InitKnight(void);
 void     InitPawn(void);
 BitBoard KingAttacksFrom(Position);
-BitBoard KingAttackersTo(ChessSet*, Position);
 BitBoard KnightAttacksFrom(Position);
-BitBoard KnightAttackersTo(ChessSet *, Position);
-BitBoard PawnAttackersTo(ChessSet*, Position);
 BitBoard PawnAttacksFrom(Position, Side);
-BitBoard RookQueenAttackersTo(ChessSet *, Position, BitBoard);
 BitBoard CalcRookSquareThreats(Position, BitBoard);
 
 // set.c
-BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
 Set      NewBlackSet(void);
 ChessSet NewChessSet(void);
 ChessSet NewEmptyChessSet(void);

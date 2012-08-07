@@ -1,14 +1,5 @@
 #include "weak.h"
 
-BitBoard
-AllAttackersTo(ChessSet *chessSet, Position pos, BitBoard occupancy)
-{
-  return PawnAttackersTo(chessSet, pos) | KnightAttackersTo(chessSet, pos) |
-    BishopQueenAttackersTo(chessSet, pos, occupancy) |
-    RookQueenAttackersTo(chessSet, pos, occupancy) |
-    KingAttackersTo(chessSet, pos);
-}
-
 Set
 NewBlackSet()
 {

@@ -8,17 +8,25 @@ static BitBoard pawnSquares[2][64];
 static FORCE_INLINE BitBoard bishopMagicSquareThreats(Position, BitBoard);
 static FORCE_INLINE BitBoard rookMagicSquareThreats(Position, BitBoard);
 
+static FORCE_INLINE BitBoard bishopQueenAttackersTo(ChessSet*, Position, BitBoard);
+static FORCE_INLINE BitBoard kingAttackersTo(ChessSet*, Position);
+static FORCE_INLINE BitBoard knightAttackersTo(ChessSet *chessSet, Position to);
+static FORCE_INLINE BitBoard pawnAttackersTo(ChessSet*, Position);
+static FORCE_INLINE BitBoard rookQueenAttackersTo(ChessSet*, Position, BitBoard);
+
+BitBoard
+AllAttackersTo(ChessSet *chessSet, Position pos, BitBoard occupancy)
+{
+  return pawnAttackersTo(chessSet, pos) | knightAttackersTo(chessSet, pos) |
+    bishopQueenAttackersTo(chessSet, pos, occupancy) |
+    rookQueenAttackersTo(chessSet, pos, occupancy) |
+    kingAttackersTo(chessSet, pos);
+}
+
 BitBoard
 BishopAttacksFrom(Position bishop, BitBoard occupancy)
 {
   return bishopMagicSquareThreats(bishop, occupancy);
-}
-
-BitBoard
-BishopQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
-{
-  return (chessSet->PieceOccupancy[Bishop] | chessSet->PieceOccupancy[Queen]) &
-    bishopMagicSquareThreats(to, occupancy);
 }
 
 BitBoard
@@ -150,21 +158,9 @@ InitPawn()
 }
 
 BitBoard
-KingAttackersTo(ChessSet *chessSet, Position to)
-{
-  return chessSet->PieceOccupancy[King] & kingSquares[to];
-}
-
-BitBoard
 KingAttacksFrom(Position king)
 {
   return kingSquares[king];
-}
-
-BitBoard
-KnightAttackersTo(ChessSet *chessSet, Position to)
-{
-  return chessSet->PieceOccupancy[Knight] & knightSquares[to];
 }
 
 BitBoard
@@ -174,23 +170,9 @@ KnightAttacksFrom(Position knight)
 }
 
 BitBoard
-PawnAttackersTo(ChessSet *chessSet, Position to)
-{
-  return (chessSet->Sets[White].Boards[Pawn] & pawnSquares[Black][to]) |
-    (chessSet->Sets[Black].Boards[Pawn] & pawnSquares[White][to]);
-}
-
-BitBoard
 PawnAttacksFrom(Position pawn, Side side)
 {
   return pawnSquares[side][pawn];
-}
-
-BitBoard
-RookQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
-{
-  return (chessSet->PieceOccupancy[Rook] | chessSet->PieceOccupancy[Queen]) &
-    rookMagicSquareThreats(to, occupancy);
 }
 
 // Get rook threats from the specified square and occupancy.
@@ -254,4 +236,37 @@ rookMagicSquareThreats(Position rook, BitBoard occupancy) {
   BitBoard index = (magic*(occupancy&mask))>>shift;
 
   return RookThreatBase[rook][index];
+}
+
+static FORCE_INLINE BitBoard
+bishopQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
+{
+  return (chessSet->PieceOccupancy[Bishop] | chessSet->PieceOccupancy[Queen]) &
+    bishopMagicSquareThreats(to, occupancy);
+}
+
+static FORCE_INLINE BitBoard
+kingAttackersTo(ChessSet *chessSet, Position to)
+{
+  return chessSet->PieceOccupancy[King] & kingSquares[to];
+}
+
+static FORCE_INLINE BitBoard
+knightAttackersTo(ChessSet *chessSet, Position to)
+{
+  return chessSet->PieceOccupancy[Knight] & knightSquares[to];
+}
+
+static FORCE_INLINE BitBoard
+pawnAttackersTo(ChessSet *chessSet, Position to)
+{
+  return (chessSet->Sets[White].Boards[Pawn] & pawnSquares[Black][to]) |
+    (chessSet->Sets[Black].Boards[Pawn] & pawnSquares[White][to]);
+}
+
+static FORCE_INLINE BitBoard
+rookQueenAttackersTo(ChessSet *chessSet, Position to, BitBoard occupancy)
+{
+  return (chessSet->PieceOccupancy[Rook] | chessSet->PieceOccupancy[Queen]) &
+    rookMagicSquareThreats(to, occupancy);
 }
