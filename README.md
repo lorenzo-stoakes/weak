@@ -18,8 +18,11 @@ front-end, probably a [UCI][2]-compatible interface.
 
 There is no engine yet to speak of, but it is coming, off in the distance...
 
-I am very influenced and inspired by the [Chess Programming Wiki][3] and [Stockfish][4], the
-best open-source chess engine out there.
+I am very influenced and inspired by the [Chess Programming Wiki][3], an excellent
+resource.
+
+The engine contains portions derived from [Stockfish][4], the best open-source chess engine out
+there. As such, I have licensed the engine under the GPL v3.
 
 [0]:https://github.com/lorenzo-stoakes/weak-go
 [1]:http://chessprogramming.wikispaces.com/perft
