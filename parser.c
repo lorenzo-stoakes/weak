@@ -33,11 +33,11 @@ ParseCommand(char *str)
 
   if(strcmp(str, "board\n") == 0) {
     ret.Type = CmdBoard;
-  } else if(strcmp(str, "quit\n") == 0) {
-    ret.Type = CmdQuit;
   } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
     ret.Type = CmdPerft;
     ret.PerftDepth = atoi(str+6);
+  } else if(strcmp(str, "q\n") == 0 || strcmp(str, "quit\n") == 0) {
+    ret.Type = CmdQuit;    
   } else {
     ret.Type = CmdInvalid;
   }
