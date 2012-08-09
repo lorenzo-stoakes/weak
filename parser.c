@@ -23,6 +23,28 @@
 #include <string.h>
 #include "weak.h"
 
+Command
+ParseCommand(char *str)
+{
+  Command ret;
+  int len = strlen(str);
+
+  // All rather horrible and hacky. TODO: Clean up.
+
+  if(strcmp(str, "board\n") == 0) {
+    ret.Type = CmdBoard;
+  } else if(strcmp(str, "quit\n") == 0) {
+    ret.Type = CmdQuit;
+  } else if(len >= 7 && strcmp(strndup(str, 5), "perft") == 0) {
+    ret.Type = CmdPerft;
+    ret.PerftDepth = atoi(str+6);
+  } else {
+    ret.Type = CmdInvalid;
+  }
+
+  return ret;
+}
+
 // Parse a FEN string into a game object.
 // See http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
 Game

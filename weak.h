@@ -94,6 +94,14 @@ enum CastleSide {
   QueenSide
 };
 
+enum CommandType {
+  CmdBoard,
+  CmdInvalid,
+  CmdMove,
+  CmdPerft,
+  CmdQuit
+};
+
 enum File {
   FileA = 0,
   FileB = 1,
@@ -165,6 +173,8 @@ typedef enum CastleEvent     CastleEvent;
 typedef enum CastleSide      CastleSide;
 typedef struct CheckStats    CheckStats;
 typedef struct ChessSet      ChessSet;
+typedef struct Command       Command;
+typedef enum CommandType     CommandType;
 typedef struct Game          Game;
 typedef struct Memory        Memory;
 typedef struct MemorySlice   MemorySlice;
@@ -183,6 +193,12 @@ typedef struct StringBuilder StringBuilder;
 struct CheckStats {
   BitBoard CheckSquares[7], CheckSources, Discovered, Pinned;
   Position DefendedKing, AttackedKing;
+};
+
+struct Command {
+  CommandType Type;
+  Move        Move;
+  int         PerftDepth;
 };
 
 struct MemorySlice {
@@ -513,6 +529,9 @@ bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
 
+// eval.c
+double Eval(Game*);
+
 // game.c
 CheckStats CalculateCheckStats(Game*);
 bool       Checkmated(Game*);
@@ -526,6 +545,9 @@ bool       PseudoLegal(Game*, Move, BitBoard);
 bool       Stalemated(Game*);
 void       Unmove(Game*);
 
+// interface.c
+void RunInterface(Game*);
+
 // magic.c
 void InitMagics(void);
 
@@ -533,7 +555,8 @@ void InitMagics(void);
 Move* AllMoves(Move*, Game*);
 
 // parser.c
-Game ParseFen(char*);
+Command ParseCommand(char*);
+Game    ParseFen(char*);
 
 // perft.c
 PerftStats Perft(Game*, int);
@@ -550,6 +573,9 @@ BitBoard KingAttacksFrom(Position);
 BitBoard KnightAttacksFrom(Position);
 BitBoard PawnAttacksFrom(Position, Side);
 BitBoard CalcRookSquareThreats(Position, BitBoard);
+
+// search.c
+Move Search(Game*);
 
 // set.c
 Set      NewBlackSet(void);

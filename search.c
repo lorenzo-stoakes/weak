@@ -19,26 +19,19 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <time.h>
 #include "weak.h"
 
-int
-main()
+Move
+Search(Game *game)
 {
-  Game game;
+  int len;
+  Move moves[INIT_MOVE_LEN];
+  Move *start =moves, *end;
 
-  SetUnbufferedOutput();
+  end = AllMoves(moves, game);
+  len = end - start;
 
-  puts("WeakC v0.0.dev.\n");
+  // Choose random move.
 
-  printf("Initialising... ");
-  InitEngine();
-  puts("done.\n");
-
-  game = NewGame(false, White);
-
-  RunInterface(&game);
-
-  return 0;
+  return moves[rand() % len];
 }

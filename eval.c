@@ -19,26 +19,23 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <time.h>
 #include "weak.h"
 
-int
-main()
+static double weights[] = { 0, 1, 3.5, 3.5, 5, 9 };
+
+// Value of game position for white.
+double
+eval(Game *game)
 {
-  Game game;
+  double ret = 0;
+  Piece piece;
 
-  SetUnbufferedOutput();
+  // Very basic evaluation for now.
 
-  puts("WeakC v0.0.dev.\n");
+  for(piece = Pawn; piece <= Queen; piece++) {
+    ret += weights[piece]*PopCount(game->ChessSet.Sets[White].Boards[piece]);
+    ret -= weights[piece]*PopCount(game->ChessSet.Sets[Black].Boards[piece]);
+  }
 
-  printf("Initialising... ");
-  InitEngine();
-  puts("done.\n");
-
-  game = NewGame(false, White);
-
-  RunInterface(&game);
-
-  return 0;
+  return ret;
 }
