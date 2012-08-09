@@ -126,8 +126,11 @@ enum MoveType {
   PromoteKnight   = PromoteMask + Knight,
   PromoteBishop   = PromoteMask + Bishop,
   PromoteRook     = PromoteMask + Rook,
-  PromoteQueen    = PromoteMask + Queen
+  PromoteQueen    = PromoteMask + Queen,
+  InvalidMoveType = 1<<4-1
 };
+
+#define INVALID_MOVE MAKE_MOVE(InvalidMoveType, A1, A1)
 
 enum Position {
   A1, B1, C1, D1, E1, F1, G1, H1,
