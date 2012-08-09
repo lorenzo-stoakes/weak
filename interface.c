@@ -77,6 +77,10 @@ RunInterface(Game *game)
       printf("%fms elapsed, %f Mnps.\n", elapsed, 1E-3*count/elapsed);
 
       break;
+    case CmdPositionFen:
+      *game = ParseFen(command.Fen);
+
+      break;
     case CmdQuit:
       return;
     }

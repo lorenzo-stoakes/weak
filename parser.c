@@ -36,6 +36,9 @@ ParseCommand(char *str)
   } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
     ret.Type = CmdPerft;
     ret.PerftDepth = atoi(str+6);
+  } else if(len >= 13 && strcmp(strndup(str, 13), "position fen ") == 0) {
+    ret.Type = CmdPositionFen;
+    ret.Fen = strdup(str+13);
   } else if(strcmp(str, "q\n") == 0 || strcmp(str, "quit\n") == 0) {
     ret.Type = CmdQuit;    
   } else {

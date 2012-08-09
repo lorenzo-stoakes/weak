@@ -89,6 +89,7 @@ enum CommandType {
   CmdInvalid,
   CmdMove,
   CmdPerft,
+  CmdPositionFen,
   CmdQuit
 };
 
@@ -189,6 +190,7 @@ struct Command {
   CommandType Type;
   Move        Move;
   int         PerftDepth;
+  char        *Fen;
 };
 
 struct MemorySlice {
