@@ -552,6 +552,7 @@ Move* AllMoves(Move*, Game*);
 // parser.c
 Command ParseCommand(char*);
 Game    ParseFen(char*);
+Move    ParseMove(char*);
 
 // perft.c
 PerftStats Perft(Game*, int);

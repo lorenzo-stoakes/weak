@@ -28,7 +28,7 @@ ParseCommand(char *str)
 {
   Command ret;
   int len = strlen(str);
-
+  Move move;
   // All rather horrible and hacky and leaky. TODO: Clean up.
 
   if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
@@ -40,9 +40,16 @@ ParseCommand(char *str)
     ret.Type = CmdPositionFen;
     ret.Fen = strdup(str+13);
   } else if(strcmp(str, "q\n") == 0 || strcmp(str, "quit\n") == 0) {
-    ret.Type = CmdQuit;    
+    ret.Type = CmdQuit;
   } else {
-    ret.Type = CmdInvalid;
+    move = ParseMove(str);
+
+    if(move == INVALID_MOVE) {
+      ret.Type = CmdInvalid;
+    } else {
+      ret.Type = CmdMove;
+      ret.Move = move;
+    }
   }
 
   return ret;
@@ -226,4 +233,61 @@ ParseFen(char *fen)
     ret.ChessSet.Sets[OPPOSITE(ret.WhosTurn)].Occupancy;
 
   return ret;
+}
+
+Move
+ParseMove(char *str)
+{
+  char *typeStr;
+  Position from, to;
+  size_t len = strlen(str);
+  MoveType type;
+
+  if(len < 4) {
+    return INVALID_MOVE;
+  }
+
+  // Moves are of the form of e2e4[ep/=[NRBQ]].
+
+  if(str[0] < 'a' || str[0] > 'h' ||
+     str[1] < '1' || str[1] > '8' ||
+     str[2] < 'a' || str[2] > 'h' ||
+     str[3] < '1' || str[3] > '8') {
+    return INVALID_MOVE;
+  }
+
+  from = POSITION(str[1] - '1', str[0] - 'a');
+  to   = POSITION( str[3] - '1', str[2] - 'a');
+
+  // Including newline.
+  if(len == 5) {
+    return MAKE_MOVE_QUICK(from, to);
+  }
+
+  typeStr = strdup(str+4);
+
+  if(strcmp(typeStr, "ep\n")) {
+    type = EnPassant;
+  } else if(typeStr[0] == '=') {
+    switch(typeStr[1]) {
+    case 'N':
+      type = PromoteKnight;
+      break;
+    case 'B':
+      type = PromoteBishop;
+      break;
+    case 'R':
+      type = PromoteRook;
+      break;
+    case 'Q':
+      type = PromoteQueen;
+      break;
+    default:
+      return INVALID_MOVE;
+    }
+  } else {
+    return INVALID_MOVE;
+  }
+
+  return MAKE_MOVE(from, to, type);
 }

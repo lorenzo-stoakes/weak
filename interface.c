@@ -60,7 +60,7 @@ RunInterface(Game *game)
         reply = Search(game);
         fromPiece = PieceAt(&game->ChessSet, FROM(reply));
         capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
-
+        DoMove(game, reply);
         puts(StringMove(reply, fromPiece, capture));
       } else {
         puts("Invalid move.");
