@@ -515,6 +515,8 @@ NewGame(bool debug, Side humanSide)
   Game ret;
   Side side;
 
+  ret.ChessSet = NewChessSet();
+
   for(side = White; side <= Black; side++) {
     for(castleSide = KingSide; castleSide <= QueenSide; castleSide++) {
       ret.CastlingRights[side][castleSide] = true;
@@ -523,13 +525,16 @@ NewGame(bool debug, Side humanSide)
 
   ret.CheckStats = NewCheckStats();
   ret.CheckStats.CheckSources = EmptyBoard;
-  ret.CheckStats.AttackedKing = E1;
-  ret.ChessSet = NewChessSet();
+  ret.CheckStats.DefendedKing = E1;
+  ret.CheckStats.AttackedKing = E8;
+
   ret.Debug = debug;
   ret.EnPassantSquare = EmptyPosition;
   ret.Memories = NewMemorySlice();
   ret.HumanSide = humanSide;
   ret.WhosTurn = White;
+
+
 
   return ret;
 }
@@ -627,7 +632,7 @@ Unmove(Game *game)
   memory = PopMemory(&game->Memories);
   move = memory.Move;
   capturePiece = memory.Captured;
-  
+
   // Rollback to previous turn.
   from = FROM(move);
   to = TO(move);

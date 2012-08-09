@@ -45,7 +45,7 @@ int main()
 
   for(i = 0; i < TEST_COUNT; i++) {
     // HACK. TODO: Fix!
-    msg = TestPerft();    
+    msg = TestPerft();
     //msg = testFunctions[i]();
 
     if(msg != NULL) {

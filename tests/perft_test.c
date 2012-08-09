@@ -94,7 +94,7 @@ TestPerft()
 
     for(j = 1; j <= expectedDepthCounts[i] && j <= MAX_DEPTH; j++) {
 
-      printf("Started Perft %d, depth %d.\n", i+1, j);      
+      printf("Started Perft %d, depth %d.\n", i+1, j);
 
       expected = expecteds[i][j-1];
       actual = Perft(&game, j);
