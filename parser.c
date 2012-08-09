@@ -35,7 +35,7 @@ ParseCommand(char *str)
     ret.Type = CmdBoard;
   } else if(strcmp(str, "quit\n") == 0) {
     ret.Type = CmdQuit;
-  } else if(len >= 7 && strcmp(strndup(str, 5), "perft") == 0) {
+  } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
     ret.Type = CmdPerft;
     ret.PerftDepth = atoi(str+6);
   } else {
