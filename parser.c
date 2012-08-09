@@ -29,7 +29,7 @@ ParseCommand(char *str)
   Command ret;
   int len = strlen(str);
 
-  // All rather horrible and hacky. TODO: Clean up.
+  // All rather horrible and hacky and leaky. TODO: Clean up.
 
   if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
     ret.Type = CmdBoard;
