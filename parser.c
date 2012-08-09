@@ -31,7 +31,7 @@ ParseCommand(char *str)
 
   // All rather horrible and hacky. TODO: Clean up.
 
-  if(strcmp(str, "board\n") == 0) {
+  if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
     ret.Type = CmdBoard;
   } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
     ret.Type = CmdPerft;
