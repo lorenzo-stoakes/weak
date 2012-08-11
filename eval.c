@@ -25,7 +25,7 @@ static double weights[] = { 0, 1, 3.5, 3.5, 5, 9 };
 
 // Value of game position for white.
 double
-eval(Game *game)
+Eval(Game *game)
 {
   double ret = 0;
   Piece piece;
