@@ -33,6 +33,8 @@ RunInterface(Game *game)
   clock_t ticks;
   Command command;
   double elapsed;
+  Move moves[INIT_MOVE_LEN];
+  Move *curr, *end;
   Move reply;
   Piece fromPiece;
   size_t length = INIT_BUFFER_LENGTH;
@@ -75,6 +77,18 @@ RunInterface(Game *game)
       puts(StringMove(reply, fromPiece, capture));
 
       break;
+    case CmdMoves:
+      end = AllMoves(moves, game);
+
+      printf("%ld moves:-\n\n", end-moves);
+      for(curr = moves; curr != end; curr++) {
+        puts(StringMove(*curr, PieceAt(&game->ChessSet, FROM(*curr)),
+                        PieceAt(&game->ChessSet, TO(*curr)) != MissingPiece));
+      }
+      printf("\n");
+
+      break;
+
     case CmdPerft:
       ticks = clock();
       count = QuickPerft(game, command.PerftDepth);

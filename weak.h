@@ -88,6 +88,7 @@ enum CommandType {
   CmdBoard,
   CmdInvalid,
   CmdMove,
+  CmdMoves,
   CmdPerft,
   CmdPositionFen,
   CmdQuit
