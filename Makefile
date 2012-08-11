@@ -1,6 +1,9 @@
 CC=clang
 
-COMMON_FLAGS=-g -pedantic -Wall -Werror -Wextra -Wshadow -std=c99 -m64 -ltcmalloc -O3
+# We're ok with static functions which aren't used.
+IGNORED_WARNINGS=-Wno-unneeded-internal-declaration
+
+COMMON_FLAGS=-g -pedantic -Wall -Werror -Wextra -Wshadow -std=c99 -m64 -ltcmalloc -O3 $(IGNORED_WARNINGS)
 
 CFLAGS=$(COMMON_FLAGS) -DNDEBUG -fomit-frame-pointer
 DEBUG_FLAGS=$(COMMON_FLAGS)
