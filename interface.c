@@ -55,16 +55,24 @@ RunInterface(Game *game)
 
       break;
     case CmdMove:
-      if(PseudoLegal(game, command.Move, game->CheckStats.Pinned)) {
-        DoMove(game, command.Move);
-        reply = Search(game);
-        fromPiece = PieceAt(&game->ChessSet, FROM(reply));
-        capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
-        DoMove(game, reply);
-        puts(StringMove(reply, fromPiece, capture));
-      } else {
+      if(!PseudoLegal(game, command.Move, game->CheckStats.Pinned)) {
         puts("Invalid move.");
+        break;
       }
+
+      DoMove(game, command.Move);
+
+      count = 0;
+      ticks = clock();
+      reply = Search(game, &count);
+      ticks = clock() - ticks;
+      elapsed = 1000*((double)ticks)/CLOCKS_PER_SEC;
+      printf("%fms elapsed, %f Mnps.\n", elapsed, 1E-3*count/elapsed);
+
+      fromPiece = PieceAt(&game->ChessSet, FROM(reply));
+      capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
+      DoMove(game, reply);
+      puts(StringMove(reply, fromPiece, capture));
 
       break;
     case CmdPerft:
