@@ -21,9 +21,9 @@
 
 #include "weak.h"
 
-#define DEPTH 8
+#define DEPTH 6
 
-
+static double quiesce(Game*, double, double, uint64_t*, Side);
 static double miniMax(Game*, double, double, int, uint64_t*);
 static double negaMax(Game*, double, double, int, uint64_t*);
 
@@ -78,7 +78,7 @@ miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
   Side side = game->WhosTurn;
 
   if(depth == DEPTH) {
-    return Eval(game, White);
+    return quiesce(game, alpha, beta, count, White);
   }
 
   end = AllMoves(moves, game);
@@ -126,13 +126,13 @@ miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 static double
 negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 {
-  double max, val;
+  double val;
   Move moves[INIT_MOVE_LEN];
   Move *start = moves;
   Move *curr, *end;
 
   if(depth == DEPTH) {
-    return Eval(game, game->WhosTurn);
+    return quiesce(game, alpha, beta, count, game->WhosTurn);
   }
 
   end = AllMoves(moves, game);
@@ -141,8 +141,6 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
   // Iterate through all moves looking for the best, whose definition
   // varies based on who's turn it is.
-
-  max = SMALL;
 
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
@@ -155,6 +153,47 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
     if(val >= alpha) {
       alpha = val;
+    }
+  }
+
+  return alpha;
+}
+
+// Quiescent search. See http://chessprogramming.wikispaces.com/Quiescence+Search
+static double
+quiesce(Game *game, double alpha, double beta, uint64_t *count, Side evalSide)
+{
+  double val;
+  double standPat = Eval(game, evalSide);
+  Move buffer[INIT_MOVE_LEN];
+  Move move;
+  Move *end;
+  Move *curr = buffer;
+
+  if(standPat >= beta) {
+    return beta;
+  }
+  
+  if(alpha < standPat) {
+    alpha = standPat;
+  }
+
+  end = AllCaptures(curr, game);
+
+  *count += end-curr;
+
+  for(; curr != end; curr++) {
+    move = *curr;
+
+    DoMove(game, move);
+    val = -quiesce(game, -beta, -alpha, count, evalSide);
+    Unmove(game);
+
+    if(val >= beta) {
+      return beta;
+    }
+    if(val > alpha) {
+      val = alpha;
     }
   }
 
