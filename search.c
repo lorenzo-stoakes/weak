@@ -26,57 +26,8 @@
 #define SMALL -1E10
 #define BIG    1E10
 
-// Perform hacky mini-max. Note the scoring is from white's perspective.
-static double
-miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
-{
-  double max, val;
-  Move moves[INIT_MOVE_LEN];
-  Move *start = moves;
-  Move *curr, *end;
-  Side side = game->WhosTurn;
-
-  if(depth == DEPTH) {
-    return Eval(game, White);
-  }
-
-  end = AllMoves(moves, game);
-
-  *count += end-start;
-
-  // Iterate through all moves looking for the best, whose definition
-  // varies based on who's turn it is.
-
-  max = side == White ? SMALL : BIG;
-
-  for(curr = start; curr != end; curr++) {
-    DoMove(game, *curr);
-    val = miniMax(game, alpha, beta, depth+1, count);
-    Unmove(game);
-
-    if(side == White) {
-      if(val >= beta) {
-        return beta;
-      }
-
-      if(val > max) {
-        max = val;
-        alpha = val;
-      }
-    } else {
-      if(val <= alpha) {
-        return alpha;
-      }
-
-      if(val < max) {
-        max = val;
-        beta = val;
-      }
-    }
-  }
-
-  return max;
-}
+static double miniMax(Game*, double, double, int, uint64_t*);
+static double negaMax(Game*, double, double, int, uint64_t*);
 
 // Perform hacky mini-max. Note the scoring is from white's perspective.
 Move
@@ -119,4 +70,105 @@ Search(Game *game, uint64_t *count)
   }
 
   return best;
+}
+
+static double
+miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
+{
+  double max, val;
+  Move moves[INIT_MOVE_LEN];
+  Move *start = moves;
+  Move *curr, *end;
+  Side side = game->WhosTurn;
+
+  if(depth == DEPTH) {
+    return Eval(game, White);
+  }
+
+  end = AllMoves(moves, game);
+
+  *count += end-start;
+
+  // Iterate through all moves looking for the best, whose definition
+  // varies based on who's turn it is.
+
+  max = side == White ? SMALL : BIG;
+
+  for(curr = start; curr != end; curr++) {
+    DoMove(game, *curr);
+    val = miniMax(game, alpha, beta, depth+1, count);
+    Unmove(game);
+
+    if(side == White) {
+      if(val >= beta) {
+        return beta;
+      }
+
+      if(val > max) {
+        max = val;
+        if(val > alpha) {
+          alpha = val;
+        }
+      }
+    } else {
+      if(val <= alpha) {
+        return alpha;
+      }
+
+      if(val < max) {
+        max = val;
+        if(val < beta) {
+          beta = val;
+        }
+      }
+    }
+  }
+
+  return max;
+}
+
+static double
+negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
+{
+  double max, val;
+  Move moves[INIT_MOVE_LEN];
+  Move *start = moves;
+  Move *curr, *end;
+  Side side = game->WhosTurn;
+
+  if(depth == DEPTH) {
+    return Eval(game, game->WhosTurn);
+  }
+
+  end = AllMoves(moves, game);
+
+  *count += end-start;
+
+  // Iterate through all moves looking for the best, whose definition
+  // varies based on who's turn it is.
+
+  max = SMALL;
+
+  for(curr = start; curr != end; curr++) {
+    DoMove(game, *curr);
+    val = -negaMax(game, -alpha, beta, depth+1, count);
+    Unmove(game);
+
+    if((side == White && val >= beta) || (side == Black && val <= alpha)) {
+      return val;
+    }
+
+    if(val > max) {
+      max = val;
+      if(side == White) {
+        if(val > alpha) {
+          alpha = val;
+        }
+      } else if(val < beta) {
+        beta = val;
+      }
+    }
+  }
+
+  return max;
 }
