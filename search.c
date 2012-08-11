@@ -55,8 +55,8 @@ miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
     Unmove(game);
 
     if(side == White) {
-      if(val > beta) {
-        return val;
+      if(val >= beta) {
+        return beta;
       }
 
       if(val > max) {
@@ -64,8 +64,8 @@ miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
         alpha = val;
       }
     } else {
-      if(val < alpha) {
-        return val;
+      if(val <= alpha) {
+        return alpha;
       }
 
       if(val < max) {
