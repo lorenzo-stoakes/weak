@@ -32,9 +32,13 @@ Eval(Game *game, Side side)
 
   // Very basic evaluation for now.
 
-  for(piece = Pawn; piece <= Queen; piece++) {
-    ret += weights[piece]*PopCount(game->ChessSet.Sets[White].Boards[piece]);
-    ret -= weights[piece]*PopCount(game->ChessSet.Sets[Black].Boards[piece]);
+  if(Checkmated(game)) {
+    ret = SMALL * (1 - 2*game->WhosTurn);
+  } else {
+    for(piece = Pawn; piece <= Queen; piece++) {
+      ret += weights[piece]*PopCount(game->ChessSet.Sets[White].Boards[piece]);
+      ret -= weights[piece]*PopCount(game->ChessSet.Sets[Black].Boards[piece]);
+    }
   }
 
   return ret * (1 - 2*side);
