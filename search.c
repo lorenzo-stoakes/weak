@@ -23,8 +23,6 @@
 
 #define DEPTH 8
 
-#define SMALL -1E10
-#define BIG    1E10
 
 static double miniMax(Game*, double, double, int, uint64_t*);
 static double negaMax(Game*, double, double, int, uint64_t*);

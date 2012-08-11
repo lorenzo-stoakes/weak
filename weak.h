@@ -46,6 +46,9 @@
 #define MAX_PIECE_LOCATION 10
 #define APPEND_STRING_BUFFER_LENGTH 2000
 
+#define BIG    1E10
+#define SMALL -1E10
+
 /*
 
 From    1 size = 6
