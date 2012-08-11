@@ -550,6 +550,7 @@ void RunInterface(Game*);
 void InitMagics(void);
 
 // movegen.c
+Move* AllCaptures(Move*, Game*);
 Move* AllMoves(Move*, Game*);
 bool  AnyMoves(Game*);
 Move* CastleMoves(Game*, Move*);

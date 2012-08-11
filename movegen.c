@@ -24,13 +24,40 @@
 
 static FORCE_INLINE Move* bishopMoves(Position*, Move*, BitBoard, BitBoard);
 static Move* evasions(Move*, Game*);
+static Move* evasionsCaptures(Move*, Game*);
 static FORCE_INLINE Move* kingMoves(Position, Move*, BitBoard);
 static FORCE_INLINE Move* knightMoves(Position*, Move*, BitBoard);
 static Move* nonEvasions(Move*, Game*);
+static Move* nonEvasionsCaptures(Move*, Game*);
 static Move* pawnMovesBlack(ChessSet*, Position, Move*, BitBoard, bool);
 static Move* pawnMovesWhite(Game*, Move*, BitBoard, bool);
 static FORCE_INLINE Move* queenMoves(Position*, Move*, BitBoard, BitBoard);
 static FORCE_INLINE Move* rookMoves(Position*, Move*, BitBoard, BitBoard);
+
+// TODO: Horrible duplication due to perf considerations. Review.
+
+Move*
+AllCaptures(Move *start, Game *game)
+{
+  Move *curr = start, *end = start;
+
+  end = game->CheckStats.CheckSources ?
+    evasionsCaptures(start, game) :
+    nonEvasionsCaptures(start, game);
+
+  // Filter out illegal moves.
+  while(curr != end) {
+    if(!PseudoLegal(game, *curr, game->CheckStats.Pinned)) {
+      // Switch last move with the one we are rejecting.
+      end--;
+      *curr = *end;
+    } else {
+      curr++;
+    }
+  }
+
+  return end;
+}
 
 Move*
 AllMoves(Move *start, Game *game)
@@ -186,9 +213,9 @@ evasions(Move *end, Game *game)
 {
   BitBoard attacks, moves, targets;
   BitBoard checks = game->CheckStats.CheckSources;
-  BitBoard occupancy = game->ChessSet.Occupancy;
   BitBoard slideAttacks = EmptyBoard;
   ChessSet *chessSet = &game->ChessSet;
+  BitBoard occupancy = chessSet->Occupancy;  
   int checkCount = 0;
   Piece piece;
   Position check;
@@ -246,6 +273,88 @@ evasions(Move *end, Game *game)
   // We use check from the loop above, since we have only 1 check this will
   // be the sole checker.
   targets = Between[check][king] | game->CheckStats.CheckSources;
+
+  if(side == White) {
+    end = pawnMovesWhite(game, end, targets, true);
+  } else {
+    end = pawnMovesBlack(chessSet, game->EnPassantSquare, end, targets, true);
+  }
+
+  // King already handled.
+  end = knightMoves(chessSet->PiecePositions[side][Knight], end, targets);
+  end = bishopMoves(chessSet->PiecePositions[side][Bishop], end, occupancy, targets);
+  end = rookMoves  (chessSet->PiecePositions[side][Rook],   end, occupancy, targets);
+  end = queenMoves (chessSet->PiecePositions[side][Queen],  end, occupancy, targets);
+
+  return end;
+}
+
+static Move*
+evasionsCaptures(Move *end, Game *game)
+{
+  BitBoard attacks, targets;
+  BitBoard checks = game->CheckStats.CheckSources;
+  BitBoard slideAttacks = EmptyBoard;
+  ChessSet *chessSet = &game->ChessSet;
+  BitBoard occupancy = chessSet->Occupancy;  
+  int checkCount = 0;
+  Piece piece;
+  Position check;
+  Position king = game->CheckStats.DefendedKing;
+  Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
+  BitBoard opposition = chessSet->Sets[opposite].Occupancy;
+
+  while(checks) {
+    check = PopForward(&checks);
+
+    checkCount++;
+
+    piece = PieceAt(chessSet, check);
+
+    switch(piece) {
+    case Bishop:
+      slideAttacks |= EmptyAttacks[Bishop][check];
+
+      break;
+    case Rook:
+      slideAttacks |= EmptyAttacks[Rook][check];
+
+      break;
+    case Queen:
+      // If king and queen are far away, i.e. there are squares between them, or they are not
+      // on a diagonal, we can remove all squares in all directions as the king can't get to them.
+      if(Between[king][check] ||
+         !(EmptyAttacks[Bishop][check] & POSBOARD(king))) {
+        slideAttacks |= EmptyAttacks[Queen][check];
+      } else {
+        slideAttacks |= EmptyAttacks[Bishop][check] |
+          RookAttacksFrom(check, occupancy);
+      }
+
+      break;
+    default:
+      break;
+    }
+  }
+
+  attacks = KingAttacksFrom(king) & ~slideAttacks & opposition;
+
+  // King evasion moves.
+
+  while(attacks) {
+    *end++ = MAKE_MOVE_QUICK(king, PopForward(&attacks));
+  }
+
+  // If there is more than 1 check, blocking won't achieve anything.
+  if(checkCount > 1) {
+    return end;
+  }
+
+  // Blocking/capturing the checking piece.
+  // We use check from the loop above, since we have only 1 check this will
+  // be the sole checker.
+  targets = opposition & (Between[check][king] | game->CheckStats.CheckSources);
 
   if(side == White) {
     end = pawnMovesWhite(game, end, targets, true);
@@ -330,6 +439,33 @@ nonEvasions(Move *end, Game *game)
   end =   rookMoves(chessSet->PiecePositions[side][Rook], end, occupancy, attackable);
   end =  queenMoves(chessSet->PiecePositions[side][Queen], end, occupancy, attackable);
   end =   kingMoves(game->CheckStats.DefendedKing, end, attackable);
+
+  end = CastleMoves(game, end);
+
+  return end;
+}
+
+
+static Move*
+nonEvasionsCaptures(Move *end, Game *game)
+{
+  Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
+  ChessSet *chessSet = &game->ChessSet;
+  BitBoard occupancy =  chessSet->Occupancy;
+  BitBoard opposition = chessSet->Sets[opposite].Occupancy;
+
+  if(side == White) {
+    end = pawnMovesWhite(game, end, opposition, false);
+  } else {
+    end = pawnMovesBlack(chessSet, game->EnPassantSquare, end, opposition, false);
+  }
+
+  end = knightMoves(chessSet->PiecePositions[side][Knight], end, opposition);
+  end = bishopMoves(chessSet->PiecePositions[side][Bishop], end, occupancy, opposition);
+  end =   rookMoves(chessSet->PiecePositions[side][Rook], end, occupancy, opposition);
+  end =  queenMoves(chessSet->PiecePositions[side][Queen], end, occupancy, opposition);
+  end =   kingMoves(game->CheckStats.DefendedKing, end, opposition);
 
   end = CastleMoves(game, end);
 
