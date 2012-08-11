@@ -547,12 +547,6 @@ return !pinned ||
     Aligned(FROM(move), TO(move), game->CheckStats.DefendedKing);
 }
 
-// Toggle whose turn it is.
-static FORCE_INLINE void
-toggleTurn(Game *game) {
-  game->WhosTurn = OPPOSITE(game->WhosTurn);
-}
-
 // Attempt to undo move.
 void
 Unmove(Game *game)
@@ -922,6 +916,12 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
   }
 
   return ret;
+}
+
+// Toggle whose turn it is.
+static FORCE_INLINE void
+toggleTurn(Game *game) {
+  game->WhosTurn = OPPOSITE(game->WhosTurn);
 }
 
 #ifndef NDEBUG
