@@ -259,7 +259,7 @@ ParseMove(char *str)
   }
 
   from = POSITION(str[1] - '1', str[0] - 'a');
-  to   = POSITION( str[3] - '1', str[2] - 'a');
+  to   = POSITION(str[3] - '1', str[2] - 'a');
 
   // Including newline.
   if(len == 5) {
