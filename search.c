@@ -55,7 +55,7 @@ Search(Game *game, uint64_t *count)
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
 
-    val = miniMax(game, SMALL, BIG, 1, count);
+    val = negaMax(game, SMALL, BIG, 1, count);
 
     if((side == White && val > max) || (side == Black && val < max)) {
       max = val;
