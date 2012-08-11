@@ -134,7 +134,6 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
   Move moves[INIT_MOVE_LEN];
   Move *start = moves;
   Move *curr, *end;
-  Side side = game->WhosTurn;
 
   if(depth == DEPTH) {
     return Eval(game, game->WhosTurn);
@@ -151,24 +150,17 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
-    val = -negaMax(game, -alpha, beta, depth+1, count);
+    val = -negaMax(game, -beta, -alpha, depth+1, count);
     Unmove(game);
 
-    if((side == White && val >= beta) || (side == Black && val <= alpha)) {
+    if(val >= beta) {
       return val;
     }
 
-    if(val > max) {
-      max = val;
-      if(side == White) {
-        if(val > alpha) {
-          alpha = val;
-        }
-      } else if(val < beta) {
-        beta = val;
-      }
+    if(val >= alpha) {
+      alpha = val;
     }
   }
 
-  return max;
+  return alpha;
 }
