@@ -40,8 +40,6 @@ Search(Game *game, uint64_t *count)
   Move *curr, *end;
   Side side = game->WhosTurn;
 
-  // Don't perform alpha/beta pruning for now.
-
   end = AllMoves(moves, game);
 
   *count = end-start;
