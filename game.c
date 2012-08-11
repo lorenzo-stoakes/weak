@@ -81,58 +81,6 @@ Checkmated(Game *game)
   return LenMoves(start, end) == 0 && game->CheckStats.CheckSources;
 }
 
-static FORCE_INLINE void
-doCastleKingSide(Game *game)
-{
-  ChessSet *chessSet = &game->ChessSet;
-  int index;
-  int offset = game->WhosTurn*8*7;
-  Side side = game->WhosTurn;
-
-  RemovePiece(chessSet, side, King, E1 + offset);
-  PlacePiece(chessSet, side, King, G1 + offset);
-  RemovePiece(chessSet, side, Rook, H1 + offset);
-  PlacePiece(chessSet, side, Rook, F1 + offset);
-
-  index = chessSet->PiecePositionIndexes[E1 + offset];
-
-  chessSet->PiecePositionIndexes[G1 + offset] = index;
-  chessSet->PiecePositions[side][King][index] = G1 + offset;
-
-  index = chessSet->PiecePositionIndexes[H1 + offset];
-
-  chessSet->PiecePositionIndexes[F1 + offset] = index;
-  chessSet->PiecePositions[side][Rook][index] = F1 + offset;
-
-  UpdateOccupancies(&game->ChessSet);
-}
-
-static FORCE_INLINE void
-doCastleQueenSide(Game *game)
-{
-  ChessSet *chessSet = &game->ChessSet;
-  int index;
-  int offset = game->WhosTurn*8*7;
-  Side side = game->WhosTurn;
-
-  RemovePiece(chessSet, side, King, E1 + offset);
-  PlacePiece(chessSet, side, King, C1 + offset);
-  RemovePiece(chessSet, side, Rook, A1 + offset);
-  PlacePiece(chessSet, side, Rook, D1 + offset);
-
-  index = chessSet->PiecePositionIndexes[E1 + offset];
-
-  chessSet->PiecePositionIndexes[C1 + offset] = index;
-  chessSet->PiecePositions[side][King][index] = C1 + offset;
-
-  index = chessSet->PiecePositionIndexes[A1 + offset];
-
-  chessSet->PiecePositionIndexes[D1 + offset] = index;
-  chessSet->PiecePositions[side][Rook][index] = D1 + offset;
-
-  UpdateOccupancies(&game->ChessSet);
-}
-
 // Attempt to move piece.
 void
 DoMove(Game *game, Move move)
@@ -808,6 +756,58 @@ Unmove(Game *game)
   if(castleEvent&LostQueenSideBlack) {
     game->CastlingRights[Black][QueenSide] = true;
   }
+}
+
+static FORCE_INLINE void
+doCastleKingSide(Game *game)
+{
+  ChessSet *chessSet = &game->ChessSet;
+  int index;
+  int offset = game->WhosTurn*8*7;
+  Side side = game->WhosTurn;
+
+  RemovePiece(chessSet, side, King, E1 + offset);
+  PlacePiece(chessSet, side, King, G1 + offset);
+  RemovePiece(chessSet, side, Rook, H1 + offset);
+  PlacePiece(chessSet, side, Rook, F1 + offset);
+
+  index = chessSet->PiecePositionIndexes[E1 + offset];
+
+  chessSet->PiecePositionIndexes[G1 + offset] = index;
+  chessSet->PiecePositions[side][King][index] = G1 + offset;
+
+  index = chessSet->PiecePositionIndexes[H1 + offset];
+
+  chessSet->PiecePositionIndexes[F1 + offset] = index;
+  chessSet->PiecePositions[side][Rook][index] = F1 + offset;
+
+  UpdateOccupancies(&game->ChessSet);
+}
+
+static FORCE_INLINE void
+doCastleQueenSide(Game *game)
+{
+  ChessSet *chessSet = &game->ChessSet;
+  int index;
+  int offset = game->WhosTurn*8*7;
+  Side side = game->WhosTurn;
+
+  RemovePiece(chessSet, side, King, E1 + offset);
+  PlacePiece(chessSet, side, King, C1 + offset);
+  RemovePiece(chessSet, side, Rook, A1 + offset);
+  PlacePiece(chessSet, side, Rook, D1 + offset);
+
+  index = chessSet->PiecePositionIndexes[E1 + offset];
+
+  chessSet->PiecePositionIndexes[C1 + offset] = index;
+  chessSet->PiecePositions[side][King][index] = C1 + offset;
+
+  index = chessSet->PiecePositionIndexes[A1 + offset];
+
+  chessSet->PiecePositionIndexes[D1 + offset] = index;
+  chessSet->PiecePositions[side][Rook][index] = D1 + offset;
+
+  UpdateOccupancies(&game->ChessSet);
 }
 
 static void
