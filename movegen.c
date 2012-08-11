@@ -23,7 +23,6 @@
 #include "magic.h"
 
 static FORCE_INLINE Move* bishopMoves(Position*, Move*, BitBoard, BitBoard);
-static Move* castleMoves(Game*, Move*);
 static Move* evasions(Move*, Game*);
 static FORCE_INLINE Move* kingMoves(Position, Move*, BitBoard);
 static FORCE_INLINE Move* knightMoves(Position*, Move*, BitBoard);
@@ -54,8 +53,6 @@ AllMoves(Move *start, Game *game)
   return end;
 }
 
-static Move*
-castleMoves(Game *game, Move *end)
 bool
 AnyMoves(Game *game)
 {
@@ -138,6 +135,9 @@ AnyMoves(Game *game)
 
   return false;
 }
+
+Move*
+CastleMoves(Game *game, Move *end)
 {
   BitBoard attackMask, occupancy, opposition;
   bool good;
@@ -331,7 +331,7 @@ nonEvasions(Move *end, Game *game)
   end =  queenMoves(chessSet->PiecePositions[side][Queen], end, occupancy, attackable);
   end =   kingMoves(game->CheckStats.DefendedKing, end, attackable);
 
-  end = castleMoves(game, end);
+  end = CastleMoves(game, end);
 
   return end;
 }

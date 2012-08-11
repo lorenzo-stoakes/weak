@@ -552,6 +552,7 @@ void InitMagics(void);
 // movegen.c
 Move* AllMoves(Move*, Game*);
 bool  AnyMoves(Game*);
+Move* CastleMoves(Game*, Move*);
 
 // parser.c
 Command ParseCommand(char*);
