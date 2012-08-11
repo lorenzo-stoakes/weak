@@ -106,5 +106,19 @@ RunInterface(Game *game)
     case CmdQuit:
       return;
     }
+
+    if(Stalemated(game)) {
+      if(Checked(game)) {
+        if(game->WhosTurn == White) {
+          puts("1-0");
+        } else {
+          puts("0-1");
+        }
+      } else {
+        puts("0.5-0.5");
+      }
+
+      return;
+    }
   }
 }
