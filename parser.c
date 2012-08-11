@@ -245,6 +245,14 @@ ParseMove(char *str)
   size_t len = strlen(str);
   MoveType type;
 
+  if(strcmp(str, "O-O-O\n") == 0) {
+    return MAKE_MOVE(E1, C1, CastleQueenSide);
+  }
+
+  if(strcmp(str, "O-O\n") == 0) {
+    return MAKE_MOVE(E1, C1, CastleKingSide);
+  }
+
   if(len < 4) {
     return INVALID_MOVE;
   }
