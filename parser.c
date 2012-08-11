@@ -41,6 +41,8 @@ ParseCommand(char *str)
     ret.Fen = strdup(str+13);
   } else if(strcmp(str, "q\n") == 0 || strcmp(str, "quit\n") == 0) {
     ret.Type = CmdQuit;
+  } else if(strcmp(str, "moves\n") == 0) {
+    ret.Type = CmdMoves;
   } else {
     move = ParseMove(str);
 
