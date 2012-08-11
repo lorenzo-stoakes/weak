@@ -67,6 +67,12 @@ CalculateCheckStats(Game *game)
   return ret;
 }
 
+bool
+Checked(Game *game)
+{
+  return game->CheckStats.CheckSources;
+}
+
 // Determine whether the current player is checkmated.
 bool
 Checkmated(Game *game)

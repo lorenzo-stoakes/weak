@@ -529,6 +529,7 @@ double Eval(Game*);
 
 // game.c
 CheckStats CalculateCheckStats(Game*);
+bool       Checked(Game*);
 bool       Checkmated(Game*);
 bool       GivesCheck(Game*, Move);
 void       InitEngine(void);
