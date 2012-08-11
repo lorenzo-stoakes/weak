@@ -57,7 +57,7 @@ miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
     if(side == White) {
       if(val > beta) {
         return val;
-      }      
+      }
 
       if(val > max) {
         max = val;
