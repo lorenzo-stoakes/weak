@@ -37,7 +37,7 @@ miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
   Side side = game->WhosTurn;
 
   if(depth == DEPTH) {
-    return Eval(game);
+    return Eval(game, White);
   }
 
   end = AllMoves(moves, game);
