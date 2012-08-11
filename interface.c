@@ -57,7 +57,7 @@ RunInterface(Game *game)
 
       break;
     case CmdMove:
-      if(!PseudoLegal(game, command.Move, game->CheckStats.Pinned)) {
+      if(!Legal(game, command.Move)) {
         puts("Invalid move.");
         break;
       }

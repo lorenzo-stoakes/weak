@@ -413,6 +413,61 @@ InitEngine()
   initArrays();
 }
 
+bool
+Legal(Game *game, Move move)
+{
+  ChessSet *chessSet = &game->ChessSet;
+  Move    currMove;
+  Move     *curr, *end;
+  Move     moves[INIT_MOVE_LEN];
+  MoveType currType;
+  MoveType type = TYPE(move);
+  Rank     enpassantRank, promoteRank;
+  Piece    piece;
+  Position from = FROM(move);
+  Position to   = TO(move);
+  Side     side = game->WhosTurn;
+
+  if(from == to) {
+    return false;
+  }
+
+  piece = PieceAt(chessSet, from);
+
+  if(piece == MissingPiece) {
+    return false;
+  }
+
+  if(type & PromoteMask) {
+    promoteRank = side == White ? Rank7 : Rank2;
+    if(piece != Pawn || RANK(from) != promoteRank) {
+      return false;
+    }
+  }
+
+  if(type == EnPassant) {
+    enpassantRank = side == White ? Rank5 : Rank4;
+    if(piece != Pawn || RANK(from) != enpassantRank || PieceAt(chessSet, to) != Pawn) {
+      return false;
+    }
+  }
+
+  // We don't need to be particularly efficient here, as this is only called when the
+  // user has input a move.
+  end = AllMoves(moves, game);
+
+  for(curr = moves; curr != end; curr++) {
+    currMove = *curr;
+    currType = TYPE(currMove);
+
+    if(currMove == move || ((type & CastleMask) && type == currType)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 CheckStats
 NewCheckStats()
 {

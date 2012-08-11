@@ -535,6 +535,7 @@ bool       Checkmated(Game*);
 bool       GivesCheck(Game*, Move);
 void       InitEngine(void);
 void       DoMove(Game*, Move);
+bool       Legal(Game*, Move);
 CheckStats NewCheckStats(void);
 Game       NewEmptyGame(bool, Side);
 Game       NewGame(bool, Side);
