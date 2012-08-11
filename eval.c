@@ -25,7 +25,7 @@ static double weights[] = { 0, 1, 3.5, 3.5, 5, 9 };
 
 // Value of game position for white.
 double
-Eval(Game *game)
+Eval(Game *game, Side side)
 {
   double ret = 0;
   Piece piece;
@@ -37,5 +37,5 @@ Eval(Game *game)
     ret -= weights[piece]*PopCount(game->ChessSet.Sets[Black].Boards[piece]);
   }
 
-  return ret;
+  return ret * (1 - 2*side);
 }
