@@ -21,7 +21,7 @@
 
 #include "weak.h"
 
-#define DEPTH 6
+#define DEPTH 8
 
 #define SMALL -1E10
 #define BIG    1E10
