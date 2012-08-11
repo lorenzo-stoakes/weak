@@ -56,6 +56,88 @@ AllMoves(Move *start, Game *game)
 
 static Move*
 castleMoves(Game *game, Move *end)
+bool
+AnyMoves(Game *game)
+{
+  Side side = game->WhosTurn;
+  ChessSet *chessSet = &game->ChessSet;
+  BitBoard occupancy =  chessSet->Occupancy;
+  BitBoard attackable = ~(chessSet->Sets[side].Occupancy);
+  BitBoard pinned = game->CheckStats.Pinned;
+  Move buffer[INIT_MOVE_LEN];
+  Move *curr = buffer;
+  Move *end = buffer;
+
+  // Attempt to order by pieces most likely to be able to move.
+
+  if(game->ChessSet.PieceCounts[side][Knight] > 0) {
+    end = knightMoves(chessSet->PiecePositions[side][Knight], end, attackable);
+    for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+        return true;
+      }
+    }
+  }
+
+  if(game->ChessSet.PieceCounts[side][Queen] > 0) {
+    end = queenMoves(chessSet->PiecePositions[side][Queen], end, occupancy, attackable);
+    for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+        return true;
+      }
+    }
+  }
+
+  if(game->ChessSet.PieceCounts[side][Rook] > 0) {
+    end = rookMoves(chessSet->PiecePositions[side][Rook], end, occupancy, attackable);
+    for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+        return true;
+      }
+    }
+  }
+
+  if(game->ChessSet.PieceCounts[side][Bishop] > 0) {
+  end = bishopMoves(chessSet->PiecePositions[side][Bishop], end, occupancy, attackable);
+    for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+        return true;
+      }
+    }
+  }
+
+  end = kingMoves(game->CheckStats.DefendedKing, end, attackable);
+  for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+      return true;
+    }
+  }
+
+  end = CastleMoves(game, end);
+  for(; curr != end; curr++) {
+    if(PseudoLegal(game, *curr, pinned)) {
+      return true;
+    }
+  }
+
+  if(side == White) {
+    end = pawnMovesWhite(game, end, attackable, false);
+    for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+        return true;
+      }
+    }
+  } else {
+    end = pawnMovesBlack(chessSet, game->EnPassantSquare, end, attackable, false);
+    for(; curr != end; curr++) {
+      if(PseudoLegal(game, *curr, pinned)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 {
   BitBoard attackMask, occupancy, opposition;
   bool good;

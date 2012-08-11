@@ -550,6 +550,7 @@ void InitMagics(void);
 
 // movegen.c
 Move* AllMoves(Move*, Game*);
+bool  AnyMoves(Game*);
 
 // parser.c
 Command ParseCommand(char*);

@@ -77,14 +77,7 @@ Checked(Game *game)
 bool
 Checkmated(Game *game)
 {
-  Move buffer[INIT_MOVE_LEN];
-  Move *start=buffer, *end;
-
-  // TODO: When *first* move returned, return false.
-
-  end = AllMoves(start, game);
-
-  return LenMoves(start, end) == 0 && game->CheckStats.CheckSources;
+  return Checked(game) && !AnyMoves(game);
 }
 
 // Attempt to move piece.
@@ -498,14 +491,7 @@ NewGame(bool debug, Side humanSide)
 bool
 Stalemated(Game *game)
 {
-  Move buffer[INIT_MOVE_LEN];
-  Move *start=buffer, *end;
-
-  // TODO: When *first* move returned, return false.
-
-  end = AllMoves(start, game);
-
-  return LenMoves(start, end) == 0;
+  return !AnyMoves(game);
 }
 
 bool
