@@ -19,298 +19,298 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
- #include <stdio.h>
- #include <strings.h>
- #include <ctype.h>
- #include "weak.h"
+#include <stdio.h>
+#include <strings.h>
+#include <ctype.h>
+#include "weak.h"
 
- char
- CharPiece(Piece piece)
- {
-   switch(piece) {
-   case Pawn:
-     return 'P';
-   case Rook:
-     return 'R';
-   case Knight:
-     return 'N';
-   case Bishop:
-     return 'B';
-   case Queen:
-     return 'Q';
-   case King:
-     return 'K';
-   default:
-     return '?';
-   }
- }
+char
+CharPiece(Piece piece)
+{
+  switch(piece) {
+  case Pawn:
+    return 'P';
+  case Rook:
+    return 'R';
+  case Knight:
+    return 'N';
+  case Bishop:
+    return 'B';
+  case Queen:
+    return 'Q';
+  case King:
+    return 'K';
+  default:
+    return '?';
+  }
+}
 
- char*
- StringBitBoard(BitBoard bitBoard)
- {
-   const int LINE_LENGTH = 36;
-   const int LINE_COUNT = 18;
+char*
+StringBitBoard(BitBoard bitBoard)
+{
+  const int LINE_LENGTH = 36;
+  const int LINE_COUNT = 18;
 
-   // TODO: Reduce duplication from StringChessSet.
+  // TODO: Reduce duplication from StringChessSet.
 
-   // Include space for newlines.
-   char ret[LINE_LENGTH * LINE_COUNT + 1 + 1000];
-   int file, offset, rank;
-   Position pos;
-   Side lineSide = Black;
+  // Include space for newlines.
+  char ret[LINE_LENGTH * LINE_COUNT + 1 + 1000];
+  int file, offset, rank;
+  Position pos;
+  Side lineSide = Black;
 
-   char *topLine    = "    A   B   C   D   E   F   G   H  \n";
-   char *dottedLine = "  ---------------------------------\n";
-   char *blackLine  = "  |   |...|   |...|   |...|   |...|\n";
-   char *whiteLine  = "  |...|   |...|   |...|   |...|   |\n";
+  char *topLine    = "    A   B   C   D   E   F   G   H  \n";
+  char *dottedLine = "  ---------------------------------\n";
+  char *blackLine  = "  |   |...|   |...|   |...|   |...|\n";
+  char *whiteLine  = "  |...|   |...|   |...|   |...|   |\n";
 
-   // Add top lines.
-   strncpy(ret, topLine, LINE_LENGTH);
-   strncpy(ret+LINE_LENGTH, dottedLine, LINE_LENGTH);
+  // Add top lines.
+  strncpy(ret, topLine, LINE_LENGTH);
+  strncpy(ret+LINE_LENGTH, dottedLine, LINE_LENGTH);
 
-   for(rank = Rank8; rank >= Rank1; rank--) {
-     offset = 2*LINE_LENGTH + 2*LINE_LENGTH*(Rank8-rank);
+  for(rank = Rank8; rank >= Rank1; rank--) {
+    offset = 2*LINE_LENGTH + 2*LINE_LENGTH*(Rank8-rank);
 
-     // Add line.
-     strncpy(ret + offset, lineSide == White ? whiteLine : blackLine, LINE_LENGTH);
+    // Add line.
+    strncpy(ret + offset, lineSide == White ? whiteLine : blackLine, LINE_LENGTH);
 
-     // Add number.
-     ret[offset] = '1'+rank;
+    // Add number.
+    ret[offset] = '1'+rank;
 
-     // Add pieces.
+    // Add pieces.
 
-     // For the sake of debugging, avoid PieceAt() in case it is buggy.
+    // For the sake of debugging, avoid PieceAt() in case it is buggy.
 
-     offset += 4;
-     for(file = FileA; file <= FileH; file++) {
-       pos = POSITION(rank, file);
+    offset += 4;
+    for(file = FileA; file <= FileH; file++) {
+      pos = POSITION(rank, file);
 
-       if((bitBoard&POSBOARD(pos)) == POSBOARD(pos)) {
-         ret[offset] = 'X';
-       }
+      if((bitBoard&POSBOARD(pos)) == POSBOARD(pos)) {
+        ret[offset] = 'X';
+      }
+
+      offset += 4;
+    }
+
+    // Add dotted line.
+    strncpy(ret + offset, dottedLine, LINE_LENGTH);
+
+    lineSide = OPPOSITE(lineSide);
+  }
+
+  ret[LINE_LENGTH * LINE_COUNT] = '\0';
+
+  return strdup(ret);
+}
+
+// ASCII-art representation of chessboard.
+char*
+StringChessSet(ChessSet *chessSet)
+{
+  const int LINE_LENGTH = 36;
+  const int LINE_COUNT = 18;
+
+  // Include space for newlines.
+  char ret[LINE_LENGTH * LINE_COUNT + 1 + 1000];
+  char pieceChr;
+  int file, offset, rank;
+  Piece piece;
+  Position pos;
+  Side side;
+  Side lineSide = Black;
+
+  char *topLine    = "    A   B   C   D   E   F   G   H  \n";
+  char *dottedLine = "  ---------------------------------\n";
+  char *blackLine  = "  |   |...|   |...|   |...|   |...|\n";
+  char *whiteLine  = "  |...|   |...|   |...|   |...|   |\n";
+
+  // Add top lines.
+  strncpy(ret, topLine, LINE_LENGTH);
+  strncpy(ret+LINE_LENGTH, dottedLine, LINE_LENGTH);
+
+  // Outputs chess set as ascii-art.
+  // pieces are upper-case if white, lower-case if black.
+  // P=pawn, R=rook, N=knight, B=bishop, Q=queen, K=king, .=empty square.
+
+  // e.g., the initial position is output as follows:-
+
+  //     A   B   C   D   E   F   G   H
+  //   ---------------------------------
+  // 8 | r |.n.| b |.q.| k |.b.| n |.r.|
+  //   ---------------------------------
+  // 7 |.p.| p |.p.| p |.p.| p |.p.| p |
+  //   ---------------------------------
+  // 6 |   |...|   |...|   |...|   |...|
+  //   ---------------------------------
+  // 5 |...|   |...|   |...|   |...|   |
+  //   ---------------------------------
+  // 4 |   |...|   |...|   |...|   |...|
+  //   ---------------------------------
+  // 3 |...|   |...|   |...|   |...|   |
+  //   ---------------------------------
+  // 2 | P |.P.| P |.P.| P |.P.| P |.P.|
+  //   ---------------------------------
+  // 1 |.R.| N |.B.| Q |.K.| B |.N.| R |
+  //   ---------------------------------
+
+  for(rank = Rank8; rank >= Rank1; rank--) {
+    offset = 2*LINE_LENGTH + 2*LINE_LENGTH*(Rank8-rank);
+
+    // Add line.
+    strncpy(ret + offset, lineSide == White ? whiteLine : blackLine, LINE_LENGTH);
+
+    // Add number.
+    ret[offset] = '1'+rank;
+
+    // Add pieces.
+
+    // For the sake of debugging, avoid PieceAt() in case it is buggy.
+
+    offset += 4;
+    for(file = FileA; file <= FileH; file++) {
+      pos = POSITION(rank, file);
+
+      pieceChr = '\0';
+
+      for(side = White; side <= Black; side++) {
+        for(piece = Pawn; piece <= King; piece++) {
+          if((chessSet->Sets[side].Boards[piece]&POSBOARD(pos)) == POSBOARD(pos)) {
+            switch(piece) {
+            case Pawn:
+              pieceChr = 'P';
+              break;
+            case Rook:
+              pieceChr = 'R';
+              break;
+            case Knight:
+              pieceChr = 'N';
+              break;
+            case Bishop:
+              pieceChr = 'B';
+              break;
+            case Queen:
+              pieceChr = 'Q';
+              break;
+            case King:
+              pieceChr = 'K';
+              break;
+            default:
+              panic("Impossible.");
+            }
+            goto loop;
+          }
+        }
+      }
+    loop:
+      if(pieceChr != '\0') {
+        if(side == Black) {
+          pieceChr += 32;
+        }
+        ret[offset] = pieceChr;
+      }
 
        offset += 4;
-     }
+    }
 
-     // Add dotted line.
-     strncpy(ret + offset, dottedLine, LINE_LENGTH);
+    // Add dotted line.
+    strncpy(ret + offset, dottedLine, LINE_LENGTH);
 
-     lineSide = OPPOSITE(lineSide);
-   }
+    lineSide = OPPOSITE(lineSide);
+  }
 
-   ret[LINE_LENGTH * LINE_COUNT] = '\0';
+  ret[LINE_LENGTH * LINE_COUNT] = '\0';
 
-   return strdup(ret);
- }
+  return strdup(ret);
+}
 
- // ASCII-art representation of chessboard.
- char*
- StringChessSet(ChessSet *chessSet)
- {
-   const int LINE_LENGTH = 36;
-   const int LINE_COUNT = 18;
+// String move in long algebraic form.
+char*
+StringMove(Move move, Piece piece, bool capture)
+{
+  char actionChr, pieceChr;
+  char *suffix, *from, *to;
+  char ret[1+2+1+2+2+1];
 
-   // Include space for newlines.
-   char ret[LINE_LENGTH * LINE_COUNT + 1 + 1000];
-   char pieceChr;
-   int file, offset, rank;
-   Piece piece;
-   Position pos;
-   Side side;
-   Side lineSide = Black;
+  from = StringPosition(FROM(move));
+  to = StringPosition(TO(move));
 
-   char *topLine    = "    A   B   C   D   E   F   G   H  \n";
-   char *dottedLine = "  ---------------------------------\n";
-   char *blackLine  = "  |   |...|   |...|   |...|   |...|\n";
-   char *whiteLine  = "  |...|   |...|   |...|   |...|   |\n";
+  switch(TYPE(move)) {
+  default:
+    suffix = "??";
+    break;
+  case CastleQueenSide:
+    return strdup("O-O-O");
+  case CastleKingSide:
+    return strdup("O-O");
+  case EnPassant:
+    suffix = "ep";
+    break;
+  case PromoteKnight:
+    suffix = "=N";
+    break;
+  case PromoteBishop:
+    suffix = "=B";
+    break;
+  case PromoteRook:
+    suffix = "=R";
+    break;
+  case PromoteQueen:
+    suffix = "=Q";
+    break;
+  case Normal:
+    suffix = "";
+    break;
+  }
 
-   // Add top lines.
-   strncpy(ret, topLine, LINE_LENGTH);
-   strncpy(ret+LINE_LENGTH, dottedLine, LINE_LENGTH);
+  if(capture) {
+    actionChr = 'x';
+  } else {
+    actionChr = '-';
+  }
 
-   // Outputs chess set as ascii-art.
-   // pieces are upper-case if white, lower-case if black.
-   // P=pawn, R=rook, N=knight, B=bishop, Q=queen, K=king, .=empty square.
+  pieceChr = CharPiece(piece);
 
-   // e.g., the initial position is output as follows:-
+  if(pieceChr == 'P' || pieceChr == 'p') {
+    sprintf(ret, "%s%c%s%s", from, actionChr, to, suffix);
+  } else {
+    sprintf(ret, "%c%s%c%s%s", pieceChr, from, actionChr, to, suffix);
+  }
 
-   //     A   B   C   D   E   F   G   H
-   //   ---------------------------------
-   // 8 | r |.n.| b |.q.| k |.b.| n |.r.|
-   //   ---------------------------------
-   // 7 |.p.| p |.p.| p |.p.| p |.p.| p |
-   //   ---------------------------------
-   // 6 |   |...|   |...|   |...|   |...|
-   //   ---------------------------------
-   // 5 |...|   |...|   |...|   |...|   |
-   //   ---------------------------------
-   // 4 |   |...|   |...|   |...|   |...|
-   //   ---------------------------------
-   // 3 |...|   |...|   |...|   |...|   |
-   //   ---------------------------------
-   // 2 | P |.P.| P |.P.| P |.P.| P |.P.|
-   //   ---------------------------------
-   // 1 |.R.| N |.B.| Q |.K.| B |.N.| R |
-   //   ---------------------------------
+  return strdup(ret);
+}
 
-   for(rank = Rank8; rank >= Rank1; rank--) {
-     offset = 2*LINE_LENGTH + 2*LINE_LENGTH*(Rank8-rank);
+char*
+StringMoveHistory(MemorySlice *history)
+{
+  Move move;
+  Memory *curr;
+  Side side = White;
+  StringBuilder builder = NewStringBuilder();
+  int fullMoveCount = 1;
 
-     // Add line.
-     strncpy(ret + offset, lineSide == White ? whiteLine : blackLine, LINE_LENGTH);
+  // TODO: Determine positions + capture condition for moves.
 
-     // Add number.
-     ret[offset] = '1'+rank;
+  for(curr = history->Vals; curr != history->Curr; curr++) {
+    move = curr->Move;
 
-     // Add pieces.
+    switch(side) {
+    case White:
+      AppendString(&builder, "%d. ?%s",
+                   fullMoveCount, StringMove(move, Pawn, false));
+      break;
+    case Black:
+      AppendString(&builder, " ?%s\n",
+                   StringMove(move, Pawn, false));
 
-     // For the sake of debugging, avoid PieceAt() in case it is buggy.
+      fullMoveCount++;
 
-     offset += 4;
-     for(file = FileA; file <= FileH; file++) {
-       pos = POSITION(rank, file);
+      break;
+    }
 
-       pieceChr = '\0';
+    side = OPPOSITE(side);
+  }
 
-       for(side = White; side <= Black; side++) {
-         for(piece = Pawn; piece <= King; piece++) {
-           if((chessSet->Sets[side].Boards[piece]&POSBOARD(pos)) == POSBOARD(pos)) {
-             switch(piece) {
-             case Pawn:
-               pieceChr = 'P';
-               break;
-             case Rook:
-               pieceChr = 'R';
-               break;
-             case Knight:
-               pieceChr = 'N';
-               break;
-             case Bishop:
-               pieceChr = 'B';
-               break;
-             case Queen:
-               pieceChr = 'Q';
-               break;
-             case King:
-               pieceChr = 'K';
-               break;
-             default:
-               panic("Impossible.");
-             }
-             goto loop;
-           }
-         }
-       }
-     loop:
-       if(pieceChr != '\0') {
-         if(side == Black) {
-           pieceChr += 32;
-         }
-         ret[offset] = pieceChr;
-       }
-
-       offset += 4;
-     }
-
-     // Add dotted line.
-     strncpy(ret + offset, dottedLine, LINE_LENGTH);
-
-     lineSide = OPPOSITE(lineSide);
-   }
-
-   ret[LINE_LENGTH * LINE_COUNT] = '\0';
-
-   return strdup(ret);
- }
-
- // String move in long algebraic form.
- char*
- StringMove(Move move, Piece piece, bool capture)
- {
-   char actionChr, pieceChr;
-   char *suffix, *from, *to;
-   char ret[1+2+1+2+2+1];
-
-   from = StringPosition(FROM(move));
-   to = StringPosition(TO(move));
-
-   switch(TYPE(move)) {
-   default:
-     suffix = "??";
-     break;
-   case CastleQueenSide:
-     return strdup("O-O-O");
-   case CastleKingSide:
-     return strdup("O-O");
-   case EnPassant:
-     suffix = "ep";
-     break;
-   case PromoteKnight:
-     suffix = "=N";
-     break;
-   case PromoteBishop:
-     suffix = "=B";
-     break;
-   case PromoteRook:
-     suffix = "=R";
-     break;
-   case PromoteQueen:
-     suffix = "=Q";
-     break;
-   case Normal:
-     suffix = "";
-     break;
-   }
-
-   if(capture) {
-     actionChr = 'x';
-   } else {
-     actionChr = '-';
-   }
-
-   pieceChr = CharPiece(piece);
-
-   if(pieceChr == 'P' || pieceChr == 'p') {
-     sprintf(ret, "%s%c%s%s", from, actionChr, to, suffix);
-   } else {
-     sprintf(ret, "%c%s%c%s%s", pieceChr, from, actionChr, to, suffix);
-   }
-
-   return strdup(ret);
- }
-
- char*
- StringMoveHistory(MemorySlice *history)
- {
-   Move move;
-   Memory *curr;
-   Side side = White;
-   StringBuilder builder = NewStringBuilder();
-   int fullMoveCount = 1;
-
-   // TODO: Determine positions + capture condition for moves.
-
-   for(curr = history->Vals; curr != history->Curr; curr++) {
-     move = curr->Move;
-
-     switch(side) {
-     case White:
-       AppendString(&builder, "%d. ?%s",
-                    fullMoveCount, StringMove(move, Pawn, false));
-       break;
-     case Black:
-       AppendString(&builder, " ?%s\n",
-                    StringMove(move, Pawn, false));
-
-       fullMoveCount++;
-
-       break;
-     }
-
-     side = OPPOSITE(side);
-   }
-
-   return builder.Length == 0 ? NULL : BuildString(&builder, true);
+  return builder.Length == 0 ? NULL : BuildString(&builder, true);
 }
 
 char*
