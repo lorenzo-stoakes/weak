@@ -96,11 +96,12 @@ DoMove(Game *game, Move move)
   int indexCaptured, indexLast, indexTo;
   Memory memory;
   MoveType type = TYPE(move);
-  Piece placePiece, capturePiece;
+  Piece capturePiece = MissingPiece;
   Position enPassantedPawn, king, last;
   Position from = FROM(move), to = TO(move);
   Piece originalPiece;
   Piece piece = PieceAt(chessSet, from);
+  Piece placePiece = piece; // Default to piece unless we know better.
   Rank offset;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
