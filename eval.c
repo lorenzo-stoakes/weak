@@ -25,7 +25,7 @@ static double weights[] = { 0, 1, 3.5, 3.5, 5, 9 };
 
 // Value of game position for white.
 double
-Eval(Game *game, Side side)
+Eval(Game *game)
 {
   double ret = 0;
   Piece piece;
@@ -41,5 +41,5 @@ Eval(Game *game, Side side)
     }
   }
 
-  return ret * (1 - 2*side);
+  return ret * (1 - 2*game->WhosTurn);
 }
