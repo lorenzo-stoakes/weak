@@ -19,17 +19,62 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define PRINT_PV
+
+#if defined(PRINT_PV)
+#include <stdio.h>
+#endif
+
+#include <time.h>
 #include "weak.h"
 
-#define DEPTH 6
-
-static double quiesce(Game*, double, double, uint64_t*, Side);
-static double miniMax(Game*, double, double, int, uint64_t*);
+static double quiesce(Game*, double, double, uint64_t*);
 static double negaMax(Game*, double, double, int, uint64_t*);
 
-// Perform hacky mini-max. Note the scoring is from white's perspective.
+#if defined(PRINT_PV)
+static Move pv[218][30];
+static int pvBestVar;
+static int pvCurrVar;
+static int pvIndex;
+static int pvLength;
+#endif
+
 Move
-Search(Game *game, uint64_t *count)
+IterSearch(Game *game, uint64_t *count, uint32_t maxSecs)
+{
+  clock_t ticks;
+  uint32_t elapsed = 0;
+  int depth;
+  Move best = INVALID_MOVE;
+  uint64_t currCount = 0;
+
+  ticks = clock();
+  // We run through this loop at least once.
+  for(depth = 1; 30*elapsed < maxSecs; depth++) {
+#if defined(PRINT_PV)
+    pvCurrVar = 0;
+    pvBestVar = -1;
+    pvLength = depth;
+#endif
+    best = Search(game, &currCount, depth);
+    *count += currCount;
+
+    elapsed = (clock() - ticks)/CLOCKS_PER_SEC;
+  }
+
+#if defined(PRINT_PV)
+  // Output PV.
+  for(depth = 0; depth < pvLength; depth++) {
+    printf("%s ", StringMove(pv[pvBestVar][depth]));
+  }
+  printf("\n");
+#endif
+
+  return best;
+}
+
+Move
+Search(Game *game, uint64_t *count, int depth)
 {
   double max, val;
   Move moves[INIT_MOVE_LEN];
@@ -51,12 +96,24 @@ Search(Game *game, uint64_t *count)
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
 
-    val = negaMax(game, SMALL, BIG, 1, count);
+#if defined(PRINT_PV)
+    pvIndex = 1;
+    pv[pvCurrVar][0] = *curr;
+#endif
+
+    val = negaMax(game, SMALL, BIG, depth-1, count);
 
     if((side == White && val > max) || (side == Black && val < max)) {
       max = val;
       best = *curr;
+#if defined(PRINT_PV)
+      pvBestVar = pvCurrVar;
+#endif
     }
+
+#if defined(PRINT_PV)    
+      pvCurrVar++;    
+#endif
 
     Unmove(game);
   }
@@ -69,61 +126,6 @@ Search(Game *game, uint64_t *count)
 }
 
 static double
-miniMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
-{
-  double max, val;
-  Move moves[INIT_MOVE_LEN];
-  Move *start = moves;
-  Move *curr, *end;
-  Side side = game->WhosTurn;
-
-  if(depth == DEPTH) {
-    return quiesce(game, alpha, beta, count, White);
-  }
-
-  end = AllMoves(moves, game);
-
-  *count += end-start;
-
-  // Iterate through all moves looking for the best, whose definition
-  // varies based on who's turn it is.
-
-  max = side == White ? SMALL : BIG;
-
-  for(curr = start; curr != end; curr++) {
-    DoMove(game, *curr);
-    val = miniMax(game, alpha, beta, depth+1, count);
-    Unmove(game);
-
-    if(side == White) {
-      if(val >= beta) {
-        return beta;
-      }
-
-      if(val > max) {
-        max = val;
-        if(val > alpha) {
-          alpha = val;
-        }
-      }
-    } else {
-      if(val <= alpha) {
-        return alpha;
-      }
-
-      if(val < max) {
-        max = val;
-        if(val < beta) {
-          beta = val;
-        }
-      }
-    }
-  }
-
-  return max;
-}
-
-static double
 negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 {
   double val;
@@ -131,27 +133,38 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
   Move *start = moves;
   Move *curr, *end;
 
-  if(depth == DEPTH) {
-    return quiesce(game, alpha, beta, count, game->WhosTurn);
+  if(depth == 0) {
+    return quiesce(game, alpha, beta, count);
   }
 
   end = AllMoves(moves, game);
 
-  *count += end-start;
+  *count += end - start;
 
   // Iterate through all moves looking for the best, whose definition
   // varies based on who's turn it is.
 
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
-    val = -negaMax(game, -beta, -alpha, depth+1, count);
+#if defined(PRINT_PV)
+    pvIndex++;
+#endif
+    val = -negaMax(game, -beta, -alpha, depth-1, count);
+#if defined(PRINT_PV)
+    pvIndex--;
+#endif
     Unmove(game);
 
+    // Fail high.
     if(val >= beta) {
       return val;
     }
 
     if(val >= alpha) {
+#if defined(PRINT_PV)
+      pv[pvCurrVar][pvIndex] = *curr;
+#endif
+
       alpha = val;
     }
   }
@@ -161,24 +174,29 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
 // Quiescent search. See http://chessprogramming.wikispaces.com/Quiescence+Search
 static double
-quiesce(Game *game, double alpha, double beta, uint64_t *count, Side evalSide)
+quiesce(Game *game, double alpha, double beta, uint64_t *count)
 {
   double val;
-  double standPat = Eval(game, evalSide);
+  double standPat = Eval(game);
   Move buffer[INIT_MOVE_LEN];
   Move move;
   Move *end;
   Move *curr = buffer;
 
+  // Fail high.
   if(standPat >= beta) {
     return beta;
   }
-  
+
   if(alpha < standPat) {
     alpha = standPat;
   }
 
-  end = AllCaptures(curr, game);
+  if(Checked(game)) {
+    return alpha;
+  } else {
+    end = AllCaptures(curr, game);
+  }
 
   *count += end-curr;
 
@@ -186,12 +204,14 @@ quiesce(Game *game, double alpha, double beta, uint64_t *count, Side evalSide)
     move = *curr;
 
     DoMove(game, move);
-    val = -quiesce(game, -beta, -alpha, count, evalSide);
+    val = -quiesce(game, -beta, -alpha, count);
     Unmove(game);
 
+    // Fail high.
     if(val >= beta) {
       return beta;
     }
+
     if(val > alpha) {
       val = alpha;
     }

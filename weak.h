@@ -580,7 +580,8 @@ BitBoard PawnAttacksFrom(Position, Side);
 BitBoard CalcRookSquareThreats(Position, BitBoard);
 
 // search.c
-Move Search(Game*, uint64_t*);
+Move IterSearch(Game*, uint64_t*, uint32_t);
+Move Search(Game*, uint64_t*, int);
 
 // set.c
 Set      NewBlackSet(void);
