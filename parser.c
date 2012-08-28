@@ -69,7 +69,7 @@ ParseFen(char *fen)
   // TODO: fix.
   int file, rank;
   Game ret = NewEmptyGame(false, White);
-  Piece piece;
+  Piece piece = MissingPiece;
   Position king, pos;
   Side side;
 
