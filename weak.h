@@ -632,6 +632,6 @@ int Distance[64][64];
 
 // Array containing attacks for a specified piece and position on an empty BitBoard.
 // We only calculate this for sliding pieces.
-BitBoard EmptyAttacks[5][64];
+BitBoard EmptyAttacks[6][64];
 
 #endif
