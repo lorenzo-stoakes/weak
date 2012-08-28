@@ -529,7 +529,7 @@ BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
 
 // eval.c
-double Eval(Game*, Side);
+double Eval(Game*);
 
 // game.c
 CheckStats CalculateCheckStats(Game*);
