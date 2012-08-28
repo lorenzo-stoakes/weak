@@ -49,6 +49,8 @@
 #define BIG    1E10
 #define SMALL -1E10
 
+#define MAX_THINK 30
+
 /*
 
 From    1 size = 6
@@ -557,6 +559,7 @@ Move* AllCaptures(Move*, Game*);
 Move* AllMoves(Move*, Game*);
 bool  AnyMoves(Game*);
 Move* CastleMoves(Game*, Move*);
+Move* Evasions(Move*, Game*);
 
 // parser.c
 Command ParseCommand(char*);
