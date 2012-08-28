@@ -61,8 +61,7 @@ NewChessSet()
 
   // Clear down piece locations.
   for(side = White; side <= Black; side++) {
-    // We ignore king here. King locations stored in CheckStats.
-    for(piece = Pawn; piece < King; piece++) {
+    for(piece = Pawn; piece <= King; piece++) {
       for(i = 0; i < MAX_PIECE_LOCATION; i++) {
         ret.PiecePositions[side][piece][i] = EmptyPosition;
       }
