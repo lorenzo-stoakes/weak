@@ -154,7 +154,7 @@ NewChessSet()
   ret.PiecePositionIndexes[E1] = 0;
 
   ret.Squares[E8] = King;
-  ret.PiecePositions[White][King][0] = E8;
+  ret.PiecePositions[Black][King][0] = E8;
   ret.PiecePositionIndexes[E8] = 0;
 
   UpdateOccupancies(&ret);
