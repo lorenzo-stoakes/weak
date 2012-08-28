@@ -88,7 +88,6 @@ RunInterface(Game *game)
       printf("\n");
 
       break;
-
     case CmdPerft:
       ticks = clock();
       count = QuickPerft(game, command.PerftDepth);

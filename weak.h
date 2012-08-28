@@ -592,7 +592,6 @@ BitBoard PinnedPieces(ChessSet*, Side, Position, bool);
 void     UpdateOccupancies(ChessSet*);
 
 // slices.c
-
 MemorySlice NewMemorySlice(void);
 MoveSlice   NewMoveSlice(Move*);
 

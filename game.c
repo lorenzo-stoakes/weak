@@ -536,8 +536,6 @@ NewGame(bool debug, Side humanSide)
   ret.HumanSide = humanSide;
   ret.WhosTurn = White;
 
-
-
   return ret;
 }
 
