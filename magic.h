@@ -438,7 +438,7 @@ static const BitBoard magicShift[2][64] = {
     C64(52)
   }};
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 RookAttacksFrom(Position rook, BitBoard occupancy)
 {
   BitBoard magic = magicBoard[MAGIC_ROOK][rook];

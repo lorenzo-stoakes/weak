@@ -367,32 +367,32 @@ Position BitScanBackward(BitBoard);
 Position BitScanForward(BitBoard);
 #endif
 
-FORCE_INLINE int
+static FORCE_INLINE int
 FileDistance(Position from, Position to)
 {
   return abs(FILE(from) - FILE(to));
 }
 
-FORCE_INLINE int
+static FORCE_INLINE int
 LenMoves(Move *start, Move *end)
 {
   return end - start;
 }
 
-FORCE_INLINE Piece
+static FORCE_INLINE Piece
 PieceAt(ChessSet *chessSet, Position pos)
 {
   return chessSet->Squares[pos];
 }
 
-FORCE_INLINE void
+static FORCE_INLINE void
 PlacePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
   chessSet->Squares[pos] = piece;
   chessSet->Sets[side].Boards[piece] |= POSBOARD(pos);
 }
 
-FORCE_INLINE void
+static FORCE_INLINE void
 RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
 {
   BitBoard complement = ~POSBOARD(pos);
@@ -401,20 +401,20 @@ RemovePiece(ChessSet *chessSet, Side side, Piece piece, Position pos)
   chessSet->Sets[side].Boards[piece] &= complement;
 }
 
-FORCE_INLINE bool
+static FORCE_INLINE bool
 SingleBit(BitBoard bitBoard) {
   // This is clever (not my idea!) - if there is only 1 bit, it'll be the msb. (n-1) gives you
   // all the bits below the msb, so if there's only 1 bit set, anding these will return 0.
   return (bitBoard & (bitBoard - 1)) == C64(0);
 }
 
-FORCE_INLINE int
+static FORCE_INLINE int
 RankDistance(Position from, Position to)
 {
   return abs(RANK(from) - RANK(to));
 }
 
-FORCE_INLINE Position
+static FORCE_INLINE Position
 PopForward(BitBoard *bitBoard)
 {
   Position ret = BitScanForward(*bitBoard);
@@ -424,97 +424,97 @@ PopForward(BitBoard *bitBoard)
   return ret;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 NortOne(BitBoard bitBoard)
 {
   return bitBoard << 8;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 NortRay(Position pos)
 {
   return nortRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 EastOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileHMask) << 1;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 EastRay(Position pos)
 {
   return eastRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 SoutOne(BitBoard bitBoard)
 {
   return bitBoard >> 8;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 SoutRay(Position pos)
 {
   return soutRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 WestOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileAMask) >> 1;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 WestRay(Position pos)
 {
   return westRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 NoEaOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileHMask) << 9;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 NoEaRay(Position pos)
 {
   return noeaRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 NoWeOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileAMask) << 7;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 NoWeRay(Position pos)
 {
   return noweRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 SoEaOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileHMask) >> 7;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 SoEaRay(Position pos)
 {
   return soeaRays[pos];
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 SoWeOne(BitBoard bitBoard)
 {
   return (bitBoard & NotFileAMask) >> 9;
 }
 
-FORCE_INLINE BitBoard
+static FORCE_INLINE BitBoard
 SoWeRay(Position pos)
 {
   return soweRays[pos];
