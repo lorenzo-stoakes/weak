@@ -74,7 +74,7 @@ RunInterface(Game *game)
       fromPiece = PieceAt(&game->ChessSet, FROM(reply));
       capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
       DoMove(game, reply);
-      puts(StringMove(reply, fromPiece, capture));
+      puts(StringMoveFull(reply, fromPiece, capture));
 
       break;
     case CmdMoves:
@@ -82,7 +82,7 @@ RunInterface(Game *game)
 
       printf("%ld moves:-\n\n", end-moves);
       for(curr = moves; curr != end; curr++) {
-        puts(StringMove(*curr, PieceAt(&game->ChessSet, FROM(*curr)),
+        puts(StringMoveFull(*curr, PieceAt(&game->ChessSet, FROM(*curr)),
                         PieceAt(&game->ChessSet, TO(*curr)) != MissingPiece));
       }
       printf("\n");

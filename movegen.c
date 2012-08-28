@@ -19,11 +19,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+
 #include "weak.h"
 #include "magic.h"
 
 static FORCE_INLINE Move* bishopMoves(Position*, Move*, BitBoard, BitBoard);
-static Move* evasions(Move*, Game*);
 static Move* evasionsCaptures(Move*, Game*);
 static FORCE_INLINE Move* kingMoves(Position, Move*, BitBoard);
 static FORCE_INLINE Move* knightMoves(Position*, Move*, BitBoard);
@@ -40,6 +41,7 @@ Move*
 AllCaptures(Move *start, Game *game)
 {
   Move *curr = start, *end = start;
+  Move move;
 
   end = game->CheckStats.CheckSources ?
     evasionsCaptures(start, game) :
@@ -47,7 +49,8 @@ AllCaptures(Move *start, Game *game)
 
   // Filter out illegal moves.
   while(curr != end) {
-    if(!PseudoLegal(game, *curr, game->CheckStats.Pinned)) {
+    move = *curr;
+    if(!PseudoLegal(game, move, game->CheckStats.Pinned)) {
       // Switch last move with the one we are rejecting.
       end--;
       *curr = *end;
@@ -64,7 +67,7 @@ AllMoves(Move *start, Game *game)
 {
   Move *curr = start, *end = start;
 
-  end = game->CheckStats.CheckSources ? evasions(start, game) : nonEvasions(start, game);
+  end = game->CheckStats.CheckSources ? Evasions(start, game) : nonEvasions(start, game);
 
   // Filter out illegal moves.
   while(curr != end) {
@@ -208,14 +211,14 @@ CastleMoves(Game *game, Move *end)
   return end;
 }
 
-static Move*
-evasions(Move *end, Game *game)
+Move*
+Evasions(Move *end, Game *game)
 {
   BitBoard attacks, moves, targets;
   BitBoard checks = game->CheckStats.CheckSources;
   BitBoard slideAttacks = EmptyBoard;
   ChessSet *chessSet = &game->ChessSet;
-  BitBoard occupancy = chessSet->Occupancy;  
+  BitBoard occupancy = chessSet->Occupancy;
   int checkCount = 0;
   Piece piece;
   Position check;
@@ -296,7 +299,7 @@ evasionsCaptures(Move *end, Game *game)
   BitBoard checks = game->CheckStats.CheckSources;
   BitBoard slideAttacks = EmptyBoard;
   ChessSet *chessSet = &game->ChessSet;
-  BitBoard occupancy = chessSet->Occupancy;  
+  BitBoard occupancy = chessSet->Occupancy;
   int checkCount = 0;
   Piece piece;
   Position check;

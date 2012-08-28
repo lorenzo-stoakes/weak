@@ -223,9 +223,20 @@ StringChessSet(ChessSet *chessSet)
   return strdup(ret);
 }
 
+char*
+StringMove(Move move)
+{
+  char ret[5];
+
+  sprintf(ret, "%s%s", StringPosition(FROM(move)),
+          StringPosition(TO(move)));
+
+  return strdup(ret);
+}
+
 // String move in long algebraic form.
 char*
-StringMove(Move move, Piece piece, bool capture)
+StringMoveFull(Move move, Piece piece, bool capture)
 {
   char actionChr, pieceChr;
   char *suffix, *from, *to;
@@ -288,19 +299,17 @@ StringMoveHistory(MemorySlice *history)
   StringBuilder builder = NewStringBuilder();
   int fullMoveCount = 1;
 
-  // TODO: Determine positions + capture condition for moves.
-
   for(curr = history->Vals; curr != history->Curr; curr++) {
     move = curr->Move;
 
     switch(side) {
     case White:
-      AppendString(&builder, "%d. ?%s",
-                   fullMoveCount, StringMove(move, Pawn, false));
+      AppendString(&builder, "%d. %s",
+                   fullMoveCount, StringMove(move));
       break;
     case Black:
-      AppendString(&builder, " ?%s\n",
-                   StringMove(move, Pawn, false));
+      AppendString(&builder, " %s\n",
+                   StringMove(move));
 
       fullMoveCount++;
 

@@ -280,7 +280,7 @@ DoMove(Game *game, Move move)
   if((msg = checkConsistency(game)) != NULL) {
     printf("Inconsistency in %s's DoMove of %s at doMoveCount %llu:-\n\n",
            StringSide(side),
-           StringMove(move, piece, capturePiece != MissingPiece),
+           StringMoveFull(move, piece, capturePiece != MissingPiece),
            doMoveCount);
     puts(StringChessSet(chessSet));
     puts(msg);
@@ -773,7 +773,7 @@ Unmove(Game *game)
   if((msg = checkConsistency(game)) != NULL) {
     printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
            StringSide(side),
-           StringMove(move, piece, capturePiece != MissingPiece),
+           StringMoveFull(move, piece, capturePiece != MissingPiece),
            unmoveCount);
     puts(StringChessSet(chessSet));
     puts(msg);
