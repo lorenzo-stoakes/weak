@@ -18,3 +18,7 @@ benches/bench
 # Directory for handy utils that aren't worth saving to the repo.
 
 util/*
+
+# Docco directory.
+
+docs/*
