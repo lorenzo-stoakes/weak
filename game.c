@@ -327,7 +327,7 @@ GivesCheck(Game *game, Move move)
       // not to be a direct check (considered above), it must be blocking an attack in the
       // direction it cannot move. Therefore any movement will 'discover' the check. Since a
       // queen can attack in all directions, it can't be involved.
-      
+
       // A pawn or king, however, can move in the same direction as the attack the 'discoverer'
       // threatens, meaning our check is not revealed. So make sure from, to and the king do
       // not sit along the same line!
