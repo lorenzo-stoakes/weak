@@ -19,6 +19,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Note that there is a lot of duplication here. This is not (entirely ;-) slackness, rather
+// due to performance concerns in the hot path of move generation we want to avoid even runtime
+// costs for e.g. determining what piece we are generating for - oh for templating in C...
+
 #include <stdio.h>
 
 #include "weak.h"
