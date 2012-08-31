@@ -95,6 +95,7 @@ enum CommandType {
   CmdMove,
   CmdMoves,
   CmdPerft,
+  CmdPerftFull,  
   CmdPositionFen,
   CmdQuit
 };

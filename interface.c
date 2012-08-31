@@ -36,6 +36,7 @@ RunInterface(Game *game)
   Move moves[INIT_MOVE_LEN];
   Move *curr, *end;
   Move reply;
+  PerftStats stats;
   Piece fromPiece;
   size_t length = INIT_BUFFER_LENGTH;
   uint64_t count;
@@ -96,6 +97,11 @@ RunInterface(Game *game)
 
       printf("Perft depth %d = %llu.\n", command.PerftDepth, count);
       printf("%fms elapsed, %f Mnps.\n", elapsed, 1E-3*count/elapsed);
+
+      break;
+    case CmdPerftFull:
+      stats = Perft(game, command.PerftDepth);
+      puts(StringPerft(&stats));
 
       break;
     case CmdPositionFen:
