@@ -225,7 +225,9 @@ Evasions(Move *end, Game *game)
   Position king = game->CheckStats.DefendedKing;
   Side side = game->WhosTurn;
 
-  while(checks) {
+  assert(checks);
+
+  do {
     check = PopForward(&checks);
 
     checkCount++;
@@ -256,7 +258,7 @@ Evasions(Move *end, Game *game)
     default:
       break;
     }
-  }
+  } while(checks);
 
   attacks = KingAttacksFrom(king) & ~slideAttacks;
 
