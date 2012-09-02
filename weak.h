@@ -122,10 +122,36 @@ enum Piece {
   King
 };
 
+// Various MoveType configurations:-
+
+// EnPassant
+// 0001
+
+// Castle Queen Side
+// 0010
+
+// Castle King Side
+// 0011
+
+// Promote Knight
+// 1010
+
+// Promote Bishop
+// 1011
+
+// Promote Rook
+// 1100
+
+// Promote Queen
+// 1101
+
+// Invalid move type
+// 1111
 
 enum MoveType {
   Normal          = 0,
   EnPassant       = 1,
+  // TODO: CastleMask isnt sufficient to definitely determine whether a move is a castle. Fix.
   CastleMask      = 1<<1,
   CastleQueenSide = CastleMask + 0,
   CastleKingSide  = CastleMask + 1,

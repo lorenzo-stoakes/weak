@@ -248,7 +248,7 @@ DoMove(Game *game, Move move)
   if(givesCheck) {
     king = game->CheckStats.AttackedKing;
 
-    if(type & CastleMask) {
+    if((type & CastleMask) && !(type & PromoteMask)) {
       checks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
         chessSet->Sets[side].Occupancy;
     } else {
@@ -462,7 +462,7 @@ Legal(Game *game, Move move)
     currMove = *curr;
     currType = TYPE(currMove);
 
-    if(currMove == move || ((type & CastleMask) && type == currType)) {
+    if(currMove == move || (((type & CastleMask) && !(type & PromoteMask)) && type == currType)) {
       return true;
     }
   }
