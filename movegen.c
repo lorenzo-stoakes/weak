@@ -154,7 +154,7 @@ Evasions(Move *end, Game *game)
   BitBoard occupancy = chessSet->Occupancy;
   int checkCount = 0;
   Piece piece;
-  Position check;
+  Position check = EmptyPosition;
   Position king = game->CheckStats.DefendedKing;
   Side side = game->WhosTurn;
   // We can only 'attack' empty squares and opponents' pieces.
@@ -162,7 +162,7 @@ Evasions(Move *end, Game *game)
 
   assert(checks);
 
-  do {
+  while(checks) {
     check = PopForward(&checks);
 
     checkCount++;
@@ -193,7 +193,7 @@ Evasions(Move *end, Game *game)
     default:
       break;
     }
-  } while(checks);
+  }
 
   attacks = KingAttacksFrom(king) & ~slideAttacks;
 
