@@ -157,6 +157,8 @@ Evasions(Move *end, Game *game)
   Position check;
   Position king = game->CheckStats.DefendedKing;
   Side side = game->WhosTurn;
+  // We can only 'attack' empty squares and opponents' pieces.
+  BitBoard attackable = ~chessSet->Sets[side].Occupancy;
 
   assert(checks);
 
@@ -197,7 +199,7 @@ Evasions(Move *end, Game *game)
 
   // King evasion moves.
 
-  moves = attacks & ~chessSet->Sets[side].Occupancy;
+  moves = attacks & attackable;
   while(moves) {
     *end++ = MAKE_MOVE_QUICK(king, PopForward(&moves));
   }
@@ -210,7 +212,7 @@ Evasions(Move *end, Game *game)
   // Blocking/capturing the checking piece.
   // We use check from the loop above, since we have only 1 check this will
   // be the sole checker.
-  targets = Between[check][king] | game->CheckStats.CheckSources;
+  targets = attackable & (Between[check][king] | game->CheckStats.CheckSources);
 
   if(side == White) {
     end = pawnMovesWhite(game, end, targets, true);
