@@ -19,7 +19,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 
 #ifndef WEAK_HEADER
 #define WEAK_HEADER
