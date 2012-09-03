@@ -37,6 +37,8 @@
 #define FEN4 "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"
 #define FEN4_REVERSED "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"
 
+static void printError(char*);
+
 static char *fens[PERFT_COUNT] = { FEN1, FEN2, FEN3, FEN4, FEN4_REVERSED };
 
 static int expectedDepthCounts[PERFT_COUNT] = { 6, 5, 7, 6, 6 };
@@ -86,6 +88,7 @@ static PerftStats expecteds[PERFT_COUNT][7] = {
 char*
 TestPerft()
 {
+  bool passed;
   char tmp[200];
   Game game;
   int i, j;
@@ -100,20 +103,25 @@ TestPerft()
     game = ParseFen(fens[i]);
 
     for(j = 1; j <= expectedDepthCounts[i] && j <= MAX_DEPTH; j++) {
+      printf("Started Perft %d, depth %d.", i+1, j);
 
-      printf("Started Perft %d, depth %d.\n", i+1, j);
+      passed = true;
 
       expected = expecteds[i][j-1];
       actual = Perft(&game, j);
 
+      // Always output count so it's easy to eyeball errors early.
+      printf(" [%llu]\n", actual.Count);
+
       if(actual.Count != expected.Count) {
+        passed = false;
         sprintf(tmp, "Perft Position %d Depth %d: Expected %llu nodes, got %llu.\n",
                 i+1, j, expected.Count, actual.Count);
+        printError(tmp);
         AppendString(&builder, tmp);
       }
 
       // TODO: FIX: Not counting captures correctly atm.
-
       /*
 
       if(actual.Captures != expected.Captures) {
@@ -125,38 +133,56 @@ TestPerft()
       */
 
       if(actual.EnPassants != expected.EnPassants) {
+        passed = false;        
         sprintf(tmp, "Perft Position %d Depth %d: Expected %llu en passants, got %llu.\n",
                 i+1, j, expected.EnPassants, actual.EnPassants);
+        printError(tmp);        
         AppendString(&builder, tmp);
       }
 
       if(actual.Castles != expected.Castles) {
+        passed = false;        
         sprintf(tmp, "Perft Position %d Depth %d: Expected %llu castles, got %llu.\n",
                 i+1, j, expected.Castles, actual.Castles);
+        printError(tmp);        
         AppendString(&builder, tmp);
       }
 
       if(actual.Promotions != expected.Promotions) {
+        passed = false;        
         sprintf(tmp, "Perft Position %d Depth %d: Expected %llu pawn promotions, got %llu.\n",
                 i+1, j, expected.Promotions, actual.Promotions);
+        printError(tmp);        
         AppendString(&builder, tmp);
       }
 
       if(actual.Checks != expected.Checks) {
+        passed = false;        
         sprintf(tmp, "Perft Position %d Depth %d: Expected %llu checks, got %llu.\n",
                 i+1, j, expected.Checks, actual.Checks);
+        printError(tmp);        
         AppendString(&builder, tmp);
       }
 
       if(actual.Checkmates != expected.Checkmates) {
+        passed = false;        
         sprintf(tmp, "Perft Position %d Depth %d: Expected %llu checkmates, got %llu.\n",
                 i+1, j, expected.Checkmates, actual.Checkmates);
+        printError(tmp);        
         AppendString(&builder, tmp);
       }
 
-      printf("Done Perft %d, depth %d.\n", i+1, j);
+      printf("Done    Perft %d, depth %d. ", i+1, j);
+      puts(passed ? "Test passed." : "Test failed.");
     }
   }
 
   return builder.Length == 1 ? NULL : BuildString(&builder, true);
+}
+
+static void
+printError(char *error)
+{
+  // Errors already include a newline.
+  printf("ERROR:  %s", error);
 }
