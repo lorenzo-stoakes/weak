@@ -333,7 +333,7 @@ GivesCheck(Game *game, Move move)
       // not sit along the same line!
 
       if(Aligned(FROM(move), TO(move), game->CheckStats.AttackedKing)) {
-        break;
+        return false;
       }
 
       return true;
