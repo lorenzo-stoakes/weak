@@ -497,6 +497,7 @@ NewEmptyGame(bool debug, Side humanSide)
 
   ret = NewGame(debug, humanSide);
 
+  ret.CheckStats.DefendedKing = EmptyPosition;
   ret.CheckStats.AttackedKing = EmptyPosition;
 
   for(side = White; side <= Black; side++) {
