@@ -406,6 +406,8 @@ GivesCheck(Game *game, Move move)
 
   }
 
+  // Unreachable.
+  abort();
   return false;
 }
 
