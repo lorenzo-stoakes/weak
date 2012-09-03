@@ -62,8 +62,7 @@ CalculateCheckStats(Game *game)
   ret.CheckSquares[Bishop] = BishopAttacksFrom(king, occupancy);
   ret.CheckSquares[Rook] = RookAttacksFrom(king, occupancy);
   ret.CheckSquares[Queen] = ret.CheckSquares[Rook] | ret.CheckSquares[Bishop];
-  // We never update king as clearly a king can't give check to another king. Leave it
-  // as EmptyBoard.
+  ret.CheckSquares[King] = EmptyBoard;
 
   return ret;
 }
