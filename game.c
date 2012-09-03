@@ -361,7 +361,7 @@ GivesCheck(Game *game, Move move)
   case PromoteBishop:
     return BishopAttacksFrom(TO(move), occNoFrom)&kingBoard;
   case PromoteQueen:
-    return ((RookAttacksFrom(TO(move), occNoFrom) | BishopAttacksFrom(TO(move), occNoFrom)) &
+    return ((RookAttacksFrom(TO(move), occNoFrom)|BishopAttacksFrom(TO(move), occNoFrom))&
             kingBoard);
   case EnPassant:
     captureSquare = POSITION(RANK(FROM(move)), FILE(TO(move)));
@@ -383,7 +383,7 @@ GivesCheck(Game *game, Move move)
     kingFrom = E1 + offset;
     kingTo = C1 + offset;
 
-    occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
+    occNoFrom = (game->ChessSet.Occupancy^kingFrom^rookFrom)|(rookTo|kingTo);
     return (RookAttacksFrom(rookTo, occNoFrom)&kingBoard);
   case CastleKingSide:
     offset = side*8*7;
@@ -392,7 +392,7 @@ GivesCheck(Game *game, Move move)
     kingFrom = E1 + offset;
     kingTo = G1 + offset;
 
-    occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
+    occNoFrom = (game->ChessSet.Occupancy^kingFrom^rookFrom)|(rookTo|kingTo);
     return (RookAttacksFrom(rookTo, occNoFrom)&kingBoard);
   default:
     panic("Invalid move type %d at this point.", type);
@@ -687,7 +687,7 @@ Unmove(Game *game)
     chessSet->PiecePositions[side][piece][indexTo] = from;
 
     // Update occupancies.
-    mask = POSBOARD(from) | POSBOARD(to);
+    mask = POSBOARD(from)|POSBOARD(to);
 
     chessSet->Occupancy ^= mask;
     chessSet->EmptySquares = ~chessSet->Occupancy;
