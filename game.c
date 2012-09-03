@@ -364,9 +364,14 @@ GivesCheck(Game *game, Move move)
     return ((RookAttacksFrom(TO(move), occNoFrom)|BishopAttacksFrom(TO(move), occNoFrom))&
             kingBoard);
   case EnPassant:
+    // We want to consider attacks on the king after we have removed the captured piece.
     captureSquare = POSITION(RANK(FROM(move)), FILE(TO(move)));
     occNoFrom ^= POSBOARD(captureSquare);
+
+    // Add position where pawn is placed in occupancy. Use |= as this could be a capture.
     occNoFrom |= toBoard;
+
+    // Now consider pieces that could have a revealed check - queen, rook, bishop.
 
     rookish = game->ChessSet.Sets[side].Boards[Rook] |
       game->ChessSet.Sets[side].Boards[Queen];
@@ -374,6 +379,8 @@ GivesCheck(Game *game, Move move)
     bishopish = game->ChessSet.Sets[side].Boards[Bishop] |
       game->ChessSet.Sets[side].Boards[Queen];
 
+    // Again, attacks *from* a square are equivalent to attacks to that square by the piece
+    // in question.
     return ((RookAttacksFrom(king, occNoFrom)&rookish) |
             (BishopAttacksFrom(king, occNoFrom)&bishopish));
   case CastleQueenSide:
