@@ -195,7 +195,7 @@ DoMove(Game *game, Move move)
     chessSet->PiecePositionIndexes[to] = indexTo;
     chessSet->PiecePositions[side][piece][indexTo] = to;
 
-    if(type & PromoteMask) {
+    if(type&PromoteMask) {
       placePiece = type - PromoteMask;
 
       // Delete from pawn list by swapping with last and decrementing count (as with capture).
@@ -248,21 +248,21 @@ DoMove(Game *game, Move move)
   if(givesCheck) {
     king = game->CheckStats.AttackedKing;
 
-    if((type & CastleMask) && !(type & PromoteMask)) {
+    if((type&CastleMask) && !(type&PromoteMask)) {
       checks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
         chessSet->Sets[side].Occupancy;
     } else {
       originalPiece = piece;
       piece = placePiece;
 
-      if((checkStats.CheckSquares[piece] & POSBOARD(to))) {
+      if((checkStats.CheckSquares[piece]&POSBOARD(to))) {
         checks |= POSBOARD(to);
       }
 
       piece = originalPiece;
 
       if(checkStats.Discovered &&
-         (checkStats.Discovered & POSBOARD(from))) {
+         (checkStats.Discovered&POSBOARD(from))) {
         if(piece != Rook) {
           checks |= RookAttacksFrom(king, chessSet->Occupancy) &
             (chessSet->Sets[side].Boards[Rook] |
@@ -314,12 +314,12 @@ GivesCheck(Game *game, Move move)
   }
 
   // Direct check.
-  if((game->CheckStats.CheckSquares[piece] & toBoard)) {
+  if(game->CheckStats.CheckSquares[piece]&toBoard) {
     return true;
   }
 
   // Discovered checks.
-  if(game->CheckStats.Discovered && (game->CheckStats.Discovered & fromBoard)) {
+  if(game->CheckStats.Discovered && (game->CheckStats.Discovered&fromBoard)) {
     switch(piece) {
     case Pawn:
     case King:
@@ -355,11 +355,11 @@ GivesCheck(Game *game, Move move)
 
   switch(type) {
   case PromoteKnight:
-    return KnightAttacksFrom(TO(move)) & kingBoard;
+    return KnightAttacksFrom(TO(move))&kingBoard;
   case PromoteRook:
-    return RookAttacksFrom(TO(move), occNoFrom) & kingBoard;
+    return RookAttacksFrom(TO(move), occNoFrom)&kingBoard;
   case PromoteBishop:
-    return BishopAttacksFrom(TO(move), occNoFrom) & kingBoard;
+    return BishopAttacksFrom(TO(move), occNoFrom)&kingBoard;
   case PromoteQueen:
     return ((RookAttacksFrom(TO(move), occNoFrom) | BishopAttacksFrom(TO(move), occNoFrom)) &
             kingBoard);
@@ -384,7 +384,7 @@ GivesCheck(Game *game, Move move)
     kingTo = C1 + offset;
 
     occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
-    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard);
+    return (RookAttacksFrom(rookTo, occNoFrom)&kingBoard);
   case CastleKingSide:
     offset = side*8*7;
     rookFrom = H1 + offset;
@@ -393,7 +393,7 @@ GivesCheck(Game *game, Move move)
     kingTo = G1 + offset;
 
     occNoFrom = (game->ChessSet.Occupancy ^ kingFrom ^ rookFrom) | (rookTo | kingTo);
-    return (RookAttacksFrom(rookTo, occNoFrom) & kingBoard);
+    return (RookAttacksFrom(rookTo, occNoFrom)&kingBoard);
   default:
     panic("Invalid move type %d at this point.", type);
 
@@ -440,7 +440,7 @@ Legal(Game *game, Move move)
     return false;
   }
 
-  if(type & PromoteMask) {
+  if(type&PromoteMask) {
     promoteRank = side == White ? Rank7 : Rank2;
     if(piece != Pawn || RANK(from) != promoteRank) {
       return false;
@@ -462,7 +462,7 @@ Legal(Game *game, Move move)
     currMove = *curr;
     currType = TYPE(currMove);
 
-    if(currMove == move || (((type & CastleMask) && !(type & PromoteMask)) && type == currType)) {
+    if(currMove == move || (((type&CastleMask) && !(type&PromoteMask)) && type == currType)) {
       return true;
     }
   }
@@ -585,13 +585,13 @@ PseudoLegal(Game *game, Move move, BitBoard pinned)
 
     return
       !(AllAttackersTo(&game->ChessSet, TO(move),
-                      game->ChessSet.Occupancy) & opposition);
+                      game->ChessSet.Occupancy)&opposition);
   }
 
   // A non-king move is legal if its not pinned or is moving in the ray between it and the king.
 
 return !pinned ||
-    !(pinned & POSBOARD(FROM(move))) ||
+    !(pinned&POSBOARD(FROM(move))) ||
     Aligned(FROM(move), TO(move), game->CheckStats.DefendedKing);
 }
 
