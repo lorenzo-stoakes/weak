@@ -41,6 +41,8 @@ int main()
 
   init();
 
+  SetUnbufferedOutput();
+
   InitEngine();
 
   for(i = 0; i < TEST_COUNT; i++) {
