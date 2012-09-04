@@ -67,7 +67,7 @@ RunInterface(Game *game)
 
       count = 0;
       ticks = clock();
-      reply = Search(game, &count, MAX_DEPTH);
+      reply = Search(game, &count, MAX_SEARCH_DEPTH);
       ticks = clock() - ticks;
       elapsed = 1000*((double)ticks)/CLOCKS_PER_SEC;
       printf("%fms elapsed, considered %llu moves.\n", elapsed, count);
