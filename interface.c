@@ -69,8 +69,9 @@ RunInterface(Game *game)
       ticks = clock();
       reply = Search(game, &count, MAX_SEARCH_DEPTH);
       ticks = clock() - ticks;
-      elapsed = 1000*((double)ticks)/CLOCKS_PER_SEC;
-      printf("%fms elapsed, considered %llu moves.\n", elapsed, count);
+      elapsed = ((double)ticks)/CLOCKS_PER_SEC;
+      printf("%fms elapsed, considered %llu moves, %0.3f Mnps\n", 1000*elapsed, count,
+             (count/1e6)/elapsed);
 
       fromPiece = PieceAt(&game->ChessSet, FROM(reply));
       capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
