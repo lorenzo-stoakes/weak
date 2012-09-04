@@ -65,6 +65,20 @@ RunInterface(Game *game)
 
       DoMove(game, command.Move);
 
+      if(Stalemated(game)) {
+        if(Checked(game)) {
+          if(game->WhosTurn == Black) {
+            puts("1-0");
+          } else {
+            puts("0-1");
+          }
+        } else {
+          puts("0.5-0.5");
+        }
+
+        return;
+      }
+
       count = 0;
       ticks = clock();
       reply = Search(game, &count, MAX_SEARCH_DEPTH);
@@ -110,20 +124,6 @@ RunInterface(Game *game)
 
       break;
     case CmdQuit:
-      return;
-    }
-
-    if(Stalemated(game)) {
-      if(Checked(game)) {
-        if(game->WhosTurn == White) {
-          puts("1-0");
-        } else {
-          puts("0-1");
-        }
-      } else {
-        puts("0.5-0.5");
-      }
-
       return;
     }
   }
