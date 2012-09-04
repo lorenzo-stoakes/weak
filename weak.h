@@ -48,7 +48,7 @@
 #define BIG    1E10
 #define SMALL -1E10
 
-#define MAX_SEARCH_DEPTH 6
+#define MAX_SEARCH_DEPTH 5
 
 /*
 
