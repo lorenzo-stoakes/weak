@@ -409,7 +409,6 @@ GivesCheck(Game *game, Move move)
     return RookAttacksFrom(rookTo, occNoFrom)&kingBoard;
   default:
     panic("Invalid move type %d at this point.", type);
-
   }
 
   panic("Unreachable.");
