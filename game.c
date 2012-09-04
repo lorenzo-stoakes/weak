@@ -284,7 +284,7 @@ DoMove(Game *game, Move move)
   }
 
 #ifndef NDEBUG
-  if((msg = checkConsistency(game, modelChecks, checks)) != NULL) {
+  if((msg = checkConsistency(game, checks, modelChecks)) != NULL) {
     printf("Inconsistency in %s's DoMove of %s at doMoveCount %llu:-\n\n",
            StringSide(side),
            StringMoveFull(move, piece, capturePiece != MissingPiece),
@@ -563,6 +563,7 @@ Stalemated(Game *game)
   return !AnyMoves(game);
 }
 
+// Check legality of pseudo legal moves.
 bool
 PseudoLegal(Game *game, Move move, BitBoard pinned)
 {
@@ -1173,9 +1174,9 @@ checkConsistency(Game *game, BitBoard checks, BitBoard modelChecks)
   }
 
   if(checks != modelChecks) {
-    AppendString(&builder, "Incorrect check source squares.\n"
+    AppendString(&builder, "Incorrect check source squares.\n\n"
                  "Expected:-\n\n"
-                 "%s"
+                 "%s\n"
                  "Actual:-\n\n"
                  "%s",
                  StringBitBoard(modelChecks), StringBitBoard(checks));
