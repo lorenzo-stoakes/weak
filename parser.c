@@ -195,8 +195,6 @@ ParseFen(char *fen)
       case 'q':
         ret.CastlingRights[Black][QueenSide] = true;
         break;
-      case ' ':
-        goto done;
       default:
         panic("Unrecognised character '%c' at position %d.", chr, i);
       }
@@ -229,7 +227,6 @@ ParseFen(char *fen)
 
   // TODO: Implement parsing of clock times.
 
- done:
   UpdateOccupancies(&ret.ChessSet);
 
   king = BitScanForward(ret.ChessSet.Sets[ret.WhosTurn].Boards[King]);
