@@ -48,7 +48,7 @@
 #define BIG    1E10
 #define SMALL -1E10
 
-#define MAX_THINK 30
+#define MAX_DEPTH 6
 
 /*
 
@@ -612,7 +612,6 @@ BitBoard PawnAttacksFrom(Position, Side);
 BitBoard CalcRookSquareThreats(Position, BitBoard);
 
 // search.c
-Move IterSearch(Game*, uint64_t*, uint32_t);
 Move Search(Game*, uint64_t*, int);
 
 // set.c

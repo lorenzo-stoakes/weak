@@ -19,8 +19,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define PRINT_PV
-
 #if defined(PRINT_PV)
 #include <stdio.h>
 #endif
@@ -30,48 +28,6 @@
 
 static double quiesce(Game*, double, double, uint64_t*);
 static double negaMax(Game*, double, double, int, uint64_t*);
-
-#if defined(PRINT_PV)
-static Move pv[218][30];
-static int pvBestVar;
-static int pvCurrVar;
-static int pvIndex;
-static int pvLength;
-#endif
-
-Move
-IterSearch(Game *game, uint64_t *count, uint32_t maxSecs)
-{
-  clock_t ticks;
-  uint32_t elapsed = 0;
-  int depth;
-  Move best = INVALID_MOVE;
-  uint64_t currCount = 0;
-
-  ticks = clock();
-  // We run through this loop at least once.
-  for(depth = 1; 30*elapsed < maxSecs; depth++) {
-#if defined(PRINT_PV)
-    pvCurrVar = 0;
-    pvBestVar = -1;
-    pvLength = depth;
-#endif
-    best = Search(game, &currCount, depth);
-    *count += currCount;
-
-    elapsed = (clock() - ticks)/CLOCKS_PER_SEC;
-  }
-
-#if defined(PRINT_PV)
-  // Output PV.
-  for(depth = 0; depth < pvLength; depth++) {
-    printf("%s ", StringMove(pv[pvBestVar][depth]));
-  }
-  printf("\n");
-#endif
-
-  return best;
-}
 
 Move
 Search(Game *game, uint64_t *count, int depth)
@@ -96,24 +52,12 @@ Search(Game *game, uint64_t *count, int depth)
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
 
-#if defined(PRINT_PV)
-    pvIndex = 1;
-    pv[pvCurrVar][0] = *curr;
-#endif
-
     val = negaMax(game, SMALL, BIG, depth-1, count);
 
     if((side == White && val > max) || (side == Black && val < max)) {
       max = val;
       best = *curr;
-#if defined(PRINT_PV)
-      pvBestVar = pvCurrVar;
-#endif
     }
-
-#if defined(PRINT_PV)    
-      pvCurrVar++;    
-#endif
 
     Unmove(game);
   }
@@ -146,13 +90,9 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
-#if defined(PRINT_PV)
-    pvIndex++;
-#endif
+
     val = -negaMax(game, -beta, -alpha, depth-1, count);
-#if defined(PRINT_PV)
-    pvIndex--;
-#endif
+
     Unmove(game);
 
     // Fail high.
@@ -161,10 +101,6 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
     }
 
     if(val >= alpha) {
-#if defined(PRINT_PV)
-      pv[pvCurrVar][pvIndex] = *curr;
-#endif
-
       alpha = val;
     }
   }
