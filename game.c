@@ -26,8 +26,8 @@
 static void              initArrays(void);
 static FORCE_INLINE void toggleTurn(Game *game);
 static CastleEvent       updateCastlingRights(Game*, Piece, Move, bool);
-static FORCE_INLINE void doCastleKingSide(Game *game);
-static FORCE_INLINE void doCastleQueenSide(Game *game);
+static FORCE_INLINE void doCastleKingSide(Game*);
+static FORCE_INLINE void doCastleQueenSide(Game*);
 
 #ifndef NDEBUG
 static char*             checkConsistency(Game *game);
