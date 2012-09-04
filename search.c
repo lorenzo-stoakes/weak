@@ -124,11 +124,7 @@ quiesce(Game *game, double alpha, double beta, uint64_t *count)
     alpha = standPat;
   }
 
-  if(Checked(game)) {
-    return alpha;
-  } else {
-    end = AllCaptures(curr, game);
-  }
+  end = AllCaptures(curr, game);
 
   *count += end-curr;
 
