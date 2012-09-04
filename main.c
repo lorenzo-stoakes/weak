@@ -30,7 +30,7 @@ main()
 
   SetUnbufferedOutput();
 
-  puts("WeakC v0.0.dev.\n");
+  printf("Weak %s.\n\n", version);
 
   printf("Initialising... ");
   InitEngine();

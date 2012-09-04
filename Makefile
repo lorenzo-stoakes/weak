@@ -15,6 +15,7 @@ FILTER_FILES=Makefile %.h
 all: weak
 
 weak: $(CODE_FILES)
+	./genver.sh
 	$(CC) $(CFLAGS) $(filter-out $(FILTER_FILES), $^) -o $@
 
 # Typically, we don't want to run long-running benchmarks. Default to QUICK_BENCH.
@@ -30,6 +31,7 @@ clean:
 	rm -rf weak *.dSYM benches/bench benches/*.dSYM tests/test tests/*.dSYM
 
 debug: $(CODE_FILES)
+	./genver.sh
 	$(CC) $(DEBUG_FLAGS) $(filter-out $(FILTER_FILES), $^) -o weak
 
 # Typically, we don't want to run long-running tests. Default to QUICK_TEST.

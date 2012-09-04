@@ -192,6 +192,9 @@ enum Side {
   Black = 1
 };
 
+// Generated from 'git describe' command during build.
+extern const char *version;
+
 // A bitboard is an efficient representation of the occupancy of a chessboard [0].
 // We use little-endian rank-file (LERF) mapping [1].
 typedef uint64_t             BitBoard;
