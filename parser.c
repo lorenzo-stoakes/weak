@@ -201,6 +201,11 @@ ParseFen(char *fen)
     }
   }
 
+  // TODO: HACK: We shouldn't need to skip spaces here. Fix up.
+  while(fen[i] == ' ') {
+    i++;
+  }
+
   if(i == len) {
     panic("FEN '%s' ended without en passant square.", fen);
   }
