@@ -30,7 +30,7 @@ static FORCE_INLINE void doCastleKingSide(Game*);
 static FORCE_INLINE void doCastleQueenSide(Game*);
 
 #ifndef NDEBUG
-static char*             checkConsistency(Game *game);
+static char*             checkConsistency(Game*, BitBoard, BitBoard);
 #endif
 
 CheckStats
@@ -105,8 +105,9 @@ DoMove(Game *game, Move move)
   Rank offset;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
-
 #ifndef NDEBUG
+  BitBoard modelChecks = EmptyBoard;
+
   doMoveCount++;
 #endif
 
@@ -275,10 +276,15 @@ DoMove(Game *game, Move move)
         }
       }
     }
+
+#ifndef NDEBUG
+    modelChecks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
+        chessSet->Sets[side].Occupancy;
+#endif 
   }
 
 #ifndef NDEBUG
-  if((msg = checkConsistency(game)) != NULL) {
+  if((msg = checkConsistency(game, modelChecks, checks)) != NULL) {
     printf("Inconsistency in %s's DoMove of %s at doMoveCount %llu:-\n\n",
            StringSide(side),
            StringMoveFull(move, piece, capturePiece != MissingPiece),
@@ -779,7 +785,7 @@ Unmove(Game *game)
 
 
 #ifndef NDEBUG
-  if((msg = checkConsistency(game)) != NULL) {
+  if((msg = checkConsistency(game, EmptyBoard, EmptyBoard)) != NULL) {
     printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
            StringSide(side),
            StringMoveFull(move, piece, capturePiece != MissingPiece),
@@ -985,7 +991,7 @@ toggleTurn(Game *game) {
 // Helper debug function which checks the consistency of the game object to ensure
 // everything should be as it is, returning a message if not.
 static char*
-checkConsistency(Game *game)
+checkConsistency(Game *game, BitBoard checks, BitBoard modelChecks)
 {
   BitBoard bitBoard;
   BitBoard occupancy = EmptyBoard, emptySquares = EmptyBoard;
@@ -1165,6 +1171,15 @@ checkConsistency(Game *game)
                    index, StringPosition(pos), StringSide(side), StringPiece(piece), index,
                    StringPosition(chessSet->PiecePositions[side][piece][index]));
     }
+  }
+
+  if(checks != modelChecks) {
+    AppendString(&builder, "Incorrect check source squares.\n"
+                 "Expected:-\n\n"
+                 "%s"
+                 "Actual:-\n\n"
+                 "%s",
+                 StringBitBoard(modelChecks), StringBitBoard(checks));
   }
 
   if(builder.Length == 0) {
