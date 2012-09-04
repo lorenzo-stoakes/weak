@@ -356,7 +356,7 @@ GivesCheck(Game *game, Move move)
   // GivesCheck() is called before the move is executed, so these are valid.
   king = game->CheckStats.AttackedKing;
   kingBoard = POSBOARD(king);
-  occNoFrom = game->ChessSet.Occupancy ^ fromBoard;
+  occNoFrom = game->ChessSet.Occupancy^fromBoard;
   side = game->WhosTurn;
 
   switch(type) {
@@ -367,8 +367,8 @@ GivesCheck(Game *game, Move move)
   case PromoteBishop:
     return BishopAttacksFrom(TO(move), occNoFrom)&kingBoard;
   case PromoteQueen:
-    return ((RookAttacksFrom(TO(move), occNoFrom)|BishopAttacksFrom(TO(move), occNoFrom))&
-            kingBoard);
+    return (RookAttacksFrom(TO(move), occNoFrom)|BishopAttacksFrom(TO(move), occNoFrom))&
+            kingBoard;
   case EnPassant:
     // We want to consider attacks on the king after we have removed the captured piece.
     captureSquare = POSITION(RANK(FROM(move)), FILE(TO(move)));
@@ -387,8 +387,8 @@ GivesCheck(Game *game, Move move)
 
     // Again, attacks *from* a square are equivalent to attacks to that square by the piece
     // in question.
-    return ((RookAttacksFrom(king, occNoFrom)&rookish) |
-            (BishopAttacksFrom(king, occNoFrom)&bishopish));
+    return (RookAttacksFrom(king, occNoFrom)&rookish) |
+      (BishopAttacksFrom(king, occNoFrom)&bishopish);
   case CastleQueenSide:
     offset = side*8*7;
     rookFrom = A1 + offset;
@@ -397,7 +397,7 @@ GivesCheck(Game *game, Move move)
     kingTo = C1 + offset;
 
     occNoFrom = (game->ChessSet.Occupancy^kingFrom^rookFrom)|(rookTo|kingTo);
-    return (RookAttacksFrom(rookTo, occNoFrom)&kingBoard);
+    return RookAttacksFrom(rookTo, occNoFrom)&kingBoard;
   case CastleKingSide:
     offset = side*8*7;
     rookFrom = H1 + offset;
@@ -406,7 +406,7 @@ GivesCheck(Game *game, Move move)
     kingTo = G1 + offset;
 
     occNoFrom = (game->ChessSet.Occupancy^kingFrom^rookFrom)|(rookTo|kingTo);
-    return (RookAttacksFrom(rookTo, occNoFrom)&kingBoard);
+    return RookAttacksFrom(rookTo, occNoFrom)&kingBoard;
   default:
     panic("Invalid move type %d at this point.", type);
 
