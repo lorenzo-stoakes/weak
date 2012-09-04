@@ -22,3 +22,7 @@ util/*
 # Docco directory.
 
 docs/*
+
+# Generated version file.
+
+version.c
