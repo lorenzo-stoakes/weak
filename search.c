@@ -19,10 +19,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined(PRINT_PV)
-#include <stdio.h>
-#endif
-
 #include <time.h>
 #include "weak.h"
 
