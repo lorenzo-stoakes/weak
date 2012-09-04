@@ -249,7 +249,7 @@ DoMove(Game *game, Move move)
   if(givesCheck) {
     king = game->CheckStats.AttackedKing;
 
-    if((type&CastleMask) && !(type&PromoteMask)) {
+    if(type == EnPassant || ((type&CastleMask) && !(type&PromoteMask))) {
       checks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
         chessSet->Sets[side].Occupancy;
     } else {
