@@ -179,7 +179,7 @@ ParseFen(char *fen)
 
   i += 2;
   if(fen[i] != '-') {
-    for(; i < len && i != ' '; i++) {
+    for(; i < len && fen[i] != ' '; i++) {
       chr = fen[i];
 
       switch(chr) {
