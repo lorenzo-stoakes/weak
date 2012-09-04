@@ -33,7 +33,7 @@ Eval(Game *game)
   // Very basic evaluation for now.
 
   if(Checkmated(game)) {
-    ret = SMALL * (1 - 2*game->WhosTurn);
+    ret = SMALL;
   } else {
     for(piece = Pawn; piece <= Queen; piece++) {
       ret += weights[piece]*PopCount(game->ChessSet.Sets[White].Boards[piece]);
