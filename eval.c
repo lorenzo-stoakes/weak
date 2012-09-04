@@ -29,6 +29,8 @@ Eval(Game *game)
 {
   double ret = 0;
   Piece piece;
+  Side side = game->WhosTurn;
+  Side opposite = OPPOSITE(side);
 
   // Very basic evaluation for now.
 
@@ -36,10 +38,10 @@ Eval(Game *game)
     ret = SMALL;
   } else {
     for(piece = Pawn; piece <= Queen; piece++) {
-      ret += weights[piece]*PopCount(game->ChessSet.Sets[White].Boards[piece]);
-      ret -= weights[piece]*PopCount(game->ChessSet.Sets[Black].Boards[piece]);
+      ret += weights[piece]*PopCount(game->ChessSet.Sets[side].Boards[piece]);
+      ret -= weights[piece]*PopCount(game->ChessSet.Sets[opposite].Boards[piece]);
     }
   }
 
-  return ret * (1 - 2*game->WhosTurn);
+  return ret;
 }
