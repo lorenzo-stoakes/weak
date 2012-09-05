@@ -251,6 +251,11 @@ ParseMove(char *str)
   size_t len = strlen(str);
   MoveType type;
 
+  if(len > 0 && str[len-1] == '\n') {
+    str[len-1] = '\0';
+    len--;
+  }
+
   if(strcmp(str, "O-O-O\n") == 0) {
     return MAKE_MOVE(E1, C1, CastleQueenSide);
   }
@@ -275,14 +280,13 @@ ParseMove(char *str)
   from = POSITION(str[1] - '1', str[0] - 'a');
   to   = POSITION(str[3] - '1', str[2] - 'a');
 
-  // Including newline.
-  if(len == 5) {
+  if(len == 4) {
     return MAKE_MOVE_QUICK(from, to);
   }
 
   typeStr = strdup(str+4);
 
-  if(strcmp(typeStr, "ep\n")) {
+  if(strcmp(typeStr, "ep")) {
     type = EnPassant;
   } else if(typeStr[0] == '=') {
     switch(typeStr[1]) {
