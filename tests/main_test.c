@@ -21,13 +21,15 @@
 
 #include "test.h"
 
-#define TEST_COUNT 1
+#define TEST_COUNT 2
 
 static char* (*testFunctions[TEST_COUNT])(void) = {
-  &TestPerft
+  &TestPerft,
+  &TestMatesInOne
 };
 static char *testNames[TEST_COUNT] = {
-  "Perft Test"
+  "Perft Test",
+  "Mates in One Test"
 };
 
 int main()
