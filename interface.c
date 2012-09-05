@@ -57,26 +57,29 @@ RunInterface(Game *game)
       puts("Invalid command.");
 
       break;
+    case CmdAnalysis:
     case CmdMove:
-      if(!Legal(game, command.Move)) {
-        puts("Invalid move.");
-        break;
-      }
-
-      DoMove(game, command.Move);
-
-      if(Stalemated(game)) {
-        if(Checked(game)) {
-          if(game->WhosTurn == Black) {
-            puts("1-0");
-          } else {
-            puts("0-1");
-          }
-        } else {
-          puts("0.5-0.5");
+      if(command.Type == CmdMove) {
+        if(!Legal(game, command.Move)) {
+          puts("Invalid move.");
+          break;
         }
 
-        return;
+        DoMove(game, command.Move);
+
+        if(Stalemated(game)) {
+          if(Checked(game)) {
+            if(game->WhosTurn == Black) {
+              puts("1-0");
+            } else {
+              puts("0-1");
+            }
+          } else {
+            puts("0.5-0.5");
+          }
+
+          return;
+        }
       }
 
       count = 0;
@@ -89,7 +92,11 @@ RunInterface(Game *game)
 
       fromPiece = PieceAt(&game->ChessSet, FROM(reply));
       capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
-      DoMove(game, reply);
+
+      if(command.Type == CmdMove) {
+        DoMove(game, reply);
+      }
+
       puts(StringMoveFull(reply, fromPiece, capture));
 
       break;

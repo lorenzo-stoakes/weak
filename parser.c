@@ -30,8 +30,9 @@ ParseCommand(char *str)
   int len = strlen(str);
   Move move;
   // All rather horrible and hacky and leaky. TODO: Clean up.
-
-  if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
+  if(strcmp(str, "analysis\n") == 0) {
+    ret.Type = CmdAnalysis;
+  } else if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
     ret.Type = CmdBoard;
   } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
     ret.Type = CmdPerft;
