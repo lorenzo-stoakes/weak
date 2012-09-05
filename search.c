@@ -33,7 +33,6 @@ Search(Game *game, uint64_t *count, int depth)
   Move best;
   Move *start = moves;
   Move *curr, *end;
-  Side side = game->WhosTurn;
 
   end = AllMoves(moves, game);
 
@@ -42,7 +41,7 @@ Search(Game *game, uint64_t *count, int depth)
   // Iterate through all moves looking for the best, whose definition
   // varies based on who's turn it is.
 
-  max = side == White ? SMALL : BIG;
+  max = SMALL;
   best = INVALID_MOVE;
 
   for(curr = start; curr != end; curr++) {
@@ -50,7 +49,7 @@ Search(Game *game, uint64_t *count, int depth)
 
     val = -negaMax(game, SMALL, BIG, depth-1, count);
 
-    if((side == White && val > max) || (side == Black && val < max)) {
+    if(val > max) {
       max = val;
       best = *curr;
     }
