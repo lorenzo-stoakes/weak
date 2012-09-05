@@ -23,15 +23,14 @@
 #include <strings.h>
 #include "test.h"
 
-char* (*TestFunctions[TEST_COUNT])(void);
-char *TestNames[TEST_COUNT];
+#define TEST_COUNT 1
 
-static void
-init()
-{
-  TestFunctions[0] = &TestPerft;
-  TestNames[0] = strdup("Perft Test");
-}
+static char* (*testFunctions[TEST_COUNT])(void) = {
+  &TestPerft
+};
+static char *testNames[TEST_COUNT] = {
+  "Perft Test"
+};
 
 int main()
 {
@@ -39,20 +38,16 @@ int main()
   int i;
   char *msg;
 
-  init();
-
   SetUnbufferedOutput();
 
   InitEngine();
 
   for(i = 0; i < TEST_COUNT; i++) {
-    // HACK. TODO: Fix!
-    msg = TestPerft();
-    //msg = testFunctions[i]();
+    msg = testFunctions[i]();
 
     if(msg != NULL) {
       failed++;
-      printf("%s FAILED: %s\n", "Perft Test", msg);
+      printf("%s FAILED: %s\n", testNames[i], msg);
     }
   }
 
