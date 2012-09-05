@@ -48,7 +48,7 @@ Search(Game *game, uint64_t *count, int depth)
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
 
-    val = negaMax(game, SMALL, BIG, depth-1, count);
+    val = -negaMax(game, SMALL, BIG, depth-1, count);
 
     if((side == White && val > max) || (side == Black && val < max)) {
       max = val;
