@@ -39,7 +39,7 @@ static char* fens[COUNT] = {
 };
 
 static char* mates[COUNT] = {
-  "f6g7", "h6h7", "h6g7", "b3h3", "h1h7", "d1g1", "d1h1", "d1h1", "b1g1", "f1a6"
+  "f6g7", "h6h7", "h6g7", "b3h3", "h1h8", "d1g1", "d1h1", "d1h1", "b1g1", "f1a6"
 };
 
 // Test that our search finds example mates in one.
