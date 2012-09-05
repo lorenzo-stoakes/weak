@@ -65,7 +65,7 @@ TestMatesInOne()
       AppendString(&builder, "Search failed mate-in-one for:-\n\n"
                    "%s\n"
                    "Expected move %s, engine selected %s.\n\n",
-                   StringChessSet(&game.ChessSet), mates[i], StringMove(actual));
+                   StringChessSet(&game.ChessSet), StringMove(expected), StringMove(actual));
     }
   }
 
