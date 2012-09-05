@@ -19,8 +19,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <strings.h>
 #include "test.h"
 
 #define TEST_COUNT 1
