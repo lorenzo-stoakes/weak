@@ -81,9 +81,6 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
   *count += end - start;
 
-  // Iterate through all moves looking for the best, whose definition
-  // varies based on who's turn it is.
-
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
 
