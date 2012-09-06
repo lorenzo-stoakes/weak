@@ -41,6 +41,9 @@ Eval(Game *game)
       ret += weights[piece]*PopCount(game->ChessSet.Sets[side].Boards[piece]);
       ret -= weights[piece]*PopCount(game->ChessSet.Sets[opposite].Boards[piece]);
     }
+
+    // Slightly weight the centre.
+    ret += 0.01 * PopCount(game->ChessSet.Sets[side].Occupancy&CentralSquaresMask);
   }
 
   return ret;
