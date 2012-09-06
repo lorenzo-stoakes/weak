@@ -1,4 +1,4 @@
-CC=gcc-4.7
+CC?=gcc-4.7
 
 COMMON_FLAGS=-g -pedantic -Wall -Werror -Wextra -Wshadow -std=c99 -m64 -ltcmalloc -O3
 
