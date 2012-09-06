@@ -33,4 +33,7 @@ char* TestPerft(void);
 // mateInOne_test.c
 char* TestMatesInOne(void);
 
+// mateInTwo_test.c
+char* TestMatesInTwo(void);
+
 #endif
