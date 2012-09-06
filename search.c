@@ -19,16 +19,28 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define SHOW_LINES
+
+#if defined(SHOW_LINES)
+#include <stdio.h>
+#endif
+
 #include <time.h>
 #include "weak.h"
 
 static double quiesce(Game*, double, double, uint64_t*);
-static double negaMax(Game*, double, double, int, uint64_t*);
+static double negaMax(Game*, double, double, int, uint64_t*, int);
+
+static Move lines[200][10];
 
 Move
 Search(Game *game, uint64_t *count, int depth)
 {
   double max, val;
+  int i;
+#if defined(SHOW_LINES)
+  int selectedLine;
+#endif
   Move moves[INIT_MOVE_LEN];
   Move best;
   Move *start = moves;
@@ -44,14 +56,21 @@ Search(Game *game, uint64_t *count, int depth)
   max = SMALL;
   best = INVALID_MOVE;
 
-  for(curr = start; curr != end; curr++) {
+  for(i = 0, curr = start; curr != end; i++, curr++) {
     DoMove(game, *curr);
 
-    val = -negaMax(game, SMALL, BIG, depth-1, count);
+#if defined(SHOW_LINES)
+    lines[i][depth-1] = *curr;
+#endif
+
+    val = -negaMax(game, SMALL, BIG, depth-1, count, i);
 
     if(val > max) {
       max = val;
       best = *curr;
+#if defined(SHOW_LINES)
+      selectedLine = i;
+#endif
     }
 
     Unmove(game);
@@ -61,11 +80,19 @@ Search(Game *game, uint64_t *count, int depth)
     panic("No move selected!");
   }
 
+#if defined(SHOW_LINES)
+  for(i = depth-1; i >= 0; i--) {
+    printf("%s ", StringMove(lines[selectedLine][i]));
+  }
+
+  printf("\n");
+#endif
+
   return best;
 }
 
 static double
-negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
+negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count, int lineInd)
 {
   double val;
   Move moves[INIT_MOVE_LEN];
@@ -88,11 +115,14 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
   for(curr = start; curr != end; curr++) {
     DoMove(game, *curr);
 
-    val = -negaMax(game, -beta, -alpha, depth-1, count);
+    val = -negaMax(game, -beta, -alpha, depth-1, count, lineInd);
 
     Unmove(game);
 
     if(val >= alpha) {
+#if defined(SHOW_LINES)    
+    lines[lineInd][depth-1] = *curr;    
+#endif
 
       alpha = val;
     }    
