@@ -92,13 +92,14 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
     Unmove(game);
 
+    if(val >= alpha) {
+
+      alpha = val;
+    }    
+
     // Fail high.
     if(val >= beta) {
       return val;
-    }
-
-    if(val >= alpha) {
-      alpha = val;
     }
   }
 
