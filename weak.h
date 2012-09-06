@@ -605,13 +605,13 @@ uint64_t   QuickPerft(Game*, int);
 BitBoard AllAttackersTo(ChessSet*, Position, BitBoard);
 BitBoard BishopAttacksFrom(Position, BitBoard);
 BitBoard CalcBishopSquareThreats(Position, BitBoard);
+BitBoard CalcRookSquareThreats(Position, BitBoard);
 void     InitKing(void);
 void     InitKnight(void);
 void     InitPawn(void);
 BitBoard KingAttacksFrom(Position);
 BitBoard KnightAttacksFrom(Position);
 BitBoard PawnAttacksFrom(Position, Side);
-BitBoard CalcRookSquareThreats(Position, BitBoard);
 
 // search.c
 Move Search(Game*, uint64_t*, int);
