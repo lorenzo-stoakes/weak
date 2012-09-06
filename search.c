@@ -78,6 +78,11 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count)
 
   end = AllMoves(moves, game);
 
+  // If no moves available, all we can do is eval. Stalemate or checkmate.
+  if(end == moves) {
+    return Eval(game);
+  }
+
   *count += end - start;
 
   for(curr = start; curr != end; curr++) {
