@@ -41,9 +41,10 @@
 
 #define FORCE_INLINE inline __attribute__((always_inline))
 
-#define INIT_MOVE_LEN 192
-#define MAX_PIECE_LOCATION 10
 #define APPEND_STRING_BUFFER_LENGTH 2000
+#define INIT_MOVE_LEN 192
+#define KISS_WARMUP_ROUNDS 100
+#define MAX_PIECE_LOCATION 10
 
 #define BIG    1E10
 #define SMALL -1E10
@@ -96,7 +97,7 @@ enum CommandType {
   CmdMove,
   CmdMoves,
   CmdPerft,
-  CmdPerftFull,  
+  CmdPerftFull,
   CmdPositionFen,
   CmdQuit
 };

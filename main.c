@@ -32,6 +32,10 @@ main()
 
   printf("Weak %s.\n\n", version);
 
+  // Initialise prng.
+  randk_seed();
+  randk_warmup(KISS_WARMUP_ROUNDS);
+
   InitEngine();
   game = NewGame(false, White);
   RunInterface(&game);
