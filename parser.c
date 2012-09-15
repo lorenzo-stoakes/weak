@@ -251,16 +251,17 @@ ParseMove(char *str)
   size_t len = strlen(str);
   MoveType type;
 
+  // Remove newline.
   if(len > 0 && str[len-1] == '\n') {
     str[len-1] = '\0';
     len--;
   }
 
-  if(strcmp(str, "O-O-O\n") == 0) {
+  if(strcmp(str, "O-O-O") == 0) {
     return MAKE_MOVE(E1, C1, CastleQueenSide);
   }
 
-  if(strcmp(str, "O-O\n") == 0) {
+  if(strcmp(str, "O-O") == 0) {
     return MAKE_MOVE(E1, C1, CastleKingSide);
   }
 
@@ -286,7 +287,7 @@ ParseMove(char *str)
 
   typeStr = strdup(str+4);
 
-  if(strcmp(typeStr, "ep")) {
+  if(strcmp(typeStr, "ep") == 0) {
     type = EnPassant;
   } else if(typeStr[0] == '=') {
     switch(typeStr[1]) {
