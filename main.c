@@ -32,12 +32,8 @@ main()
 
   printf("Weak %s.\n\n", version);
 
-  printf("Initialising... ");
   InitEngine();
-  puts("done.\n");
-
   game = NewGame(false, White);
-
   RunInterface(&game);
 
   return 0;
