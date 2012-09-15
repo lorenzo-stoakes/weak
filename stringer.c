@@ -228,10 +228,21 @@ StringMove(Move move)
 {
   char ret[5];
 
-  sprintf(ret, "%s%s", StringPosition(FROM(move)),
-          StringPosition(TO(move)));
+  switch(TYPE(move)) {
+  case CastleKingSide:
+    return strdup("O-O");
+  case CastleQueenSide:
+    return strdup("O-O-O");
+  case Normal:
+    sprintf(ret, "%s%s", StringPosition(FROM(move)),
+            StringPosition(TO(move)));
+    return strdup(ret);
+  default:
+    panic("Unrecognised move type %d.", TYPE(move));
+  }
 
-  return strdup(ret);
+  panic("Impossible.");
+  return '\0';
 }
 
 // String move in long algebraic form.
