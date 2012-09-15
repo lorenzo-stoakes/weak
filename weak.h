@@ -613,6 +613,11 @@ BitBoard KingAttacksFrom(Position);
 BitBoard KnightAttacksFrom(Position);
 BitBoard PawnAttacksFrom(Position, Side);
 
+// prng.c
+uint64_t randk(void);
+void     randk_seed(void);
+void     randk_warmup(int);
+
 // search.c
 Move Search(Game*, uint64_t*, int);
 
