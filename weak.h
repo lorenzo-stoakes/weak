@@ -73,7 +73,7 @@ Type    3 size = 4
 #define MAKE_MOVE(from, to, type)             \
   ((Move)(((type)<<12)|((from)<<6)|(to)))
 
-#define TO(move)      ((Position)(    (move)&(MOVE_MASK(6))))
+#define TO(move)      ((Position)(      (move)&(MOVE_MASK(6))))
 #define FROM(move)    ((Position)( ((move)>>6)&(MOVE_MASK(6))))
 #define TYPE(move)    ((MoveType)(((move)>>12)&(MOVE_MASK(4))))
 
@@ -153,7 +153,7 @@ enum Piece {
 enum MoveType {
   Normal          = 0,
   EnPassant       = 1,
-  // TODO: CastleMask isnt sufficient to definitely determine whether a move is a castle. Fix.
+  // TODO: CastleMask isn't sufficient to definitely determine whether a move is a castle. Fix.
   CastleMask      = 1<<1,
   CastleQueenSide = CastleMask + 0,
   CastleKingSide  = CastleMask + 1,
@@ -270,8 +270,8 @@ struct Game {
   CheckStats  CheckStats;
   ChessSet    ChessSet;
   bool        Debug;
-  MemorySlice Memories;
   Position    EnPassantSquare;
+  MemorySlice Memories;  
   Side        WhosTurn, HumanSide;
 };
 
