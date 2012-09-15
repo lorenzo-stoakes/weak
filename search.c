@@ -39,7 +39,7 @@ Search(Game *game, uint64_t *count, int depth)
   double max, val;
   int i;
 #if defined(SHOW_LINES)
-  int selectedLine;
+  int selectedLine = 0;
 #endif
   Move moves[INIT_MOVE_LEN];
   Move best;
