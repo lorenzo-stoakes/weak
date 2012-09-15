@@ -419,6 +419,7 @@ GivesCheck(Game *game, Move move)
 void
 InitEngine()
 {
+  InitZobrist();
   InitKing();
   InitKnight();
   InitPawn();

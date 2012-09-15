@@ -580,6 +580,10 @@ bool       PseudoLegal(Game*, Move, BitBoard);
 bool       Stalemated(Game*);
 void       Unmove(Game*);
 
+// hash.c
+uint64_t HashGame(Game*);
+void     InitZobrist(void);
+
 // interface.c
 void RunInterface(Game*);
 
@@ -673,5 +677,10 @@ int Distance[64][64];
 // Array containing attacks for a specified piece and position on an empty BitBoard.
 // We only calculate this for sliding pieces.
 BitBoard EmptyAttacks[6][64];
+
+uint64_t ZobristCastlingHash[2][2];
+uint64_t ZobristEnPassantFileHash[8];
+uint64_t ZobristPositionHash[2][7][64];
+uint64_t ZobristBlackHash;
 
 #endif
