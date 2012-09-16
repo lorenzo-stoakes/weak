@@ -674,9 +674,10 @@ char* StringSide(Side);
 // trans.c
 void        InitTrans(void);
 TransEntry* LookupPosition(uint64_t);
-void        NextSearch(void);
+void        NextSearchTrans(void);
 void        ResizeTrans(uint64_t);
 void        SavePosition(uint64_t, int, QuickMove, uint16_t);
+void        UpdateGeneration(TransEntry*);
 
 // util.c
 void*         allocate(size_t, size_t);

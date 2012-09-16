@@ -21,6 +21,8 @@
 
 #define SHOW_LINES
 
+//#define DISABLE_TRANS
+
 #if defined(SHOW_LINES)
 #include <stdio.h>
 #endif
@@ -41,10 +43,14 @@ Search(Game *game, uint64_t *count, int depth)
 #if defined(SHOW_LINES)
   int selectedLine = 0;
 #endif
+  Move move;
   Move moves[INIT_MOVE_LEN];
   Move best;
   Move *start = moves;
   Move *curr, *end;
+#ifndef DISABLE_TRANS
+  TransEntry *entry;
+#endif
 
   end = AllMoves(moves, game);
 
@@ -57,17 +63,30 @@ Search(Game *game, uint64_t *count, int depth)
   best = INVALID_MOVE;
 
   for(i = 0, curr = start; curr != end; i++, curr++) {
-    DoMove(game, *curr);
+    move = *curr;
+
+    DoMove(game, move);
 
 #if defined(SHOW_LINES)
-    lines[i][depth-1] = *curr;
+    lines[i][depth-1] = move;
 #endif
 
-    val = -negaMax(game, SMALL, BIG, depth-1, count, i);
+#ifndef DISABLE_TRANS
+    if((entry = LookupPosition(game->Hash))) {
+      UpdateGeneration(entry);
+      entry->QuickMove = (QuickMove)move;
+      val = entry->Value;
+    } else {
+#endif
+      val = -negaMax(game, SMALL, BIG, depth-1, count, i);      
+#ifndef DISABLE_TRANS
+      SavePosition(game->Hash, val, (QuickMove)move, depth);
+    }
+#endif
 
     if(val > max) {
       max = val;
-      best = *curr;
+      best = move;
 #if defined(SHOW_LINES)
       selectedLine = i;
 #endif
@@ -95,9 +114,13 @@ static int
 negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd)
 {
   int val;
+  Move move;
   Move moves[INIT_MOVE_LEN];
   Move *start = moves;
   Move *curr, *end;
+#ifndef DISABLE_TRANS
+  TransEntry *entry;
+#endif
 
   if(depth == 0) {
     return quiesce(game, alpha, beta, count);
@@ -113,19 +136,32 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
   *count += end - start;
 
   for(curr = start; curr != end; curr++) {
-    DoMove(game, *curr);
+    move = *curr;
 
-    val = -negaMax(game, -beta, -alpha, depth-1, count, lineInd);
+    DoMove(game, move);
+
+#ifndef DISABLE_TRANS
+    if((entry = LookupPosition(game->Hash))) {
+      UpdateGeneration(entry);
+      entry->QuickMove = (QuickMove)move;
+      val = entry->Value;
+    } else {
+#endif
+      val = -negaMax(game, -beta, -alpha, depth-1, count, lineInd);
+#ifndef DISABLE_TRANS
+      SavePosition(game->Hash, val, (QuickMove)move, depth);
+    }
+#endif
 
     Unmove(game);
 
     if(val >= alpha) {
-#if defined(SHOW_LINES)    
-    lines[lineInd][depth-1] = *curr;    
+#if defined(SHOW_LINES)
+    lines[lineInd][depth-1] = move;
 #endif
 
       alpha = val;
-    }    
+    }
 
     // Fail high.
     if(val >= beta) {
@@ -146,6 +182,9 @@ quiesce(Game *game, int alpha, int beta, uint64_t *count)
   Move move;
   Move *end;
   Move *curr = buffer;
+#ifndef DISABLE_TRANS
+  TransEntry *entry;
+#endif
 
   // Fail high.
   if(standPat >= beta) {
@@ -164,7 +203,20 @@ quiesce(Game *game, int alpha, int beta, uint64_t *count)
     move = *curr;
 
     DoMove(game, move);
+
+#ifndef DISABLE_TRANS
+    if((entry = LookupPosition(game->Hash))) {
+      UpdateGeneration(entry);
+      entry->QuickMove = (QuickMove)move;
+      val = entry->Value;
+    } else {
+#endif
     val = -quiesce(game, -beta, -alpha, count);
+#ifndef DISABLE_TRANS
+      SavePosition(game->Hash, val, (QuickMove)move, 0);
+    }
+#endif
+
     Unmove(game);
 
     // Fail high.
