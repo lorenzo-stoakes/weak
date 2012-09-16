@@ -47,6 +47,6 @@ testfull: $(TEST_FILES)
 
 trail:
     # Remove trailing whitespace in all .c, .h files.
-	find . -name '*.h' -or -name '*.c' -or -name 'Makefile' | xargs -I _ sed -i '' 's/[ ]+$//' _
+	find . -name '*.h' -or -name '*.c' -or -name 'Makefile' | xargs -I _ sed -i '' 's/[ \\t]+$$//' _
 
 .PHONY: all bench benchfull clean debug test testfull trail
