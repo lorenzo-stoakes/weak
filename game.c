@@ -281,7 +281,7 @@ DoMove(Game *game, Move move)
 #ifndef NDEBUG
     modelChecks = AllAttackersTo(chessSet, king, game->ChessSet.Occupancy) &
         chessSet->Sets[side].Occupancy;
-#endif 
+#endif
   }
 
 #ifndef NDEBUG
