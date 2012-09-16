@@ -41,6 +41,7 @@
 #define POSITION(rank, file) ((Position)((rank)*8 + (file)))
 
 #define FORCE_INLINE inline __attribute__((always_inline))
+#define PACKED __attribute__((packed))
 
 #define APPEND_STRING_BUFFER_LENGTH 2000
 #define INIT_MOVE_LEN 192
@@ -51,6 +52,8 @@
 #define SMALL -INT_MAX
 
 #define MAX_SEARCH_DEPTH 5
+
+#define TRANS_CLUSTER_SIZE 4
 
 /*
 
@@ -222,6 +225,8 @@ typedef enum File            File;
 typedef struct Set           Set;
 typedef enum Side            Side;
 typedef struct StringBuilder StringBuilder;
+typedef struct TransCluster  TransCluster;
+typedef struct TransEntry    TransEntry;
 
 struct CheckStats {
   BitBoard CheckSquares[7], CheckSources, Discovered, Pinned;
@@ -287,6 +292,18 @@ struct StringBuilder {
   // cap, len refer to the capacity/length of the number of strings in the builder.
   int cap, len;
   char **strings;
+};
+
+struct TransEntry {
+  uint16_t Depth;
+  uint8_t  Generation;
+  uint32_t Key32;
+  uint16_t QuickMove;
+  uint16_t Value;
+};
+
+struct TransCluster {
+  TransEntry Data[TRANS_CLUSTER_SIZE];
 };
 
 static const BitBoard
@@ -652,6 +669,13 @@ char* StringPerft(PerftStats*);
 char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
+
+// trans.c
+void        InitTrans(void);
+TransEntry* LookupPosition(uint64_t);
+void        NextSearch(void);
+void        ResizeTrans(uint64_t);
+void        SavePosition(uint64_t, uint16_t, uint16_t, uint16_t);
 
 // util.c
 void*         allocate(size_t, size_t);

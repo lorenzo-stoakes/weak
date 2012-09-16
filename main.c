@@ -37,6 +37,10 @@ main()
   randk_warmup(KISS_WARMUP_ROUNDS);
 
   InitEngine();
+
+  // For now, always have a transposition table.
+  InitTrans();  
+
   game = NewGame(false, White);
   RunInterface(&game);
 
