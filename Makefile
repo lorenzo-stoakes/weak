@@ -1,6 +1,6 @@
 CC=gcc-4.7
 
-COMMON_FLAGS=-g -pedantic -Wall -Werror -Wextra -Wshadow -std=c99 -m64 -ltcmalloc -O3
+COMMON_FLAGS=-g -pedantic -Wall -Werror -Wextra -Wpacked -Wshadow -std=c99 -m64 -ltcmalloc -O3
 
 CFLAGS=$(COMMON_FLAGS) -DNDEBUG -fomit-frame-pointer
 DEBUG_FLAGS=$(COMMON_FLAGS)
