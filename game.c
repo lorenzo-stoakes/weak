@@ -523,6 +523,8 @@ NewEmptyGame(bool debug, Side humanSide)
 
   ret.ChessSet = NewEmptyChessSet();
 
+  ret.Hash = HashGame(&ret);
+
   return ret;
 }
 
@@ -553,6 +555,8 @@ NewGame(bool debug, Side humanSide)
   ret.Memories = NewMemorySlice();
   ret.HumanSide = humanSide;
   ret.WhosTurn = White;
+
+  ret.Hash = HashGame(&ret);
 
   return ret;
 }

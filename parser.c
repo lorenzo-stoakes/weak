@@ -240,6 +240,8 @@ ParseFen(char *fen)
   ret.CheckStats.CheckSources = AllAttackersTo(&ret.ChessSet, king, ret.ChessSet.Occupancy) &
     ret.ChessSet.Sets[OPPOSITE(ret.WhosTurn)].Occupancy;
 
+  ret.Hash = HashGame(&ret);
+
   return ret;
 }
 
