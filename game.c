@@ -116,6 +116,12 @@ DoMove(Game *game, Move move)
 
   givesCheck = GivesCheck(game, move);
 
+  // If we did just have an en passant square and are about to invalidate it,
+  // then update the hash accordingly.
+  if(game->EnPassantSquare != EmptyPosition) {
+    game->Hash ^= ZobristEnPassantFileHash[FILE(game->EnPassantSquare)];
+  }
+
   // Store previous en passant square.
   memory.EnPassantSquare = game->EnPassantSquare;
 
@@ -132,10 +138,15 @@ DoMove(Game *game, Move move)
     enPassantedPawn = POSITION(RANK(to)+offset, FILE(to));
 
     RemovePiece(chessSet, opposite, Pawn, enPassantedPawn);
+    game->Hash ^= ZobristPositionHash[opposite][Pawn][enPassantedPawn];
+
     memory.Captured = Pawn;
 
     RemovePiece(chessSet, side, Pawn, from);
+    game->Hash ^= ZobristPositionHash[side][Pawn][from];
+
     PlacePiece (chessSet, side, Pawn, to);
+    game->Hash ^= ZobristPositionHash[side][Pawn][to];
 
     // TODO: Make quicker.
     UpdateOccupancies(chessSet);
@@ -163,6 +174,7 @@ DoMove(Game *game, Move move)
       memory.Captured = capturePiece;
 
       RemovePiece(chessSet, opposite, capturePiece, to);
+      game->Hash ^= ZobristPositionHash[opposite][capturePiece][to];
 
       // Update occupancies.
       mask = POSBOARD(to);
@@ -220,10 +232,14 @@ DoMove(Game *game, Move move)
       if(piece == Pawn && RANK(from) == Rank2 + (side*5) &&
          RANK(to) == Rank4 + (side*1)) {
         game->EnPassantSquare = from + (side == White ? 8 : -8);
+        game->Hash ^= ZobristEnPassantFileHash[FILE(game->EnPassantSquare)];
       }
     }
 
+    game->Hash ^= ZobristPositionHash[side][piece][from];
     RemovePiece(chessSet, side, piece, from);
+
+    game->Hash ^= ZobristPositionHash[side][placePiece][to];
     PlacePiece(chessSet, side, placePiece, to);
 
     // Update occupancies.
@@ -654,12 +670,16 @@ Unmove(Game *game)
   switch(TYPE(move)) {
   case EnPassant:
     RemovePiece(chessSet, side, Pawn, to);
+    game->Hash ^= ZobristPositionHash[side][Pawn][to];
+
     PlacePiece(chessSet, side, Pawn, from);
+    game->Hash ^= ZobristPositionHash[side][Pawn][from];
 
     offset = -1 + side*2;
     enPassantedPawn = POSITION(RANK(to)+offset, FILE(to));
 
     PlacePiece(chessSet, opposite, Pawn, enPassantedPawn);
+    game->Hash ^= ZobristPositionHash[opposite][Pawn][enPassantedPawn];
 
     indexLast = chessSet->PieceCounts[opposite][Pawn]++;
     chessSet->PiecePositionIndexes[enPassantedPawn] = indexLast;
@@ -700,7 +720,10 @@ Unmove(Game *game)
     }
 
     RemovePiece(chessSet, side, removePiece, to);
+    game->Hash ^= ZobristPositionHash[side][removePiece][to];
+
     PlacePiece(chessSet, side, piece, from);
+    game->Hash ^= ZobristPositionHash[side][piece][from];
 
     indexTo = chessSet->PiecePositionIndexes[to];
     chessSet->PiecePositionIndexes[from] = indexTo;
@@ -720,6 +743,7 @@ Unmove(Game *game)
 
     if(capturePiece != MissingPiece) {
       PlacePiece(chessSet, opposite, capturePiece, to);
+      game->Hash ^= ZobristPositionHash[opposite][capturePiece][to];
 
       // Update occupancies.
       mask = POSBOARD(to);
@@ -740,9 +764,16 @@ Unmove(Game *game)
     offset = side == White ? 0 : 8*7;
 
     RemovePiece(chessSet, side, King, C1+offset);
+    game->Hash ^= ZobristPositionHash[side][King][C1+offset];
+
     PlacePiece(chessSet, side, King, E1+offset);
+    game->Hash ^= ZobristPositionHash[side][King][E1+offset];
+
     RemovePiece(chessSet, side, Rook, D1+offset);
+    game->Hash ^= ZobristPositionHash[side][Rook][D1+offset];
+
     PlacePiece(chessSet, side, Rook, A1+offset);
+    game->Hash ^= ZobristPositionHash[side][Rook][A1+offset];
 
     indexTo = chessSet->PiecePositionIndexes[C1 + offset];
 
@@ -762,9 +793,16 @@ Unmove(Game *game)
     offset = game->WhosTurn == White ? 0 : 8*7;
 
     RemovePiece(chessSet, side, King, G1+offset);
+    game->Hash ^= ZobristPositionHash[side][King][G1+offset];
+
     PlacePiece(chessSet, side, King, E1+offset);
+    game->Hash ^= ZobristPositionHash[side][King][E1+offset];
+
     RemovePiece(chessSet, side, Rook, F1+offset);
+    game->Hash ^= ZobristPositionHash[side][Rook][F1+offset];
+
     PlacePiece(chessSet, side, Rook, H1+offset);
+    game->Hash ^= ZobristPositionHash[side][Rook][H1+offset];
 
     indexTo = chessSet->PiecePositionIndexes[G1 + offset];
 
@@ -785,11 +823,38 @@ Unmove(Game *game)
   }
 
   game->CheckStats = memory.CheckStats;
+
+  if(game->EnPassantSquare != EmptyPosition) {
+    game->Hash ^= ZobristEnPassantFileHash[FILE(game->EnPassantSquare)];
+  }
+
   game->EnPassantSquare = memory.EnPassantSquare;
+
+  if(game->EnPassantSquare != EmptyPosition) {
+    game->Hash ^= ZobristEnPassantFileHash[FILE(game->EnPassantSquare)];    
+  }
 
   castleEvent = memory.CastleEvent;
 
-
+  if(castleEvent != NoCastleEvent) {
+    if(castleEvent&LostKingSideWhite) {
+      game->CastlingRights[White][KingSide] = true;
+      game->Hash ^= ZobristCastlingHash[White][KingSide];
+    }
+    if(castleEvent&LostQueenSideWhite) {
+      game->CastlingRights[White][QueenSide] = true;
+      game->Hash ^= ZobristCastlingHash[White][QueenSide];
+    }
+    if(castleEvent&LostKingSideBlack) {
+      game->CastlingRights[Black][KingSide] = true;
+      game->Hash ^= ZobristCastlingHash[Black][KingSide];
+    }
+    if(castleEvent&LostQueenSideBlack) {
+      game->CastlingRights[Black][QueenSide] = true;
+      game->Hash ^= ZobristCastlingHash[Black][QueenSide];
+    }
+  }
+  
 #ifndef NDEBUG
   if((msg = checkConsistency(game, EmptyBoard, EmptyBoard)) != NULL) {
     printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
@@ -801,23 +866,6 @@ Unmove(Game *game)
     abort();
   }
 #endif
-
-  if(castleEvent == NoCastleEvent) {
-    return;
-  }
-
-  if(castleEvent&LostKingSideWhite) {
-    game->CastlingRights[White][KingSide] = true;
-  }
-  if(castleEvent&LostQueenSideWhite) {
-    game->CastlingRights[White][QueenSide] = true;
-  }
-  if(castleEvent&LostKingSideBlack) {
-    game->CastlingRights[Black][KingSide] = true;
-  }
-  if(castleEvent&LostQueenSideBlack) {
-    game->CastlingRights[Black][QueenSide] = true;
-  }
 }
 
 static FORCE_INLINE void
@@ -829,9 +877,16 @@ doCastleKingSide(Game *game)
   Side side = game->WhosTurn;
 
   RemovePiece(chessSet, side, King, E1 + offset);
+  game->Hash ^= ZobristPositionHash[side][King][E1+offset];
+
   PlacePiece(chessSet, side, King, G1 + offset);
+  game->Hash ^= ZobristPositionHash[side][King][G1+offset];
+
   RemovePiece(chessSet, side, Rook, H1 + offset);
+  game->Hash ^= ZobristPositionHash[side][Rook][H1+offset];
+
   PlacePiece(chessSet, side, Rook, F1 + offset);
+  game->Hash ^= ZobristPositionHash[side][Rook][F1+offset];
 
   index = chessSet->PiecePositionIndexes[E1 + offset];
 
@@ -855,9 +910,16 @@ doCastleQueenSide(Game *game)
   Side side = game->WhosTurn;
 
   RemovePiece(chessSet, side, King, E1 + offset);
+  game->Hash ^= ZobristPositionHash[side][King][E1+offset];
+
   PlacePiece(chessSet, side, King, C1 + offset);
+  game->Hash ^= ZobristPositionHash[side][King][C1+offset];
+
   RemovePiece(chessSet, side, Rook, A1 + offset);
+  game->Hash ^= ZobristPositionHash[side][Rook][A1+offset];
+
   PlacePiece(chessSet, side, Rook, D1 + offset);
+  game->Hash ^= ZobristPositionHash[side][Rook][D1+offset];
 
   index = chessSet->PiecePositionIndexes[E1 + offset];
 
@@ -932,11 +994,15 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
   if(TYPE(move) == CastleKingSide || TYPE(move) == CastleQueenSide) {
     if(game->CastlingRights[side][QueenSide]) {
       game->CastlingRights[side][QueenSide] = false;
+      game->Hash ^= ZobristCastlingHash[side][QueenSide];
+
       ret = side == White ? LostQueenSideWhite : LostQueenSideBlack;
     }
 
     if(game->CastlingRights[side][KingSide]) {
       game->CastlingRights[side][KingSide] = false;
+      game->Hash ^= ZobristCastlingHash[side][KingSide];
+
       ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
     }
 
@@ -946,9 +1012,13 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
   if(capture) {
     if(TO(move) == A1+opposite*8*7 && game->CastlingRights[opposite][QueenSide]) {
       game->CastlingRights[opposite][QueenSide] = false;
+      game->Hash ^= ZobristCastlingHash[opposite][QueenSide];
+
       ret = opposite == White ? LostQueenSideWhite : LostQueenSideBlack;
     } else if(TO(move) == H1+opposite*8*7 && game->CastlingRights[opposite][KingSide]) {
       game->CastlingRights[opposite][KingSide] = false;
+      game->Hash ^= ZobristCastlingHash[opposite][KingSide];
+
       ret = opposite == White ? LostKingSideWhite : LostKingSideBlack;
     }
   }
@@ -967,19 +1037,24 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
     if(game->CastlingRights[side][QueenSide]) {
       ret |= side == White ? LostQueenSideWhite : LostQueenSideBlack;
       game->CastlingRights[side][QueenSide] = false;
+      game->Hash ^= ZobristCastlingHash[side][QueenSide];
+
     }
     if(game->CastlingRights[side][KingSide]) {
       ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
       game->CastlingRights[side][KingSide] = false;
+      game->Hash ^= ZobristCastlingHash[side][KingSide];
     }
   } else {
     if(FROM(move) == A1+offset && game->CastlingRights[side][QueenSide]) {
       ret |= side == White ? LostQueenSideWhite : LostQueenSideBlack;
       game->CastlingRights[side][QueenSide] = false;
+      game->Hash ^= ZobristCastlingHash[side][QueenSide];
     }
     if(FROM(move) == H1+offset && game->CastlingRights[side][KingSide]) {
       ret |= side == White ? LostKingSideWhite : LostKingSideBlack;
       game->CastlingRights[side][KingSide] = false;
+      game->Hash ^= ZobristCastlingHash[side][KingSide];
     }
   }
 
@@ -990,6 +1065,7 @@ updateCastlingRights(Game *game, Piece piece, Move move, bool capture)
 static FORCE_INLINE void
 toggleTurn(Game *game) {
   game->WhosTurn = OPPOSITE(game->WhosTurn);
+  game->Hash ^= ZobristBlackHash;
 }
 
 #ifndef NDEBUG
@@ -1186,6 +1262,12 @@ checkConsistency(Game *game, BitBoard checks, BitBoard modelChecks)
                  "Actual:-\n\n"
                  "%s",
                  StringBitBoard(modelChecks), StringBitBoard(checks));
+  }
+
+  // Check hashes.
+  if(game->Hash != HashGame(game)) {
+    AppendString(&builder, "Incorrect hash - calculated 0x%lx, game->Hash is 0x%lx.\n",
+                 HashGame(game), game->Hash);
   }
 
   if(builder.Length == 0) {
