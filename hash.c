@@ -56,7 +56,7 @@ HashGame(Game *game)
     }
   }
 
-  ret ^= (side == Black) * ZobristBlackHash;
+  ret ^= (game->WhosTurn == Black) * ZobristBlackHash;
 
   return ret;
 }
