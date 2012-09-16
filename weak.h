@@ -271,6 +271,7 @@ struct Game {
   ChessSet    ChessSet;
   bool        Debug;
   Position    EnPassantSquare;
+  uint64_t    Hash;
   MemorySlice Memories;  
   Side        WhosTurn, HumanSide;
 };
