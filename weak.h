@@ -212,6 +212,7 @@ typedef struct ChessSet      ChessSet;
 typedef struct Command       Command;
 typedef enum CommandType     CommandType;
 typedef struct Game          Game;
+typedef uint16_t             QuickMove;
 typedef struct Memory        Memory;
 typedef struct MemorySlice   MemorySlice;
 typedef uint64_t             Move;
