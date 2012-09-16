@@ -273,7 +273,7 @@ struct Game {
   bool        Debug;
   Position    EnPassantSquare;
   uint64_t    Hash;
-  MemorySlice Memories;  
+  MemorySlice Memories;
   Side        WhosTurn, HumanSide;
 };
 
