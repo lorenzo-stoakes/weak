@@ -28,15 +28,15 @@
 #include <time.h>
 #include "weak.h"
 
-static double quiesce(Game*, double, double, uint64_t*);
-static double negaMax(Game*, double, double, int, uint64_t*, int);
+static int quiesce(Game*, int, int, uint64_t*);
+static int negaMax(Game*, int, int, int, uint64_t*, int);
 
 static Move lines[200][10];
 
 Move
 Search(Game *game, uint64_t *count, int depth)
 {
-  double max, val;
+  int max, val;
   int i;
 #if defined(SHOW_LINES)
   int selectedLine = 0;
@@ -91,10 +91,10 @@ Search(Game *game, uint64_t *count, int depth)
   return best;
 }
 
-static double
-negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count, int lineInd)
+static int
+negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd)
 {
-  double val;
+  int val;
   Move moves[INIT_MOVE_LEN];
   Move *start = moves;
   Move *curr, *end;
@@ -137,11 +137,11 @@ negaMax(Game *game, double alpha, double beta, int depth, uint64_t *count, int l
 }
 
 // Quiescent search. See http://chessprogramming.wikispaces.com/Quiescence+Search
-static double
-quiesce(Game *game, double alpha, double beta, uint64_t *count)
+static int
+quiesce(Game *game, int alpha, int beta, uint64_t *count)
 {
-  double val;
-  double standPat = Eval(game);
+  int val;
+  int standPat = Eval(game);
   Move buffer[INIT_MOVE_LEN];
   Move move;
   Move *end;

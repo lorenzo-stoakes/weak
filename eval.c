@@ -21,10 +21,10 @@
 
 #include "weak.h"
 
-static double weights[] = { 0, 1, 3.5, 3.5, 5, 9 };
+static double weights[] = { 0, 10, 35, 35, 50, 90 };
 
 // Value of game position for white.
-double
+int
 Eval(Game *game)
 {
   double ret = 0;
@@ -42,8 +42,7 @@ Eval(Game *game)
       ret -= weights[piece]*PopCount(game->ChessSet.Sets[opposite].Boards[piece]);
     }
 
-    // Slightly weight the centre.
-    ret += 0.01 * PopCount(game->ChessSet.Sets[side].Occupancy&CentralSquaresMask);
+    ret += PopCount(game->ChessSet.Sets[side].Occupancy&CentralSquaresMask);
   }
 
   return ret;

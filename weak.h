@@ -24,6 +24,7 @@
 #define WEAK_HEADER
 
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -46,8 +47,8 @@
 #define KISS_WARMUP_ROUNDS 100
 #define MAX_PIECE_LOCATION 10
 
-#define BIG    1E10
-#define SMALL -1E10
+#define BIG    INT_MAX
+#define SMALL -INT_MAX
 
 #define MAX_SEARCH_DEPTH 5
 
@@ -564,7 +565,7 @@ BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
 
 // eval.c
-double Eval(Game*);
+int Eval(Game*);
 
 // game.c
 CheckStats CalculateCheckStats(Game*);
