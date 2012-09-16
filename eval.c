@@ -27,7 +27,7 @@ static double weights[] = { 0, 10, 35, 35, 50, 90 };
 int
 Eval(Game *game)
 {
-  double ret = 0;
+  int ret = 0;
   Piece piece;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);

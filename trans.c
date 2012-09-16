@@ -32,7 +32,7 @@ static uint64_t      transSize  = 0;
 static uint8_t       generation = 0;
 
 static FORCE_INLINE TransEntry* firstEntry(uint64_t);
-static void         saveEntry(TransEntry*, uint16_t, uint8_t, uint32_t, uint16_t, uint16_t);
+static void         saveEntry(TransEntry*, uint16_t, uint8_t, uint32_t, QuickMove, int);
 
 void
 InitTrans()
@@ -47,7 +47,7 @@ LookupPosition(uint64_t key)
   TransEntry *entry = firstEntry(key);
   uint32_t innerKey = key >> 32;
 
-  for(i = 0; i < TRANS_CLUSTER_SIZE; i++) {
+  for(i = 0; i < TRANS_CLUSTER_SIZE; i++, entry++) {
     if(entry->Key32 == innerKey) {
       return entry;
     }
@@ -57,7 +57,7 @@ LookupPosition(uint64_t key)
 }
 
 void
-NextSearch()
+NextSearchTrans()
 {
   // We use generation to determine which entries relate to our current search or not.
   generation++;
@@ -70,7 +70,7 @@ ResizeTrans(uint64_t sizeMb)
 
   // We want size to be a multiple of 2, minimum 1kb.
   size = 1024;
-  while(C64(2) * size * sizeof(TransCluster) <= (sizeMb * 1024 * 1024)) {
+  while(C64(2) * size * sizeof(TransCluster) <= (sizeMb * C64(1024) * C64(1024))) {
     size *= 2;
   }
 
@@ -84,11 +84,11 @@ ResizeTrans(uint64_t sizeMb)
   }
 
   transSize = size;
-  clusters = allocateZero(transSize, sizeof(TransCluster));
+  clusters = allocateZero(sizeof(TransCluster), transSize);
 }
 
 void
-SavePosition(uint64_t key, uint16_t value, uint16_t quickMove, uint16_t depth)
+SavePosition(uint64_t key, int value, QuickMove quickMove, uint16_t depth)
 {
   int i, weight;
   TransEntry *entry, *replaceee;
@@ -125,16 +125,22 @@ SavePosition(uint64_t key, uint16_t value, uint16_t quickMove, uint16_t depth)
   saveEntry(replaceee, depth, generation, innerKey, quickMove, value);
 }
 
+void
+UpdateGeneration(TransEntry *entry)
+{
+  entry->Generation = generation;
+}
+
 static FORCE_INLINE
 TransEntry* firstEntry(uint64_t key)
 {
   // Use low 32 bits of key to determine the cluster.
-  return clusters[(uint32_t)key & (transSize-1)].Data;
+  return clusters[((uint32_t)key) & (transSize-1)].Data;
 }
 
 static void
 saveEntry(TransEntry *entry, uint16_t depth, uint8_t gen, uint32_t key32,
-          uint16_t quickMove, uint16_t value)
+          QuickMove quickMove, int value)
 {
   entry->Depth = depth;
   entry->Generation = gen;

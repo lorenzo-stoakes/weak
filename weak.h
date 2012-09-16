@@ -300,7 +300,7 @@ struct TransEntry {
   uint8_t  Generation;
   uint32_t Key32;
   uint16_t QuickMove;
-  uint16_t Value;
+  int      Value;
 };
 
 struct TransCluster {
@@ -676,7 +676,7 @@ void        InitTrans(void);
 TransEntry* LookupPosition(uint64_t);
 void        NextSearch(void);
 void        ResizeTrans(uint64_t);
-void        SavePosition(uint64_t, uint16_t, uint16_t, uint16_t);
+void        SavePosition(uint64_t, int, QuickMove, uint16_t);
 
 // util.c
 void*         allocate(size_t, size_t);
