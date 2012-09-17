@@ -19,8 +19,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define SHOW_LINES
-
+//#define SHOW_LINES
 //#define DISABLE_TRANS
 
 #if defined(SHOW_LINES)
@@ -33,7 +32,9 @@
 static int quiesce(Game*, int, int, uint64_t*);
 static int negaMax(Game*, int, int, int, uint64_t*, int);
 
+#if defined(SHOW_LINES)
 static Move lines[200][10];
+#endif
 
 Move
 Search(Game *game, uint64_t *count, int depth)
@@ -78,7 +79,7 @@ Search(Game *game, uint64_t *count, int depth)
       val = entry->Value;
     } else {
 #endif
-      val = -negaMax(game, SMALL, BIG, depth-1, count, i);      
+      val = -negaMax(game, SMALL, BIG, depth-1, count, i);
 #ifndef DISABLE_TRANS
       SavePosition(game->Hash, val, (QuickMove)move, depth);
     }
