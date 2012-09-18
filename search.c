@@ -138,11 +138,13 @@ Search(Game *game, uint64_t *count, int depth)
   }
 
 #if defined(SHOW_LINES)
-  for(i = depth-1; i >= 0; i--) {
-    printf("%s ", StringMove(lines[selectedLine][i]));
-  }
+  if(!stop) {
+    for(i = depth-1; i >= 0; i--) {
+      printf("%s ", StringMove(lines[selectedLine][i]));
+    }
 
-  printf("\n");
+    printf("\n");
+  }
 #endif
 
   return best;
@@ -159,6 +161,10 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 #ifndef DISABLE_TRANS
   TransEntry *entry;
 #endif
+
+  if(stop) {
+    return beta;
+  }
 
   if(depth == 0) {
     return quiesce(game, alpha, beta, count);
@@ -187,7 +193,9 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 #endif
       val = -negaMax(game, -beta, -alpha, depth-1, count, lineInd);
 #ifndef DISABLE_TRANS
-      SavePosition(game->Hash, val, (QuickMove)move, depth);
+      if(!stop) {
+        SavePosition(game->Hash, val, (QuickMove)move, depth);
+      }
     }
 #endif
 
@@ -224,6 +232,10 @@ quiesce(Game *game, int alpha, int beta, uint64_t *count)
   TransEntry *entry;
 #endif
 
+  if(stop) {
+    return beta;
+  }
+
   // Fail high.
   if(standPat >= beta) {
     return beta;
@@ -249,9 +261,11 @@ quiesce(Game *game, int alpha, int beta, uint64_t *count)
       val = entry->Value;
     } else {
 #endif
-    val = -quiesce(game, -beta, -alpha, count);
+      val = -quiesce(game, -beta, -alpha, count);
 #ifndef DISABLE_TRANS
-      SavePosition(game->Hash, val, (QuickMove)move, 0);
+      if(!stop) {
+        SavePosition(game->Hash, val, (QuickMove)move, 0);
+      }
     }
 #endif
 
