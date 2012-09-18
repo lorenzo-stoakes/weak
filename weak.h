@@ -51,7 +51,7 @@
 #define BIG    INT_MAX
 #define SMALL -INT_MAX
 
-#define MAX_SEARCH_DEPTH 5
+#define MAX_THINK_SECS 30
 
 #define TRANS_CLUSTER_SIZE 4
 
@@ -644,6 +644,7 @@ void     randk_seed(void);
 void     randk_warmup(int);
 
 // search.c
+Move IterSearch(Game*, uint64_t*, uint16_t);
 Move Search(Game*, uint64_t*, int);
 
 // set.c

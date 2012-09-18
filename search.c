@@ -22,11 +22,10 @@
 //#define SHOW_LINES
 //#define DISABLE_TRANS
 
-#if defined(SHOW_LINES)
 #include <stdio.h>
-#endif
+#include <unistd.h> // For sleep().
 
-#include <time.h>
+
 #include "weak.h"
 
 static int quiesce(Game*, int, int, uint64_t*);
@@ -35,6 +34,58 @@ static int negaMax(Game*, int, int, int, uint64_t*, int);
 #if defined(SHOW_LINES)
 static Move lines[200][10];
 #endif
+
+// TODO: Remove all these statics :'-(.
+static Move bestMove;
+static uint64_t *iterCount;
+static bool stop;
+
+static void*
+doIterSearch(void *gameVoid)
+{
+  int depth = 1;  
+  uint64_t currCount;
+  Move move;
+
+  Game *game = (Game*)gameVoid;
+
+  while(!stop) {
+    move = Search(game, &currCount, depth);
+    *iterCount += currCount;
+
+    if(!stop) {
+      bestMove = move;
+      printf("Depth %d, bestmove=%s.\n", depth, StringMove(bestMove));
+    }
+
+    depth++;
+  }
+
+  return NULL;
+}
+
+Move
+IterSearch(Game *game, uint64_t *count, uint16_t maxSeconds)
+{
+// TODO: Hackish.  
+
+  iterCount = count;
+
+  stop = false;
+
+  if(CreateThread(&doIterSearch, game)) {
+    panic("Error creating thread.");
+  }
+
+  sleep(maxSeconds);
+
+  stop = true;
+
+  // Allow the search to stop.
+  sleep(1);
+
+  return bestMove;
+}
 
 Move
 Search(Game *game, uint64_t *count, int depth)
