@@ -179,7 +179,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
     DoMove(game, move);
 
 #ifndef DISABLE_TRANS
-    if((entry = LookupPosition(game->Hash))) {
+    if((entry = LookupPosition(game->Hash)) && entry->Depth >= depth) {
       UpdateGeneration(entry);
       entry->QuickMove = (QuickMove)move;
       val = entry->Value;
