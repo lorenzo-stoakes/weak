@@ -100,9 +100,6 @@ Search(Game *game, uint64_t *count, int depth)
   Move best;
   Move *start = moves;
   Move *curr, *end;
-#ifndef DISABLE_TRANS
-  TransEntry *entry;
-#endif
 
   end = AllMoves(moves, game);
 
@@ -123,18 +120,7 @@ Search(Game *game, uint64_t *count, int depth)
     lines[i][depth-1] = move;
 #endif
 
-#ifndef DISABLE_TRANS
-    if((entry = LookupPosition(game->Hash))) {
-      UpdateGeneration(entry);
-      entry->QuickMove = (QuickMove)move;
-      val = entry->Value;
-    } else {
-#endif
-      val = -negaMax(game, SMALL, BIG, depth-1, count, i);
-#ifndef DISABLE_TRANS
-      SavePosition(game->Hash, val, (QuickMove)move, depth);
-    }
-#endif
+    val = -negaMax(game, SMALL, BIG, depth-1, count, i);
 
     if(val > max) {
       max = val;
