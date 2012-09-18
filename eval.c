@@ -19,14 +19,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "magic.h"
 #include "weak.h"
 
 static double weights[] = { 0, 10, 35, 35, 50, 90 };
+
+static int getCentreControl(Piece, BitBoard, Side, BitBoard);
 
 // Value of game position for white.
 int
 Eval(Game *game)
 {
+  ChessSet *chessSet = &game->ChessSet;
+  BitBoard occupancy = chessSet->Occupancy;
+  BitBoard pieceBoard;
+
   int ret = 0;
   Piece piece;
   Side side = game->WhosTurn;
@@ -38,11 +45,53 @@ Eval(Game *game)
     ret = SMALL;
   } else {
     for(piece = Pawn; piece <= Queen; piece++) {
-      ret += weights[piece]*PopCount(game->ChessSet.Sets[side].Boards[piece]);
-      ret -= weights[piece]*PopCount(game->ChessSet.Sets[opposite].Boards[piece]);
-    }
+      pieceBoard = chessSet->Sets[side].Boards[piece];
+      ret += weights[piece]*PopCount(pieceBoard);
+      ret += getCentreControl(piece, pieceBoard, side, occupancy);
 
-    ret += PopCount(game->ChessSet.Sets[side].Occupancy&CentralSquaresMask);
+      pieceBoard = chessSet->Sets[opposite].Boards[piece];
+      ret -= weights[piece]*PopCount(pieceBoard);
+      ret -= getCentreControl(piece, pieceBoard, opposite, occupancy);      
+    }
+  }
+
+  return ret;
+}
+
+static int
+getCentreControl(Piece piece, BitBoard pieceBoard, Side side, BitBoard occupancy)
+{
+  // Slow. We like control of the centre.  
+
+  int ret = 0;
+  Position pos;
+
+  while(pieceBoard) {
+    pos = PopForward(&pieceBoard);
+
+    switch(piece) {
+    case Pawn:
+      ret += PopCount(CentralSquaresMask&PawnAttacksFrom(pos, side));
+      break;
+    case Knight:
+      ret += PopCount(CentralSquaresMask&KnightAttacksFrom(pos));
+      break;
+    case Bishop:
+      ret += PopCount(CentralSquaresMask&BishopAttacksFrom(pos, occupancy));
+      break;
+    case Rook:
+      ret += PopCount(CentralSquaresMask&RookAttacksFrom(pos, occupancy));
+      break;
+    case Queen:
+      ret += PopCount(CentralSquaresMask&
+                      (RookAttacksFrom(pos, occupancy)|BishopAttacksFrom(pos, occupancy)));
+      break;
+    case King:
+      ret += PopCount(CentralSquaresMask&KingAttacksFrom(pos));
+      break;
+    default:
+      panic("Impossible.");
+    }
   }
 
   return ret;
