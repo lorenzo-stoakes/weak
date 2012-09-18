@@ -22,7 +22,7 @@
 #include "magic.h"
 #include "weak.h"
 
-static double weights[] = { 0, 10, 35, 35, 50, 90 };
+static double weights[] = { 0, 100, 350, 350, 500, 900 };
 
 static int getCentreControl(Piece, BitBoard, Side, BitBoard);
 
