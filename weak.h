@@ -672,6 +672,9 @@ char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
 
+// thread.c
+bool CreateThread(void *(*thread)(void*), void *);
+
 // trans.c
 void        InitTrans(void);
 TransEntry* LookupPosition(uint64_t);
