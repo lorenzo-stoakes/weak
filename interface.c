@@ -88,6 +88,9 @@ RunInterface(Game *game)
 
       if(command.Type == CmdMove) {
         DoMove(game, move);
+        if(isDrawnWon(game)) {
+          return;
+        }
       }
 
       puts(StringMoveFull(reply, fromPiece, capture));
