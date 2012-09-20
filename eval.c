@@ -34,28 +34,41 @@ Eval(Game *game)
   BitBoard occupancy = chessSet->Occupancy;
   BitBoard pieceBoard;
 
-  int ret = 0;
+  int them, us;
   Piece piece;
   Side side = game->WhosTurn;
   Side opposite = OPPOSITE(side);
 
   // Very basic evaluation for now.
 
-  if(Checkmated(game)) {
-    ret = SMALL;
-  } else {
-    for(piece = Pawn; piece <= Queen; piece++) {
-      pieceBoard = chessSet->Sets[side].Boards[piece];
-      ret += weights[piece]*PopCount(pieceBoard);
-      ret += getCentreControl(piece, pieceBoard, side, occupancy);
+  us = them = 0;
 
-      pieceBoard = chessSet->Sets[opposite].Boards[piece];
-      ret -= weights[piece]*PopCount(pieceBoard);
-      ret -= getCentreControl(piece, pieceBoard, opposite, occupancy);      
+  // Grade check mate as worth 15*queens for both sides.
+
+  // Material and central control.
+  for(piece = Pawn; piece <= Queen; piece++) {
+    pieceBoard = chessSet->Sets[side].Boards[piece];
+    us += weights[piece]*PopCount(pieceBoard);
+    us += getCentreControl(piece, pieceBoard, side, occupancy);
+
+    pieceBoard = chessSet->Sets[opposite].Boards[piece];
+    them += weights[piece]*PopCount(pieceBoard);
+    them += getCentreControl(piece, pieceBoard, opposite, occupancy);
+  }
+
+  if(Stalemated(game)) {
+    // If checkmate or unappealing draw, it is worth -15*queen.
+    if(Checked(game) || us - them > -900) {
+      us -= 13500;
+      them += 13500;
+    } else {
+      // If appealing draw, then that is worth +15*queen.
+      us += 13500;
+      them -= 13500;
     }
   }
 
-  return ret;
+  return us - them;
 }
 
 static int
