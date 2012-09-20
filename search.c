@@ -88,7 +88,7 @@ IterSearch(Game *game, uint64_t *count, uint16_t maxSeconds)
 }
 
 Move
-Search(Game *game, uint64_t *count, int depth)
+Search(Game *game, uint64_t *count, int *value, int depth)
 {
   int max, val;
   int i;
@@ -146,6 +146,8 @@ Search(Game *game, uint64_t *count, int depth)
     printf("\n");
   }
 #endif
+
+  *value = max;
 
   return best;
 }

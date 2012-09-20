@@ -646,7 +646,7 @@ void     randk_warmup(int);
 
 // search.c
 Move IterSearch(Game*, uint64_t*, uint16_t);
-Move Search(Game*, uint64_t*, int);
+Move Search(Game*, uint64_t*, int*, int);
 
 // set.c
 Set      NewBlackSet(void);
