@@ -59,6 +59,19 @@ RunInterface(Game *game)
       puts("Invalid command.");
 
       break;
+    case CmdAuto:
+      while(!isDrawnWon(game)) {
+        move = IterSearch(game, &count, MAX_THINK_SECS);
+
+        fromPiece = PieceAt(&game->ChessSet, FROM(move));
+        capture = PieceAt(&game->ChessSet, TO(move)) != MissingPiece;
+
+        puts(StringMoveFull(move, fromPiece, capture));        
+
+        DoMove(game, move);
+      }
+
+      return;
     case CmdAnalysis:
     case CmdMove:
       if(command.Type == CmdMove) {
