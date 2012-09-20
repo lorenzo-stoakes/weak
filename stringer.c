@@ -226,23 +226,36 @@ StringChessSet(ChessSet *chessSet)
 char*
 StringMove(Move move)
 {
-  char ret[5];
+  char ret[7];
+
+  sprintf(ret, "%s%s", StringPosition(FROM(move)),
+          StringPosition(TO(move)));
 
   switch(TYPE(move)) {
   case CastleKingSide:
     return strdup("O-O");
   case CastleQueenSide:
     return strdup("O-O-O");
+
+  case PromoteKnight:
+    sprintf(ret+4, "=N");
+    break;
+  case PromoteBishop:
+    sprintf(ret+4, "=B");
+    break;
+  case PromoteRook:
+    sprintf(ret+4, "=R");
+    break;
+  case PromoteQueen:
+    sprintf(ret+4, "=Q");
+    break;
   case Normal:
-    sprintf(ret, "%s%s", StringPosition(FROM(move)),
-            StringPosition(TO(move)));
-    return strdup(ret);
+    break;
   default:
     panic("Unrecognised move type %d.", TYPE(move));
   }
 
-  panic("Impossible.");
-  return '\0';
+  return strdup(ret);
 }
 
 // String move in long algebraic form.
