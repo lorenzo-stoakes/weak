@@ -44,18 +44,19 @@ static void*
 doIterSearch(void *gameVoid)
 {
   int depth = 1;
+  int val;
   uint64_t currCount;
   Move move;
 
   Game *game = (Game*)gameVoid;
 
   while(!stop) {
-    move = Search(game, &currCount, depth);
+    move = Search(game, &currCount, &val, depth);
     *iterCount += currCount;
 
     if(!stop) {
       bestMove = move;
-      printf("Depth %d, bestmove=%s.\n", depth, StringMove(bestMove));
+      fprintf(stderr, "Depth %d, bestmove=%s,val=%d.\n", depth, StringMove(bestMove), val);
     }
 
     depth++;
