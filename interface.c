@@ -83,8 +83,8 @@ RunInterface(Game *game)
       printf("%fms elapsed, considered %llu moves, %0.3f Mnps\n", 1000*elapsed, count,
              (count/1e6)/elapsed);
 
-      fromPiece = PieceAt(&game->ChessSet, FROM(reply));
-      capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
+      fromPiece = PieceAt(&game->ChessSet, FROM(move));
+      capture = PieceAt(&game->ChessSet, TO(move)) != MissingPiece;
 
       if(command.Type == CmdMove) {
         DoMove(game, move);
@@ -93,7 +93,7 @@ RunInterface(Game *game)
         }
       }
 
-      puts(StringMoveFull(reply, fromPiece, capture));
+      puts(StringMoveFull(move, fromPiece, capture));
 
       break;
     case CmdMoves:
