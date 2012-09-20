@@ -67,7 +67,7 @@ doIterSearch(void *gameVoid)
 Move
 IterSearch(Game *game, uint64_t *count, uint16_t maxSeconds)
 {
-// TODO: Hackish.  
+// TODO: Hackish.
 
   iterCount = count;
 
