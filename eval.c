@@ -61,7 +61,7 @@ Eval(Game *game)
 static int
 getCentreControl(Piece piece, BitBoard pieceBoard, Side side, BitBoard occupancy)
 {
-  // Slow. We like control of the centre.  
+  // Slow. We like control of the centre.
 
   int ret = 0;
   Position pos;
