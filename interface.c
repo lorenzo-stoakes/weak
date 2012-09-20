@@ -25,6 +25,8 @@
 
 #define INIT_BUFFER_LENGTH 100
 
+static bool isDrawnWon(Game*);
+
 void
 RunInterface(Game *game)
 {
@@ -67,17 +69,7 @@ RunInterface(Game *game)
 
         DoMove(game, command.Move);
 
-        if(Stalemated(game)) {
-          if(Checked(game)) {
-            if(game->WhosTurn == Black) {
-              puts("1-0");
-            } else {
-              puts("0-1");
-            }
-          } else {
-            puts("0.5-0.5");
-          }
-
+        if(isDrawnWon(game)) {
           return;
         }
       }
@@ -135,4 +127,24 @@ RunInterface(Game *game)
       return;
     }
   }
+}
+
+static bool
+isDrawnWon(Game *game)
+{
+  if(Stalemated(game)) {
+    if(Checked(game)) {
+      if(game->WhosTurn == Black) {
+        puts("1-0");
+      } else {
+        puts("0-1");
+      }
+    } else {
+      puts("0.5-0.5");
+    }
+
+    return true;
+  }
+
+  return false;
 }
