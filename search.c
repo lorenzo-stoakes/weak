@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <unistd.h> // For sleep().
 
-
 #include "weak.h"
 
 static int quiesce(Game*, int, int, uint64_t*);
