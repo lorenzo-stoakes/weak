@@ -37,7 +37,7 @@ RunInterface(Game *game)
   double elapsed;
   Move moves[INIT_MOVE_LEN];
   Move *curr, *end;
-  Move reply;
+  Move move;
   PerftStats stats;
   Piece fromPiece;
   size_t length = INIT_BUFFER_LENGTH;
@@ -77,7 +77,7 @@ RunInterface(Game *game)
       count = 0;
 
       ticks = clock();
-      reply = IterSearch(game, &count, MAX_THINK_SECS);
+      move = IterSearch(game, &count, MAX_THINK_SECS);
       ticks = clock() - ticks;
       elapsed = ((double)ticks)/CLOCKS_PER_SEC;
       printf("%fms elapsed, considered %llu moves, %0.3f Mnps\n", 1000*elapsed, count,
@@ -87,7 +87,7 @@ RunInterface(Game *game)
       capture = PieceAt(&game->ChessSet, TO(reply)) != MissingPiece;
 
       if(command.Type == CmdMove) {
-        DoMove(game, reply);
+        DoMove(game, move);
       }
 
       puts(StringMoveFull(reply, fromPiece, capture));
