@@ -24,7 +24,7 @@
 #include "weak.h"
 
 // TODO: Parameterise.
-#define DEFAULT_SIZE_MB 512
+#define DEFAULT_SIZE_MB 128
 
 //static uint8_t       generation = 0;
 static TransCluster* clusters   = NULL;
