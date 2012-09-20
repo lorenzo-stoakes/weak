@@ -95,7 +95,7 @@ Search(Game *game, uint64_t *count, int depth)
 #if defined(SHOW_LINES)
   int selectedLine = 0;
 #endif
-  Move move;
+  Move move = INVALID_MOVE;
   Move moves[INIT_MOVE_LEN];
   Move best;
   Move *start = moves;
