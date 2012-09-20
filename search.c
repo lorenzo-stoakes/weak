@@ -134,7 +134,11 @@ Search(Game *game, uint64_t *count, int *value, int depth)
     Unmove(game);
   }
 
-  if(best == INVALID_MOVE) {
+  if(stop) {
+    return INVALID_MOVE;
+  }
+
+  if(move == INVALID_MOVE) {
     panic("No move selected!");
   }
 
