@@ -43,7 +43,7 @@ static bool stop;
 static void*
 doIterSearch(void *gameVoid)
 {
-  int depth = 1;  
+  int depth = 1;
   uint64_t currCount;
   Move move;
 
