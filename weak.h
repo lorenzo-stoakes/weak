@@ -48,8 +48,8 @@
 #define KISS_WARMUP_ROUNDS 100
 #define MAX_PIECE_LOCATION 10
 
-#define BIG    INT_MAX
-#define SMALL -INT_MAX
+#define BIG   (INT_MAX-1)
+#define SMALL (-INT_MAX+1)
 
 #define MAX_THINK_SECS 30
 
