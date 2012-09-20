@@ -108,7 +108,7 @@ Search(Game *game, uint64_t *count, int depth)
   // Iterate through all moves looking for the best, whose definition
   // varies based on who's turn it is.
 
-  max = SMALL;
+  max = -INT_MAX;
   best = INVALID_MOVE;
 
   for(i = 0, curr = start; curr != end; i++, curr++) {
