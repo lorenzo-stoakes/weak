@@ -96,6 +96,7 @@ enum CastleSide {
 
 enum CommandType {
   CmdAnalysis,
+  CmdAuto,
   CmdBoard,
   CmdInvalid,
   CmdMove,

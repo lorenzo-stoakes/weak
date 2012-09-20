@@ -32,6 +32,8 @@ ParseCommand(char *str)
   // All rather horrible and hacky and leaky. TODO: Clean up.
   if(strcmp(str, "analysis\n") == 0) {
     ret.Type = CmdAnalysis;
+  } else if(strcmp(str, "auto\n") == 0) {
+    ret.Type = CmdAuto;
   } else if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
     ret.Type = CmdBoard;
   } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
@@ -39,7 +41,7 @@ ParseCommand(char *str)
     ret.PerftDepth = atoi(str+6);
   } else if(len >= 11 && strcmp(strndup(str, 10), "perftfull ") == 0) {
     ret.Type = CmdPerftFull;
-    ret.PerftDepth = atoi(str+10);    
+    ret.PerftDepth = atoi(str+10);
   } else if(len >= 13 && strcmp(strndup(str, 13), "position fen ") == 0) {
     ret.Type = CmdPositionFen;
     ret.Fen = strdup(str+13);
