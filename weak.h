@@ -118,7 +118,6 @@ enum File {
   FileH = 7
 };
 
-
 enum Piece {
   MissingPiece,
   Pawn,
