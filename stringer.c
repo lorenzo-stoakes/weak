@@ -322,7 +322,7 @@ StringMoveFull(Move move, Piece piece, bool capture)
 }
 
 char*
-StringMoveHistory(MemorySlice *history)
+StringMoveHistory(MemorySlice *history, bool abbrev)
 {
   Move move;
   Memory *curr;
@@ -333,18 +333,22 @@ StringMoveHistory(MemorySlice *history)
   for(curr = history->Vals; curr != history->Curr; curr++) {
     move = curr->Move;
 
-    switch(side) {
-    case White:
-      AppendString(&builder, "%d. %s",
-                   fullMoveCount, StringMove(move));
-      break;
-    case Black:
-      AppendString(&builder, " %s\n",
-                   StringMove(move));
+    if(abbrev) {
+      AppendString(&builder, "%s ", StringMove(move));      
+    } else {
+      switch(side) {
+      case White:
+        AppendString(&builder, "%d. %s",
+                     fullMoveCount, StringMove(move));
+        break;
+      case Black:
+        AppendString(&builder, " %s\n",
+                     StringMove(move));
 
-      fullMoveCount++;
+        fullMoveCount++;
 
-      break;
+        break;
+      }
     }
 
     side = OPPOSITE(side);
