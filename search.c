@@ -25,6 +25,7 @@
 // Examine node by node.
 #define EXPLAIN
 //#define EXPLAIN_OUTPUT
+
 #include <stdio.h>
 #include <unistd.h> // For sleep().
 
