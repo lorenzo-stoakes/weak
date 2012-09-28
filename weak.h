@@ -224,6 +224,7 @@ typedef enum Piece           Piece;
 typedef enum Position        Position;
 typedef enum Rank            Rank;
 typedef enum File            File;
+typedef struct SearchNode    SearchNode;
 typedef struct Set           Set;
 typedef enum Side            Side;
 typedef struct StringBuilder StringBuilder;
@@ -282,6 +283,19 @@ struct Game {
   uint64_t    Hash;
   MemorySlice Memories;
   Side        WhosTurn, HumanSide;
+};
+
+struct SearchNode {
+  int          Alpha, Beta, Depth, Value;
+  bool         BetaPruned, Quiesce, Stopped, TransHit;
+
+  // Kept in sync.
+  SearchNode **Children;
+  SearchNode **CurrChild;
+  Move        *Moves;
+  Move        *CurrMove;
+
+  Side        Side;
 };
 
 struct PerftStats {
