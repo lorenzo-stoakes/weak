@@ -48,7 +48,7 @@ TestMatesInTwo()
 {
   char *fen;
   Game game;
-  int i;
+  int i, dummyVal;
   Move actual, expected;
   uint64_t dummy = 0;
 
@@ -59,7 +59,7 @@ TestMatesInTwo()
     expected = ParseMove(mates[i]);
 
     game = ParseFen(fen);
-    actual = Search(&game, &dummy, 3);
+    actual = Search(&game, &dummy, &dummyVal, 3);    
 
     if(actual != expected) {
       AppendString(&builder, "Search failed mate-in-two for:-\n\n"

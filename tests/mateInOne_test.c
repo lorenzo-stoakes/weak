@@ -48,7 +48,7 @@ TestMatesInOne()
 {
   char *fen;
   Game game;
-  int i;
+  int i, dummyVal;
   Move actual, expected;
   uint64_t dummy = 0;
 
@@ -59,7 +59,7 @@ TestMatesInOne()
     expected = ParseMove(mates[i]);
 
     game = ParseFen(fen);
-    actual = Search(&game, &dummy, 1);
+    actual = Search(&game, &dummy, &dummyVal, 1);
 
     if(actual != expected) {
       AppendString(&builder, "Search failed mate-in-one for:-\n\n"
