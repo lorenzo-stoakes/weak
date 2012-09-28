@@ -51,7 +51,7 @@
 #define BIG   (INT_MAX-1)
 #define SMALL (-INT_MAX+1)
 
-#define MAX_THINK_SECS 30
+#define MAX_THINK_SECS 1
 
 #define TRANS_CLUSTER_SIZE 4
 
