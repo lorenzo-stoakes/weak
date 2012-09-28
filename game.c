@@ -1277,7 +1277,7 @@ checkConsistency(Game *game, BitBoard checks, BitBoard modelChecks)
 
   AppendString(&builder, "\nMove History:-\n\n"
                "%s",
-               StringMoveHistory(&game->Memories));
+               StringMoveHistory(&game->Memories, false));
 
   return BuildString(&builder, true);
 }
