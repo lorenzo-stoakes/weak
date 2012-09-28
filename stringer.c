@@ -226,7 +226,8 @@ StringChessSet(ChessSet *chessSet)
 char*
 StringMove(Move move)
 {
-  char ret[7];
+  char ret[10];
+
   if(move == INVALID_MOVE || TYPE(move) == InvalidMoveType) {
     return strdup("-");
   }
@@ -255,7 +256,7 @@ StringMove(Move move)
   case Normal:
     break;
   default:
-    panic("Unrecognised move type %d.", TYPE(move));
+    sprintf(ret+4, "??%d", TYPE(move));
   }
 
   return strdup(ret);
