@@ -227,6 +227,9 @@ char*
 StringMove(Move move)
 {
   char ret[7];
+  if(move == INVALID_MOVE || TYPE(move) == InvalidMoveType) {
+    return strdup("-");
+  }
 
   sprintf(ret, "%s%s", StringPosition(FROM(move)),
           StringPosition(TO(move)));
