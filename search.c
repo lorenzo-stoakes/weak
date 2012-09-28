@@ -125,7 +125,7 @@ doIterSearch(void *gameVoid)
 Move
 IterSearch(Game *game, uint64_t *count, uint16_t maxSeconds)
 {
-// TODO: Hackish.
+  // TODO: Hackish.
 
   iterCount = count;
 
@@ -139,7 +139,7 @@ IterSearch(Game *game, uint64_t *count, uint16_t maxSeconds)
 
   stop = true;
 
-  // Allow the search to stop.
+  // Allow the search to stop. TODO: Remove this hacktasticness.
   sleep(1);
 
   return bestMove;
@@ -183,8 +183,7 @@ Search(Game *game, uint64_t *count, int *value, int depth)
 
   *count = end-start;
 
-  // Iterate through all moves looking for the best, whose definition
-  // varies based on who's turn it is.
+  // Iterate through all moves looking for the best scoring one.
 
   max = -INT_MAX;
   best = INVALID_MOVE;
