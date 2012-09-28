@@ -33,6 +33,9 @@ Eval(Game *game)
   ChessSet *chessSet = &game->ChessSet;
   BitBoard occupancy = chessSet->Occupancy;
   BitBoard pieceBoard;
+  // Use a very rough heuristic to see whether we're in the endgame, if so we don't care
+  // about control of the centre.
+  int centreMult = PopCount(chessSet->Occupancy) <= 10 ? 0 : 1;
 
   int them, us;
   Piece piece;
@@ -49,22 +52,22 @@ Eval(Game *game)
   for(piece = Pawn; piece <= Queen; piece++) {
     pieceBoard = chessSet->Sets[side].Boards[piece];
     us += weights[piece]*PopCount(pieceBoard);
-    us += getCentreControl(piece, pieceBoard, side, occupancy);
+    us += centreMult*getCentreControl(piece, pieceBoard, side, occupancy);
 
     pieceBoard = chessSet->Sets[opposite].Boards[piece];
     them += weights[piece]*PopCount(pieceBoard);
-    them += getCentreControl(piece, pieceBoard, opposite, occupancy);
+    them += centreMult*getCentreControl(piece, pieceBoard, opposite, occupancy);
   }
 
   if(Stalemated(game)) {
-    // If checkmate or unappealing draw, it is worth -15*queen.
-    if(Checked(game) || us - them > -900) {
+    // If checkmate, worth -15*queen, on both sides.
+    if(Checked(game)) {
       us -= 13500;
       them += 13500;
     } else {
-      // If appealing draw, then that is worth +15*queen.
-      us += 13500;
-      them -= 13500;
+      // If draw, then that is worth -8*queen.
+      us -= 7200;
+      them += 7200;
     }
   }
 
