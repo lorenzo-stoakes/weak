@@ -667,7 +667,7 @@ char* StringBitBoard(BitBoard);
 char* StringChessSet(ChessSet*);
 char* StringMove(Move);
 char* StringMoveFull(Move, Piece, bool);
-char* StringMoveHistory(MemorySlice*);
+char* StringMoveHistory(MemorySlice*, bool);
 char* StringPerft(PerftStats*);
 char* StringPiece(Piece);
 char* StringPosition(Position);
