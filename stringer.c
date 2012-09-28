@@ -269,6 +269,10 @@ StringMoveFull(Move move, Piece piece, bool capture)
   char *suffix, *from, *to;
   char ret[1+2+1+2+2+1];
 
+  if(move == INVALID_MOVE || TYPE(move) == InvalidMoveType) {
+    return strdup("-");
+  }
+
   from = StringPosition(FROM(move));
   to = StringPosition(TO(move));
 
