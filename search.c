@@ -283,7 +283,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
   if(stop) {
 #if defined(EXPLAIN)
     node->Stopped = true;
-    node->Value = alpha;
+    node->Value   = alpha;
 #endif
 
     return alpha;
