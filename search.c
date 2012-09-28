@@ -529,7 +529,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
     }
 
     if(val > alpha) {
-      val = alpha;
+      alpha = val;
     }
   }
 
