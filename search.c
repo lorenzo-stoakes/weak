@@ -622,7 +622,7 @@ stringNode(SearchNode *node)
     AppendString(&builder, "t");
   }
 
-  AppendString(&builder, "] ");
+  AppendString(&builder, "]");
 
   return BuildString(&builder, true);
 }
