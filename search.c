@@ -54,6 +54,7 @@ newNode(int alpha, int beta, int depth, Side side, SearchNode *parent)
   node->Alpha      = alpha;
   node->Beta       = beta;
   node->Depth      = depth;
+  node->AlphaBeat  = false;
   node->BetaPruned = false;
   node->Quiesce    = false;
   node->Stopped    = false;
@@ -400,6 +401,12 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
     if(val > alpha) {
       alpha = val;
+
+#if defined(EXPLAIN)
+      node->CurrChild--;
+      (*node->CurrChild)->AlphaBeat = true;
+      node->CurrChild++;
+#endif
     }
 
     // Fail high.
@@ -530,6 +537,12 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
 
     if(val > alpha) {
       alpha = val;
+
+#if defined(EXPLAIN)
+      node->CurrChild--;
+      (*node->CurrChild)->AlphaBeat = true;
+      node->CurrChild++;
+#endif
     }
   }
 
@@ -588,12 +601,16 @@ stringNode(SearchNode *node)
     AppendString(&builder, "%d", node->Beta);
   }
 
-  if(node->Quiesce || node->BetaPruned || node->Stopped || node->TransHit) {
+  if(node->Quiesce || node->AlphaBeat || node->BetaPruned || node->Stopped ||
+     node->TransHit) {
     AppendString(&builder, " ");
   }
 
   if(node->Quiesce) {
     AppendString(&builder, "Q");
+  }
+  if(node->AlphaBeat) {
+    AppendString(&builder, "a");
   }
   if(node->BetaPruned) {
     AppendString(&builder, "b");
