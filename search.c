@@ -297,7 +297,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
     *node->CurrMove = INVALID_MOVE;
 #endif
 
-    val = quiesce(game, alpha, beta, 0, count
+    val = quiesce(game, alpha, beta, -1, count
 #if defined(EXPLAIN)
                   , node
 #endif
