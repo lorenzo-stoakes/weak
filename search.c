@@ -574,7 +574,7 @@ stringNode(SearchNode *node)
     AppendString(&builder, "%s ", StringMove(prevMoves[i]));
   }
 
-  AppendString(&builder, "(%d) [", node->Value);
+  AppendString(&builder, "(%d%c) [", node->Value, node->Side == White ? 'w' : 'b');
 
   if(node->Alpha == SMALL) {
     AppendString(&builder, "- ");
