@@ -286,7 +286,7 @@ struct Game {
 
 struct SearchNode {
   int          Alpha, Beta, Depth, Value;
-  bool         BetaPruned, Quiesce, Stopped, TransHit;
+  bool         AlphaBeat, BetaPruned, Quiesce, Stopped, TransHit;
 
   // Kept in sync.
   SearchNode **Children;
