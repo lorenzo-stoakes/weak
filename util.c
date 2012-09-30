@@ -166,14 +166,14 @@ NewStringBuilder()
 }
 
 PackedMoves
-PackMoveHistory(MemorySlice *history)
+PackMoveHistory(MemorySlice *history, int offset)
 {
   Memory *curr;
   Move move;
   PackedMoves ret = newPackedMoves();
 
   int i;
-  int count = history->Curr - history->Vals;
+  int count = history->Curr - history->Vals - offset;
   int index;
   int packSize = count/4;
   int target;
@@ -187,7 +187,7 @@ PackMoveHistory(MemorySlice *history)
   ret.Count = count;
   ret.Moves = allocate(sizeof(uint64_t), packSize);
 
-  for(curr = history->Vals, index = 0; curr < history->Curr; curr += 4, index++) {
+  for(curr = history->Vals + offset, index = 0; curr < history->Curr; curr += 4, index++) {
     packed = 0;
     target = count < 4 ? count : 4;
 

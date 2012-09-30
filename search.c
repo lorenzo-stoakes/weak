@@ -50,7 +50,7 @@ static int negaMax(Game*, int, int, int, uint64_t*, int
 #if defined(EXPLAIN)
 static void        correctDepth(int, SearchNode*);
 static void        doExplain(int, SearchNode*);
-static SearchNode* newNode(int, int, int, Side, SearchNode*, MemorySlice*);
+static SearchNode* newNode(int, int, int, Side, SearchNode*, MemorySlice*, int);
 static void        allocateChildren(SearchNode*, size_t);
 
 #endif
@@ -63,10 +63,11 @@ static Move lines[MAX_LINES][MAX_DEPTH];
 #endif
 
 // TODO: Remove all these statics :'-(.
-static Move bestMove;
+static Move     bestMove;
 static uint64_t *iterCount;
-static bool stop;
-static int currDepth;
+static bool     stop;
+static int      currDepth;
+static int      historyOffset;
 
 static void*
 doIterSearch(void *gameVoid)
@@ -128,7 +129,7 @@ Search(Game *game, uint64_t *count, int *value, int depth)
   Move *curr, *end;
 
 #if defined(EXPLAIN)
-  SearchNode *node = newNode(SMALL, BIG, depth, game->WhosTurn, NULL, NULL);
+  SearchNode *node = newNode(SMALL, BIG, depth, game->WhosTurn, NULL, NULL, 0);
 #endif
 
 #if defined(SHOW_LINES)
@@ -144,7 +145,8 @@ Search(Game *game, uint64_t *count, int *value, int depth)
   }
 #endif
 
-  currDepth = depth;
+  currDepth     = depth;
+  historyOffset = game->Memories.Curr - game->Memories.Vals;
 
   end = AllMoves(moves, game);
 
@@ -248,7 +250,8 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
 #if defined(EXPLAIN)
   // Set initial values here in case we are stopped.
-  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode, &game->Memories);
+  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode, &game->Memories,
+                             historyOffset);
 #endif
 
   if(stop) {
@@ -333,7 +336,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
 #if defined(EXPLAIN)
       *node->CurrChild = newNode(-beta, -alpha, depth-1, game->WhosTurn, node,
-                                 &game->Memories);
+                                 &game->Memories, historyOffset);
       node->CurrChild--;
       (*node->CurrChild)->TransHit = true;
       node->CurrChild++;
@@ -421,7 +424,8 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
 
 #if defined(EXPLAIN)
   // Set initial values here in case we are stopped.
-  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode, &game->Memories);
+  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode,
+                             &game->Memories, historyOffset);
   node->Quiesce = true;
 #endif
 
@@ -473,7 +477,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
 
 #if defined(EXPLAIN)
       *node->CurrChild = newNode(-beta, -alpha, depth-1, game->WhosTurn, node,
-                                 &game->Memories);
+                                 &game->Memories, historyOffset);
       node->CurrChild--;
       (*node->CurrChild)->TransHit = true;
       node->CurrChild++;
@@ -691,7 +695,8 @@ doExplain(int depth, SearchNode *root)
 }
 
 static SearchNode*
-newNode(int alpha, int beta, int depth, Side side, SearchNode *parent, MemorySlice *history)
+newNode(int alpha, int beta, int depth, Side side, SearchNode *parent, MemorySlice *history,
+        int offset)
 {
   SearchNode *node = allocateZero(sizeof(SearchNode), 1);
 
@@ -701,7 +706,7 @@ newNode(int alpha, int beta, int depth, Side side, SearchNode *parent, MemorySli
   node->Side       = side;
 
   if(history != NULL) {
-    node->MoveHistory = PackMoveHistory(history);
+    node->MoveHistory = PackMoveHistory(history, offset);
   }
 
   if(parent != NULL) {

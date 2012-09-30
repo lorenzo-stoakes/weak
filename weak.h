@@ -727,7 +727,7 @@ char*         BuildString(StringBuilder*, bool);
 int           Max(int, int);
 List*         NewList(void);
 StringBuilder NewStringBuilder(void);
-PackedMoves   PackMoveHistory(MemorySlice*);
+PackedMoves   PackMoveHistory(MemorySlice*, int);
 void*         PopBack(List*);
 void*         PopFront(List*);
 void          PushBack(List*, void*);
