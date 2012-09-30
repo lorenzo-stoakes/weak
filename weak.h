@@ -304,7 +304,7 @@ struct Game {
 
 struct SearchNode {
   int          Alpha, Beta, Depth, Value;
-  bool         AlphaBeat, BetaPruned, Quiesce, Stopped, TransHit;
+  bool         AlphaBeat, BetaPruned, Leaf, Quiesce, Stopped, TransHit;
 
   PackedMoves  MoveHistory;
 

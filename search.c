@@ -263,6 +263,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
   if(stop) {
 #if defined(EXPLAIN)
+    node->Leaf    = true;
     node->Stopped = true;
     node->Value   = alpha;
 #endif
@@ -272,6 +273,8 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
   if(depth == 0) {
 #if defined(EXPLAIN)
+    node->Leaf = true;
+
     // One child for quiescing!
     allocateChildren(node, 1);
     // Mark with invalid move.
@@ -298,6 +301,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
     val = Eval(game);
 
 #if defined(EXPLAIN)
+    node->Leaf  = true;
     node->Value = val;
 #endif
 
@@ -395,6 +399,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 #if defined(EXPLAIN)
       node->CurrChild--;
       (*node->CurrChild)->BetaPruned = true;
+      (*node->CurrChild)->Leaf       = true;
       node->CurrChild++;
 
       node->Value = beta;
@@ -438,6 +443,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
 
   if(stop) {
 #if defined(EXPLAIN)
+    node->Leaf    = true;
     node->Stopped = true;
     node->Value   = beta;
 #endif
@@ -448,6 +454,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
   // Fail high.
   if(standPat >= beta) {
 #if defined(EXPLAIN)
+    node->Leaf       = true;
     node->BetaPruned = true;
     node->Value      = beta;
 #endif
@@ -510,6 +517,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
 #if defined(EXPLAIN)
       node->CurrChild--;
       (*node->CurrChild)->BetaPruned = true;
+      (*node->CurrChild)->Leaf       = true;
       node->CurrChild++;
 
       node->Value = beta;
@@ -585,7 +593,7 @@ stringNode(SearchNode *node)
   }
 
   if(node->Quiesce || node->AlphaBeat || node->BetaPruned || node->Stopped ||
-     node->TransHit) {
+     node->TransHit || node->Leaf) {
     AppendString(&builder, " ");
   }
 
@@ -603,6 +611,9 @@ stringNode(SearchNode *node)
   }
   if(node->TransHit) {
     AppendString(&builder, "t");
+  }
+  if(node->Leaf) {
+    AppendString(&builder, "L");    
   }
 
   AppendString(&builder, "]");
