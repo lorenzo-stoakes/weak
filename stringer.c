@@ -240,7 +240,6 @@ StringMove(Move move)
     return strdup("O-O");
   case CastleQueenSide:
     return strdup("O-O-O");
-
   case PromoteKnight:
     sprintf(ret+4, "=N");
     break;
