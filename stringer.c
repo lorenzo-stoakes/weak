@@ -228,7 +228,7 @@ StringMove(Move move)
 {
   char ret[10];
 
-  if(move == INVALID_MOVE || TYPE(move) == InvalidMoveType) {
+  if(move == INVALID_MOVE) {
     return strdup("-");
   }
 
@@ -270,7 +270,7 @@ StringMoveFull(Move move, Piece piece, bool capture)
   char *suffix, *from, *to;
   char ret[1+2+1+2+2+1];
 
-  if(move == INVALID_MOVE || TYPE(move) == InvalidMoveType) {
+  if(move == INVALID_MOVE) {
     return strdup("-");
   }
 
