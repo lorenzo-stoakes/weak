@@ -554,7 +554,7 @@ stringNode(SearchNode *node)
   StringBuilder builder = NewStringBuilder();
 
   Move *moves = UnpackMoveHistory(&node->MoveHistory, true);
-  for(i = 0; i < node->MoveHistory.Count; i++) {
+  for(i = 0; i < node->Depth; i++) {
     AppendString(&builder, "%s ", StringMove(moves[i]));
   }
   release(moves);
