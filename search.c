@@ -123,7 +123,7 @@ Search(Game *game, uint64_t *count, int *value, int depth)
   Move *curr, *end;
 
 #if defined(EXPLAIN)
-  SearchNode *node = newNode(SMALL, BIG, depth, game->WhosTurn, NULL);
+  SearchNode *node = newNode(SMALL, BIG, depth, game->WhosTurn, NULL, NULL);
 #endif
 
 #if defined(SHOW_LINES)
@@ -243,7 +243,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
 #if defined(EXPLAIN)
   // Set initial values here in case we are stopped.
-  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode);
+  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode, &game->Memories);
 #endif
 
   if(stop) {
@@ -327,7 +327,8 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
       val = entry->Value;
 
 #if defined(EXPLAIN)
-      *node->CurrChild = newNode(-beta, -alpha, depth-1, game->WhosTurn, node);
+      *node->CurrChild = newNode(-beta, -alpha, depth-1, game->WhosTurn, node,
+                                 &game->Memories);
       node->CurrChild--;
       (*node->CurrChild)->TransHit = true;
       node->CurrChild++;
@@ -415,7 +416,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
 
 #if defined(EXPLAIN)
   // Set initial values here in case we are stopped.
-  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode);
+  SearchNode *node = newNode(alpha, beta, depth, game->WhosTurn, parentNode, &game->Memories);
   node->Quiesce = true;
 #endif
 
@@ -466,7 +467,8 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
       val = entry->Value;
 
 #if defined(EXPLAIN)
-      *node->CurrChild = newNode(-beta, -alpha, depth-1, game->WhosTurn, node);
+      *node->CurrChild = newNode(-beta, -alpha, depth-1, game->WhosTurn, node,
+                                 &game->Memories);
       node->CurrChild--;
       (*node->CurrChild)->TransHit = true;
       node->CurrChild++;
@@ -539,8 +541,6 @@ correctDepth(int depth, SearchNode *node)
   }
 }
 
-static Move prevMoves[100];
-
 #if defined(EXPLAIN_OUTPUT)
 static char*
 stringNode(SearchNode *node)
@@ -548,9 +548,11 @@ stringNode(SearchNode *node)
   int i;
   StringBuilder builder = NewStringBuilder();
 
-  for(i = 0; i < node->Depth; i++) {
-    AppendString(&builder, "%s ", StringMove(prevMoves[i]));
+  Move *moves = UnpackMoveHistory(&node->MoveHistory, true);
+  for(i = 0; i < node->MoveHistory.Count; i++) {
+    AppendString(&builder, "%s ", StringMove(moves[i]));
   }
+  release(moves);
 
   AppendString(&builder, "(%d%c) [", node->Value, node->Side == White ? 'w' : 'b');
 
@@ -597,13 +599,8 @@ static uint64_t betaPruneCount, nodeCount, qBetaPruneCount, quiesceCount, stopCo
   transHitCount;
 
 static void
-walk(SearchNode *node)
+updateCounts(SearchNode *node)
 {
-  SearchNode *child;
-  SearchNode **childPtr = node->Children;
-  Move *movePtr = node->Moves;
-  Move move;
-
   if(!node->Quiesce) {
     nodeCount++;
   }
@@ -630,13 +627,19 @@ walk(SearchNode *node)
 #endif
 
   while(childPtr && (child = *childPtr++)) {
-    if(movePtr) {
-      move = *movePtr++;
-    } else {
-      move = INVALID_MOVE;
-    }
-    prevMoves[child->Depth-1] = move;
+static void
+walk(SearchNode *node)
+{
+  SearchNode *child;
+  SearchNode **childPtr = node->Children;
 
+  updateCounts(node);
+
+#if defined(EXPLAIN_OUTPUT)
+  printf("EXPLAIN: %s\n", stringNode(node));
+#endif
+
+  while(childPtr && (child = *childPtr++)) {
     walk(child);
   }
 }
