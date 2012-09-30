@@ -24,6 +24,11 @@
 
 // Examine node by node.
 #define EXPLAIN
+
+// Use breadth-first search.
+#define BREADTH_EXPLAIN
+
+// Output EXPLAIN: xxx for every node.
 //#define EXPLAIN_OUTPUT
 
 #include <stdio.h>
@@ -621,12 +626,34 @@ updateCounts(SearchNode *node)
   if(node->TransHit) {
     transHitCount++;
   }
+}
+
+#if defined(BREADTH_EXPLAIN)
+static List *nodeList;
+
+static void
+walk(SearchNode *node)
+{
+  SearchNode *child;
+  SearchNode **childPtr = node->Children;
+
+  updateCounts(node);
 
 #if defined(EXPLAIN_OUTPUT)
   printf("EXPLAIN: %s\n", stringNode(node));
 #endif
 
   while(childPtr && (child = *childPtr++)) {
+    PushFront(nodeList, child);
+  }
+
+  while(nodeList->Count > 0) {
+    child = PopBack(nodeList);
+
+    walk(child);
+  }
+}
+#else
 static void
 walk(SearchNode *node)
 {
@@ -643,11 +670,16 @@ walk(SearchNode *node)
     walk(child);
   }
 }
+#endif
 
 static void
 doExplain(int depth, SearchNode *root)
 {
   printf("EXPLAIN: Search results for depth %d:-\n", depth);
+
+#if defined(BREADTH_EXPLAIN)
+  nodeList = NewList();
+#endif
 
   walk(root);
 
