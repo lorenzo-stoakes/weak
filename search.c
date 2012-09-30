@@ -43,45 +43,10 @@ static int negaMax(Game*, int, int, int, uint64_t*, int
                    );
 
 #if defined(EXPLAIN)
-static void correctDepth(int, SearchNode*);
-static void doExplain(int, SearchNode*);
-
-static SearchNode*
-newNode(int alpha, int beta, int depth, Side side, SearchNode *parent)
-{
-  SearchNode *node = allocate(sizeof(SearchNode), 1);
-
-  node->Alpha      = alpha;
-  node->Beta       = beta;
-  node->Depth      = depth;
-  node->AlphaBeat  = false;
-  node->BetaPruned = false;
-  node->Quiesce    = false;
-  node->Stopped    = false;
-  node->TransHit   = false;
-  node->Children   = NULL;
-  node->CurrChild  = NULL;
-  node->Moves      = NULL;
-  node->CurrMove   = NULL;
-  node->Side       = side;
-
-  if(parent != NULL) {
-    *parent->CurrChild++ = node;
-  }
-
-  return node;
-}
-
-static void
-allocateChildren(SearchNode *node, size_t size)
-{
-  // +1 so we can null-terminate.
-  node->Children  = allocateZero(sizeof(SearchNode*), size+1);
-  node->CurrChild = node->Children;
-
-  node->Moves    = allocateZero(sizeof(Move), size+1);
-  node->CurrMove = node->Moves;
-}
+static void        correctDepth(int, SearchNode*);
+static void        doExplain(int, SearchNode*);
+static SearchNode* newNode(int, int, int, Side, SearchNode*, MemorySlice*);
+static void        allocateChildren(SearchNode*, size_t);
 
 #endif
 
@@ -688,6 +653,38 @@ doExplain(int depth, SearchNode *root)
          nodeCount, betaPruneCount, quiesceCount, qBetaPruneCount, stopCount, transHitCount);
 
   puts("EXPLAIN: Done.");
+}
+
+static SearchNode*
+newNode(int alpha, int beta, int depth, Side side, SearchNode *parent, MemorySlice *history)
+{
+  SearchNode *node = allocateZero(sizeof(SearchNode), 1);
+
+  node->Alpha      = alpha;
+  node->Beta       = beta;
+  node->Depth      = depth;
+  node->Side       = side;
+
+  if(history != NULL) {
+    node->MoveHistory = PackMoveHistory(history);
+  }
+
+  if(parent != NULL) {
+    *parent->CurrChild++ = node;
+  }
+
+  return node;
+}
+
+static void
+allocateChildren(SearchNode *node, size_t size)
+{
+  // +1 so we can null-terminate.
+  node->Children  = allocateZero(sizeof(SearchNode*), size+1);
+  node->CurrChild = node->Children;
+
+  node->Moves    = allocateZero(sizeof(Move), size+1);
+  node->CurrMove = node->Moves;
 }
 
 #endif
