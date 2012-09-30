@@ -218,7 +218,7 @@ typedef struct ListNode      ListNode;
 typedef uint16_t             QuickMove;
 typedef struct Memory        Memory;
 typedef struct MemorySlice   MemorySlice;
-typedef uint64_t             Move;
+typedef uint16_t             Move;
 typedef struct MoveSlice     MoveSlice;
 typedef enum MoveType        MoveType;
 typedef struct PerftStats    PerftStats;
