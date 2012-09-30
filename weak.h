@@ -212,6 +212,8 @@ typedef struct ChessSet      ChessSet;
 typedef struct Command       Command;
 typedef enum CommandType     CommandType;
 typedef struct Game          Game;
+typedef struct List          List;
+typedef struct ListNode      ListNode;
 typedef uint16_t             QuickMove;
 typedef struct Memory        Memory;
 typedef struct MemorySlice   MemorySlice;
@@ -240,6 +242,17 @@ struct Command {
   Move        Move;
   int         PerftDepth;
   char        *Fen;
+};
+
+struct List {
+  ListNode *Head, *Tail;
+  uint64_t Count;
+};
+
+struct ListNode {
+  void     *Item;
+  ListNode *Prev, *Next;
+  List     *List;
 };
 
 struct MemorySlice {
@@ -705,7 +718,12 @@ void          panic(char*, ...);
 void          AppendString(StringBuilder *, char*, ...);
 char*         BuildString(StringBuilder*, bool);
 int           Max(int, int);
+List*         NewList(void);
 StringBuilder NewStringBuilder(void);
+void*         PopBack(List*);
+void*         PopFront(List*);
+void          PushBack(List*, void*);
+void          PushFront(List*, void*);
 void          ReleaseStringBuilder(StringBuilder*);
 void          SetUnbufferedOutput(void);
 

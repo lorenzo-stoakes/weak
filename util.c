@@ -29,7 +29,8 @@
 
 #define INIT_BUILDER_SIZE 10
 
-static void expandBuilder(StringBuilder*);
+static void        expandBuilder(StringBuilder*);
+static ListNode*   newListNode(List*, ListNode*, ListNode*, void*);
 
 // Wrapper for malloc. We might change the implementation later.
 void*
@@ -137,6 +138,18 @@ Max(int a, int b)
   return a >= b ? a : b;
 }
 
+List*
+NewList()
+{
+  List *ret = allocate(sizeof(List), 1);
+
+  ret->Count = 0;
+  ret->Head = NULL;
+  ret->Tail = NULL;
+
+  return ret;
+}
+
 StringBuilder
 NewStringBuilder()
 {
@@ -149,6 +162,92 @@ NewStringBuilder()
   ret.strings = (char**)allocate(sizeof(char*), INIT_BUILDER_SIZE);
 
   return ret;
+}
+
+void*
+PopBack(List *list)
+{
+  ListNode *prev;
+  void *ret;
+
+  assert(list != NULL);
+  assert(list->Count > 0);
+  assert(list->Head);
+  assert(list->Tail);
+
+  ret = list->Tail->Item;
+  prev = list->Tail->Prev;
+  release(list->Tail);
+  list->Tail = prev;
+
+  if(list->Count == 1) {
+    list->Head = NULL;
+  }
+
+  list->Count--;
+
+  return ret;
+}
+
+void*
+PopFront(List *list)
+{
+  ListNode *next;
+  void *ret;
+
+  assert(list != NULL);
+  assert(list->Count > 0);
+  assert(list->Head);
+  assert(list->Tail);
+
+  ret = list->Head->Item;
+  next = list->Head->Next;
+  release(list->Head);
+  list->Head = next;
+
+  if(list->Count == 1) {
+    list->Tail = NULL;
+  }
+
+  list->Count--;
+
+  return ret;
+}
+
+void
+PushFront(List *list, void *item)
+{
+  ListNode *node = newListNode(list, NULL, list->Head, item);
+
+  assert(list != NULL);
+
+  if(list->Count == 0) {
+    list->Tail = node;
+  } else {
+    list->Head->Prev = node;
+  }
+
+  list->Head = node;
+
+  list->Count++;
+}
+
+void
+PushBack(List *list, void *item)
+{
+  ListNode *node = newListNode(list, list->Tail, NULL, item);
+
+  assert(list != NULL);
+
+  if(list->Count == 0) {
+    list->Head = node;
+  } else {
+    list->Tail->Next = node;
+  }
+
+  list->Tail = node;
+
+  list->Count++;
 }
 
 void
@@ -179,4 +278,17 @@ expandBuilder(StringBuilder *builder)
   memcpy(buffer, builder->strings, builder->len*sizeof(char*));
   release(builder->strings);
   builder->strings = buffer;
+}
+
+static ListNode*
+newListNode(List* list, ListNode* prev, ListNode* next, void* item)
+{
+  ListNode *ret = allocate(sizeof(ListNode), 1);
+
+  ret->List = list;
+  ret->Prev = prev;
+  ret->Next = next;
+  ret->Item = item;
+
+  return ret;
 }
