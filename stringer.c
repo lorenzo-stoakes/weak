@@ -253,6 +253,9 @@ StringMove(Move move)
   case PromoteQueen:
     sprintf(ret+4, "=Q");
     break;
+  case EnPassant:
+    sprintf(ret+4, "ep");
+    break;
   case Normal:
     break;
   default:
