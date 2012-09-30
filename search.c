@@ -179,6 +179,13 @@ Search(Game *game, uint64_t *count, int *value, int depth)
     if(val > max) {
       max = val;
       best = move;
+
+#if defined(EXPLAIN)
+      node->CurrChild--;
+      (*node->CurrChild)->AlphaBeat = true;
+      node->CurrChild++;
+#endif
+
 #if defined(SHOW_LINES)
       selectedLine = i;
 #endif
