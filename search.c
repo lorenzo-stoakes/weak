@@ -158,7 +158,7 @@ Search(Game *game, uint64_t *count, int *value, int depth)
 
   // Iterate through all moves looking for the best scoring one.
 
-  max = -INT_MAX;
+  max  = -INT_MAX;
   best = INVALID_MOVE;
 
   for(i = 0, curr = start; curr != end; i++, curr++) {
@@ -432,7 +432,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
   if(stop) {
 #if defined(EXPLAIN)
     node->Stopped = true;
-    node->Value = beta;
+    node->Value   = beta;
 #endif
 
     return beta;
