@@ -31,6 +31,7 @@
 
 static void        expandBuilder(StringBuilder*);
 static ListNode*   newListNode(List*, ListNode*, ListNode*, void*);
+static PackedMoves newPackedMoves(void);
 
 // Wrapper for malloc. We might change the implementation later.
 void*
@@ -164,6 +165,44 @@ NewStringBuilder()
   return ret;
 }
 
+PackedMoves
+PackMoveHistory(MemorySlice *history)
+{
+  Memory *curr;
+  Move move;
+  PackedMoves ret = newPackedMoves();
+
+  int i;
+  int count = history->Curr - history->Vals;
+  int index;
+  int packSize = count/4;
+  int target;
+
+  uint64_t packed;
+
+  if(packSize == 0) {
+    packSize = 1;
+  }
+
+  ret.Count = count;
+  ret.Moves = allocate(sizeof(uint64_t), packSize);
+
+  for(curr = history->Vals, index = 0; curr < history->Curr; curr += 4, index++) {
+    packed = 0;
+    target = count < 4 ? count : 4;
+
+    for(i = 0; i < target; i++) {
+      move = curr[i].Move;
+      packed |= ((uint64_t)move<<(i*16));
+    }
+
+    ret.Moves[index] = packed;
+    count -= 4;
+  }
+
+  return ret;
+}
+
 void*
 PopBack(List *list)
 {
@@ -268,6 +307,33 @@ SetUnbufferedOutput()
   setbuf(stdout, NULL);
 }
 
+Move*
+UnpackMoveHistory(PackedMoves* packed, bool releasePackedMoves)
+{
+  int i, index, j, target;
+  uint64_t packedVal;
+
+  // +1 to zero-terminate.
+  Move *ret = allocateZero(sizeof(Move), packed->Count+1);
+
+  index = 0;
+  for(i = 0; i < packed->Count; i++) {
+    packedVal = packed->Moves[i];
+    target = packed->Count - i*4 < 4 ? packed->Count - i*4 : 4;
+
+    for(j = 0; j < target; index++, j++) {
+      ret[index] = packedVal&((1<<16)-1);
+      packedVal >>= 16;
+    }
+  }
+
+  if(releasePackedMoves) {
+    release(packed->Moves);
+  }
+
+  return ret;
+}
+
 static void
 expandBuilder(StringBuilder *builder)
 {
@@ -289,6 +355,17 @@ newListNode(List* list, ListNode* prev, ListNode* next, void* item)
   ret->Prev = prev;
   ret->Next = next;
   ret->Item = item;
+
+  return ret;
+}
+
+static PackedMoves
+newPackedMoves()
+{
+  PackedMoves ret;
+
+  ret.Count = 0;
+  ret.Moves = NULL;
 
   return ret;
 }

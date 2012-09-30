@@ -210,6 +210,7 @@ typedef enum CastleSide      CastleSide;
 typedef struct CheckStats    CheckStats;
 typedef struct ChessSet      ChessSet;
 typedef struct Command       Command;
+typedef struct PackedMoves   PackedMoves;
 typedef enum CommandType     CommandType;
 typedef struct Game          Game;
 typedef struct List          List;
@@ -242,6 +243,11 @@ struct Command {
   Move        Move;
   int         PerftDepth;
   char        *Fen;
+};
+
+struct PackedMoves {
+  uint64_t *Moves;
+  int       Count;
 };
 
 struct List {
@@ -300,6 +306,8 @@ struct Game {
 struct SearchNode {
   int          Alpha, Beta, Depth, Value;
   bool         AlphaBeat, BetaPruned, Quiesce, Stopped, TransHit;
+
+  PackedMoves  MoveHistory;
 
   // Kept in sync.
   SearchNode **Children;
@@ -720,12 +728,14 @@ char*         BuildString(StringBuilder*, bool);
 int           Max(int, int);
 List*         NewList(void);
 StringBuilder NewStringBuilder(void);
+PackedMoves   PackMoveHistory(MemorySlice*);
 void*         PopBack(List*);
 void*         PopFront(List*);
 void          PushBack(List*, void*);
 void          PushFront(List*, void*);
 void          ReleaseStringBuilder(StringBuilder*);
 void          SetUnbufferedOutput(void);
+Move*         UnpackMoveHistory(PackedMoves*, bool);
 
 // Array containing BitBoard of positions between two specified squares, as long as
 // they are on the same rank/file/diagonal. This is exclusive of the from and to squares.
