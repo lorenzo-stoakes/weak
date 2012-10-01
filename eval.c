@@ -28,7 +28,7 @@ static int getCentreControl(Piece, BitBoard, Side, BitBoard);
 
 // Value of game position for white.
 int
-Eval(Game *game)
+Eval(Game *game, int moveCount)
 {
   ChessSet *chessSet = &game->ChessSet;
   BitBoard occupancy = chessSet->Occupancy;
@@ -63,7 +63,8 @@ Eval(Game *game)
     // If checkmate, worth -15*queen, on both sides.
     if(Checked(game)) {
       us -= 13500;
-      them += 13500;
+      // We prefer quicker checkmates.
+      them += 13500 - moveCount;
     } else {
       // If draw, then that is worth -8*queen.
       us -= 7200;

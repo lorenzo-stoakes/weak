@@ -294,7 +294,7 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 
   // If no moves available, all we can do is eval. Stalemate or checkmate.
   if(end == moves) {
-    val = Eval(game);
+    val = Eval(game, currDepth-depth);
 
 #if defined(EXPLAIN)
     node->Leaf  = true;
@@ -401,7 +401,7 @@ quiesce(Game *game, int alpha, int beta, int depth, uint64_t *count
         )
 {
   int val;
-  int standPat = Eval(game);
+  int standPat = Eval(game, currDepth-depth);
   Move buffer[INIT_MOVE_LEN];
   Move move;
   Move *end;

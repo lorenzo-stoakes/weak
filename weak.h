@@ -617,7 +617,7 @@ BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
 
 // eval.c
-int Eval(Game*);
+int Eval(Game*, int);
 
 // game.c
 CheckStats CalculateCheckStats(Game*);
