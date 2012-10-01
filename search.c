@@ -189,6 +189,7 @@ Search(Game *game, uint64_t *count, int *value, int depth)
 
 #if defined(SHOW_LINES)
       selectedLine = i;
+      lines[i][0] = move;
 #endif
     }
 
