@@ -213,18 +213,14 @@ Search(Game *game, uint64_t *count, int *value, int depth)
 
 #if defined(SHOW_LINES)
   if(!stop) {
-    printf("Line %d selected.\n", selectedLine);
-
-    for(i = 0; i < end - start; i++) {
-      printf("%d: ", i);
-
-      for(j = 0; j < depth; j++) {
-        printf("%s ", StringMove(lines[i][j]));
       }
 
-      printf("\n");
+    for(i = 0; i < depth; i++) {
+      printf("%s ", StringMove(lines[selectedLine][i]));
     }
+    printf("\n");
   }
+    
 #endif
 
   *value = max;
