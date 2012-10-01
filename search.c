@@ -60,6 +60,7 @@ static void        allocateChildren(SearchNode*, size_t);
 #define MAX_DEPTH 50
 
 static Move lines[MAX_LINES][MAX_DEPTH];
+static int  depths[MAX_LINES];
 #endif
 
 // TODO: Remove all these statics :'-(.
@@ -213,7 +214,11 @@ Search(Game *game, uint64_t *count, int *value, int depth)
 
 #if defined(SHOW_LINES)
   if(!stop) {
+    if(depths[selectedLine] > 0) {
+      for(i = depth - depths[selectedLine]; i < MAX_DEPTH; i++) {
+        lines[selectedLine][i] = INVALID_MOVE;
       }
+    }
 
     for(i = 0; i < depth; i++) {
       printf("%s ", StringMove(lines[selectedLine][i]));
@@ -240,12 +245,6 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
   Move moves[INIT_MOVE_LEN];
   Move *start = moves;
   Move *curr, *end;
-#if defined(SHOW_LINES)
-  int i, j;
-  int64_t offset;
-  MemorySlice *history = &game->Memories;
-  Memory *currMem;
-#endif
 
 #ifndef DISABLE_TRANS
   TransEntry *entry;
@@ -301,22 +300,6 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
     node->Value = val;
 #endif
 
-#if defined(SHOW_LINES)
-    if(val > alpha && val <= beta) {
-      offset = history->Curr - history->Vals;
-      offset -= currDepth - depth;
-
-      for(currMem = history->Vals + offset, i = 0;
-          currMem != history->Curr && i < currDepth - depth; currMem++, i++) {
-        lines[lineInd][i] = currMem->Move;
-      }
-
-      for(i = currDepth - depth; i < currDepth; i++) {
-        lines[lineInd][i] = INVALID_MOVE;
-      }
-    }
-#endif
-
     return val;
   }
 
@@ -348,16 +331,13 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
       (*node->CurrChild)->TransHit = true;
       node->CurrChild++;
 #endif
-
     } else {
 #endif
-
       val = -negaMax(game, -beta, -alpha, depth-1, count, lineInd
 #if defined(EXPLAIN)
                    , node
 #endif
                     );
-
 #ifndef DISABLE_TRANS
       if(!stop) {
         SavePosition(game->Hash, val, (QuickMove)move, depth);
@@ -366,29 +346,12 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 #endif
 
 #if defined(SHOW_LINES)
-    if(depth == 1 && val > alpha && val < beta) {
-      offset = (history->Curr - history->Vals) - 1;
-      offset -= currDepth - depth;
-
-      j = 0;
-      for(currMem = history->Vals + offset; currMem != history->Curr; currMem++) {
-        lines[lineInd][j] = currMem->Move;
-        j++;
-      }
+    if(val > alpha && val < beta && !AnyMoves(game)) {
+        depths[lineInd] = depth-1;
     }
 #endif
 
     Unmove(game);
-
-    if(val > alpha) {
-      alpha = val;
-
-#if defined(EXPLAIN)
-      node->CurrChild--;
-      (*node->CurrChild)->AlphaBeat = true;
-      node->CurrChild++;
-#endif
-    }
 
     // Fail high.
     if(val >= beta) {
@@ -402,6 +365,20 @@ negaMax(Game *game, int alpha, int beta, int depth, uint64_t *count, int lineInd
 #endif
 
       return beta;
+    }
+
+    if(val > alpha) {
+      alpha = val;
+
+#if defined(SHOW_LINES)
+      lines[lineInd][currDepth-depth] = move;
+#endif
+
+#if defined(EXPLAIN)
+      node->CurrChild--;
+      (*node->CurrChild)->AlphaBeat = true;
+      node->CurrChild++;
+#endif
     }
   }
 
