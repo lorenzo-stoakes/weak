@@ -23,46 +23,6 @@
 #include <string.h>
 #include "weak.h"
 
-Command
-ParseCommand(char *str)
-{
-  Command ret;
-  int len = strlen(str);
-  Move move;
-  // All rather horrible and hacky and leaky. TODO: Clean up.
-  if(strcmp(str, "analysis\n") == 0) {
-    ret.Type = CmdAnalysis;
-  } else if(strcmp(str, "auto\n") == 0) {
-    ret.Type = CmdAuto;
-  } else if(strcmp(str, "b\n") == 0 || strcmp(str, "board\n") == 0) {
-    ret.Type = CmdBoard;
-  } else if(len >= 7 && strcmp(strndup(str, 6), "perft ") == 0) {
-    ret.Type = CmdPerft;
-    ret.PerftDepth = atoi(str+6);
-  } else if(len >= 11 && strcmp(strndup(str, 10), "perftfull ") == 0) {
-    ret.Type = CmdPerftFull;
-    ret.PerftDepth = atoi(str+10);
-  } else if(len >= 13 && strcmp(strndup(str, 13), "position fen ") == 0) {
-    ret.Type = CmdPositionFen;
-    ret.Fen = strdup(str+13);
-  } else if(strcmp(str, "q\n") == 0 || strcmp(str, "quit\n") == 0) {
-    ret.Type = CmdQuit;
-  } else if(strcmp(str, "moves\n") == 0) {
-    ret.Type = CmdMoves;
-  } else {
-    move = ParseMove(str);
-
-    if(move == INVALID_MOVE) {
-      ret.Type = CmdInvalid;
-    } else {
-      ret.Type = CmdMove;
-      ret.Move = move;
-    }
-  }
-
-  return ret;
-}
-
 // Parse a FEN string into a game object.
 // See http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
 Game

@@ -20,17 +20,32 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include "weak.h"
 
 int
-main()
+main(int argc, char **argv)
 {
   Game game;
+  uint64_t perftVal;
+  int depth;
 
   SetUnbufferedOutput();
 
-  printf("Weak %s.\n\n", version);
+  if(argc == 2 && strcmp(argv[1], "--version") == 0) {
+      printf("Weak %s.\n", version);
+      return EXIT_SUCCESS;
+  }
+
+  if(argc < 3) {
+    fprintf(stderr, "Usage: %s [fen] [depth]\n", argv[0]);
+    return EXIT_FAILURE;
+  }
+
+  if(!(depth = atoi(argv[2]))) {
+    fprintf(stderr, "Invalid depth '%s'.\n", argv[2]);
+  }
 
   // Initialise prng.
   randk_seed();
@@ -38,8 +53,11 @@ main()
 
   InitEngine();
 
-  game = NewGame(false, White);
-  RunInterface(&game);
+  game = ParseFen(argv[1]);
 
-  return 0;
+  perftVal = QuickPerft(&game, depth);
+
+  printf("%llu\n", perftVal);
+
+  return EXIT_SUCCESS;
 }

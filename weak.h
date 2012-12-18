@@ -93,19 +93,6 @@ enum CastleSide {
   QueenSide
 };
 
-enum CommandType {
-  CmdAnalysis,
-  CmdAuto,
-  CmdBoard,
-  CmdInvalid,
-  CmdMove,
-  CmdMoves,
-  CmdPerft,
-  CmdPerftFull,
-  CmdPositionFen,
-  CmdQuit
-};
-
 enum File {
   FileA = 0,
   FileB = 1,
@@ -207,9 +194,7 @@ typedef enum CastleEvent     CastleEvent;
 typedef enum CastleSide      CastleSide;
 typedef struct CheckStats    CheckStats;
 typedef struct ChessSet      ChessSet;
-typedef struct Command       Command;
 typedef struct PackedMoves   PackedMoves;
-typedef enum CommandType     CommandType;
 typedef struct Game          Game;
 typedef struct List          List;
 typedef struct ListNode      ListNode;
@@ -224,7 +209,6 @@ typedef enum Piece           Piece;
 typedef enum Position        Position;
 typedef enum Rank            Rank;
 typedef enum File            File;
-typedef struct SearchNode    SearchNode;
 typedef struct Set           Set;
 typedef enum Side            Side;
 typedef struct StringBuilder StringBuilder;
@@ -234,13 +218,6 @@ typedef struct TransEntry    TransEntry;
 struct CheckStats {
   BitBoard CheckSquares[7], CheckSources, Discovered, Pinned;
   Position DefendedKing, AttackedKing;
-};
-
-struct Command {
-  CommandType Type;
-  Move        Move;
-  int         PerftDepth;
-  char        *Fen;
 };
 
 struct PackedMoves {
@@ -299,21 +276,6 @@ struct Game {
   uint64_t    Hash;
   MemorySlice Memories;
   Side        WhosTurn, HumanSide;
-};
-
-struct SearchNode {
-  int          Alpha, Beta, Depth, Value;
-  bool         AlphaBeat, BetaPruned, Leaf, Quiesce, Stopped, TransHit;
-
-  PackedMoves  MoveHistory;
-
-  // Kept in sync.
-  SearchNode **Children;
-  SearchNode **CurrChild;
-  Move        *Moves;
-  Move        *CurrMove;
-
-  Side        Side;
 };
 
 struct PerftStats {
@@ -615,9 +577,6 @@ bool     PositionOccupied(BitBoard, Position);
 BitBoard Rotate90AntiClockwise(BitBoard);
 BitBoard Rotate90Clockwise(BitBoard);
 
-// eval.c
-int Eval(Game*, int);
-
 // game.c
 CheckStats CalculateCheckStats(Game*);
 bool       Checked(Game*);
@@ -637,9 +596,6 @@ void       Unmove(Game*);
 uint64_t HashGame(Game*);
 void     InitZobrist(void);
 
-// interface.c
-void RunInterface(Game*);
-
 // magic.c
 void InitMagics(void);
 
@@ -651,7 +607,6 @@ Move* CastleMoves(Game*, Move*);
 Move* Evasions(Move*, Game*);
 
 // parser.c
-Command ParseCommand(char*);
 Game    ParseFen(char*);
 Move    ParseMove(char*);
 
@@ -675,10 +630,6 @@ BitBoard PawnAttacksFrom(Position, Side);
 uint64_t randk(void);
 void     randk_seed(void);
 void     randk_warmup(int);
-
-// search.c
-Move IterSearch(Game*, uint64_t*, uint16_t);
-Move Search(Game*, uint64_t*, int*, int);
 
 // set.c
 Set      NewBlackSet(void);
