@@ -1,5 +1,5 @@
 /*
-  Weak, a chess engine derived from Stockfish.
+  Weak, a chess perft calculator derived from Stockfish.
 
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
   Copyright (C) 2008-2012 Marco Costalba, Joona Kiiski, Tord Romstad (Stockfish authors)
