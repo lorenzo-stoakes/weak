@@ -337,7 +337,7 @@ StringMoveHistory(MemorySlice *history, bool abbrev)
     move = curr->Move;
 
     if(abbrev) {
-      AppendString(&builder, "%s ", StringMove(move));      
+      AppendString(&builder, "%s ", StringMove(move));
     } else {
       switch(side) {
       case White:

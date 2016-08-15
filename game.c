@@ -435,7 +435,7 @@ GivesCheck(Game *game, Move move)
 void
 InitEngine()
 {
-  InitTrans();    
+  InitTrans();
   InitZobrist();
   InitKing();
   InitKnight();
@@ -832,7 +832,7 @@ Unmove(Game *game)
   game->EnPassantSquare = memory.EnPassantSquare;
 
   if(game->EnPassantSquare != EmptyPosition) {
-    game->Hash ^= ZobristEnPassantFileHash[FILE(game->EnPassantSquare)];    
+    game->Hash ^= ZobristEnPassantFileHash[FILE(game->EnPassantSquare)];
   }
 
   castleEvent = memory.CastleEvent;
