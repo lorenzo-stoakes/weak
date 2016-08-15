@@ -23,6 +23,7 @@
 
 #include "weak.h"
 
+#ifdef USE_THREAD
 bool
 CreateThread(void *(*thread)(void*), void *arg)
 {
@@ -39,3 +40,4 @@ CreateThread(void *(*thread)(void*), void *arg)
 
   return !!pthread_create(&posixThreadId, &attr, thread, arg);
 }
+#endif

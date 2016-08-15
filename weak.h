@@ -656,8 +656,10 @@ char* StringPiece(Piece);
 char* StringPosition(Position);
 char* StringSide(Side);
 
+#ifdef USE_THREAD
 // thread.c
 bool CreateThread(void *(*thread)(void*), void *);
+#endif
 
 // trans.c
 void        InitTrans(void);
