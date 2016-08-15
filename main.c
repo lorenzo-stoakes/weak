@@ -43,8 +43,9 @@ main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  if(!(depth = atoi(argv[2]))) {
+  if((depth = atoi(argv[2])) < 1) {
     fprintf(stderr, "Invalid depth '%s'.\n", argv[2]);
+    return EXIT_FAILURE;
   }
 
   // Initialise prng.
