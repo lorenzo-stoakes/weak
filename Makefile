@@ -1,6 +1,4 @@
-CC=gcc-4.7
-
-COMMON_FLAGS=-g -pedantic -Wall -Werror -Wextra -Wpacked -Wshadow -std=c99 -m64 -O3 #-ltcmalloc
+COMMON_FLAGS=-g -D_GNU_SOURCE -pedantic -Wall -Werror -Wextra -Wpacked -Wshadow -std=c99 -m64 -O3 -lpthread
 
 CFLAGS=$(COMMON_FLAGS) -DNDEBUG -fomit-frame-pointer
 DEBUG_FLAGS=$(COMMON_FLAGS)

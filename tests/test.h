@@ -23,7 +23,6 @@
 #define TEST_HEADER
 
 #include <stdio.h>
-#include <strings.h>
 
 #include "../weak.h"
 

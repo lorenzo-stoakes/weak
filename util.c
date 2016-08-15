@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 #include "weak.h"
 
 // We violate naming convention here for familiarity-with-go's sake. :-) TODO: Fix.

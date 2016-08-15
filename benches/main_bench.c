@@ -20,7 +20,6 @@
 */
 
 #include <stdio.h>
-#include <strings.h>
 #include <time.h>
 #include "bench.h"
 
