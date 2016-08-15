@@ -1,4 +1,4 @@
-COMMON_FLAGS=-g -D_GNU_SOURCE -pedantic -Wall -Werror -Wextra -Wpacked -Wshadow -std=c99 -m64 -O3
+COMMON_FLAGS=-g -D_GNU_SOURCE -pedantic -Wall -Werror -Wextra -Wpacked -Wshadow -std=c99 -m64 -O3 -Wno-format
 
 CFLAGS=$(COMMON_FLAGS) -DNDEBUG -fomit-frame-pointer
 DEBUG_FLAGS=$(COMMON_FLAGS)
