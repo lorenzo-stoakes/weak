@@ -302,7 +302,7 @@ DoMove(Game *game, Move move)
 
 #ifndef NDEBUG
   if((msg = checkConsistency(game, checks, modelChecks)) != NULL) {
-    printf("Inconsistency in %s's DoMove of %s at doMoveCount %llu:-\n\n",
+    printf("Inconsistency in %s's DoMove of %s at doMoveCount %lu:-\n\n",
            StringSide(side),
            StringMoveFull(move, piece, capturePiece != MissingPiece),
            doMoveCount);
@@ -855,10 +855,10 @@ Unmove(Game *game)
       game->Hash ^= ZobristCastlingHash[Black][QueenSide];
     }
   }
-  
+
 #ifndef NDEBUG
   if((msg = checkConsistency(game, EmptyBoard, EmptyBoard)) != NULL) {
-    printf("Inconsistency in %s's Unmove of %s at unmoveCount %llu:-\n\n",
+    printf("Inconsistency in %s's Unmove of %s at unmoveCount %lu:-\n\n",
            StringSide(side),
            StringMoveFull(move, piece, capturePiece != MissingPiece),
            unmoveCount);

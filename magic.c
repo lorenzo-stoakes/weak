@@ -56,7 +56,7 @@ InitMagics()
       currThreats = BishopThreatBase[from][index];
 
       if(currThreats != EmptyBoard && currThreats != threats) {
-        panic("Invalid magic for bishops in position %s, index %llu. Have threats:-\n"
+        panic("Invalid magic for bishops in position %s, index %lu. Have threats:-\n"
               "%s\n"
               "But already have:-\n"
               "%s\n"
@@ -88,7 +88,7 @@ InitMagics()
       currThreats = RookThreatBase[from][index];
 
       if(currThreats != EmptyBoard && currThreats != threats) {
-        panic("Invalid magic for rooks in position %s, index %llu. Have threats:-\n"
+        panic("Invalid magic for rooks in position %s, index %lu. Have threats:-\n"
               "%s\n"
               "But already have:-\n"
               "%s\n"

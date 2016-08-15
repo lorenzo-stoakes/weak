@@ -366,13 +366,13 @@ StringPerft(PerftStats *s)
   char ret[1000];
 
   sprintf(ret, ""
-          "Count:       %llu\n"
-          "Captures:    %llu\n"
-          "En Passants: %llu\n"
-          "Castles:     %llu\n"
-          "Promotions:  %llu\n"
-          "Checks:      %llu\n"
-          "Checkmates:  %llu\n",
+          "Count:       %lu\n"
+          "Captures:    %lu\n"
+          "En Passants: %lu\n"
+          "Castles:     %lu\n"
+          "Promotions:  %lu\n"
+          "Checks:      %lu\n"
+          "Checkmates:  %lu\n",
           s->Count, s->Captures, s->EnPassants, s->Castles, s->Promotions, s->Checks,
           s->Checkmates);
 

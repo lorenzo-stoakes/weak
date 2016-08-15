@@ -57,7 +57,7 @@ main(int argc, char **argv)
 
   perftVal = QuickPerft(&game, depth);
 
-  printf("%llu\n", perftVal);
+  printf("%lu\n", perftVal);
 
   return EXIT_SUCCESS;
 }

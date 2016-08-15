@@ -109,11 +109,11 @@ TestPerft()
       actual = Perft(&game, j);
 
       // Always output count so it's easy to eyeball errors early.
-      printf(" [%llu]\n", actual.Count);
+      printf(" [%lu]\n", actual.Count);
 
       if(actual.Count != expected.Count) {
         passed = false;
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu nodes, got %llu.\n",
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu nodes, got %lu.\n",
                 i+1, j, expected.Count, actual.Count);
         printError(tmp);
         AppendString(&builder, tmp);
@@ -123,7 +123,7 @@ TestPerft()
       /*
 
       if(actual.Captures != expected.Captures) {
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu captures, got %llu.\n",
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu captures, got %lu.\n",
                 i+1, j, expected.Captures, actual.Captures);
         AppendString(&builder, tmp);
       }
@@ -131,42 +131,42 @@ TestPerft()
       */
 
       if(actual.EnPassants != expected.EnPassants) {
-        passed = false;        
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu en passants, got %llu.\n",
+        passed = false;
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu en passants, got %lu.\n",
                 i+1, j, expected.EnPassants, actual.EnPassants);
-        printError(tmp);        
+        printError(tmp);
         AppendString(&builder, tmp);
       }
 
       if(actual.Castles != expected.Castles) {
-        passed = false;        
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu castles, got %llu.\n",
+        passed = false;
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu castles, got %lu.\n",
                 i+1, j, expected.Castles, actual.Castles);
-        printError(tmp);        
+        printError(tmp);
         AppendString(&builder, tmp);
       }
 
       if(actual.Promotions != expected.Promotions) {
-        passed = false;        
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu pawn promotions, got %llu.\n",
+        passed = false;
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu pawn promotions, got %lu.\n",
                 i+1, j, expected.Promotions, actual.Promotions);
-        printError(tmp);        
+        printError(tmp);
         AppendString(&builder, tmp);
       }
 
       if(actual.Checks != expected.Checks) {
-        passed = false;        
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu checks, got %llu.\n",
+        passed = false;
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu checks, got %lu.\n",
                 i+1, j, expected.Checks, actual.Checks);
-        printError(tmp);        
+        printError(tmp);
         AppendString(&builder, tmp);
       }
 
       if(actual.Checkmates != expected.Checkmates) {
-        passed = false;        
-        sprintf(tmp, "Perft Position %d Depth %d: Expected %llu checkmates, got %llu.\n",
+        passed = false;
+        sprintf(tmp, "Perft Position %d Depth %d: Expected %lu checkmates, got %lu.\n",
                 i+1, j, expected.Checkmates, actual.Checkmates);
-        printError(tmp);        
+        printError(tmp);
         AppendString(&builder, tmp);
       }
 
